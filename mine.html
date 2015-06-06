@@ -25,16 +25,16 @@ img, button{
 img.displayed {
     display: block;
   margin-left:auto;
-  margin-right:auto; 
+  margin-right:auto;
 }
 .gameSpace {
 	width : 480px;
 	background-color: white;
 	padding-top : 10px;
   margin-left:auto;
-  margin-right:auto; 
+  margin-right:auto;
 }
-p { 
+p {
   text-align : center;
 }
 .copyright {
@@ -46,12 +46,12 @@ div#difficultity {
 	</style>
 </head>
 <body onload="drawBoard(9,9,10)">
-	
+
 
 <div class="gameSpace">
-	
+
 	<h1 align="center">Land Mine Mapper v0.1</h1>
-	
+
 <div class="difficultity" align="center"><input type="submit" value="Easy" onclick="drawBoard(9,9,10)"></button>
 <input type="submit" onclick="drawBoard(16,16,40)" value="Harder"></button>
 <input type="submit" onclick="drawBoard(16,30,99)" value="Hardest"></button></div>
@@ -73,14 +73,13 @@ div#difficultity {
 
 <div class="copyright">
 <p>Game Information:</p>
-<p>Produced by Alan Rominger, 2015, strictly for learning purposes. 
-All images were made in Paint from scratch. Reuse whatever you want. 
-I relinquish all copyright to the maximum extent that the law allows.</p>
+<p>Produced by Alan Rominger, 2015, strictly for learning purposes.
+All images were made in Paint from scratch. Reuse whatever you want.</p>
 
 <p>Philosophy:</p>
 <p>The tiles of this game are created in a table, intentionally avoiding
 a canvas element, so all the interactions
-are coded to the page elements individually. That means you should 
+are coded to the page elements individually. That means you should
 experience some slowdown when using the "hardest" mode.</p>
 </div>
 
