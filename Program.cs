@@ -20,9 +20,9 @@ public class entry : IEquatable<entry>, IComparable<entry>
     {
         return name1.CompareTo(name2);
     }
-    public int CompareTo(entry comparePart)    // Default comparer for Part type. 
+    public int CompareTo(entry comparePart)    // Default comparer for Part type.
     {
-        if (comparePart == null)        // A null value means that this object is greater. 
+        if (comparePart == null)        // A null value means that this object is greater.
             return 1;
         else
             return this.ordered.CompareTo(comparePart.ordered);
@@ -48,10 +48,6 @@ namespace DictParse
         {
             string[] lines = System.IO.File.ReadAllLines("wordsEn.txt");
             string[] lineo = new string[lines.Length];
-            //int k;
-
-            //string stores;
-            //string storeo;
 
             System.Console.WriteLine("b".CompareTo("a"));
             System.Console.WriteLine("b".CompareTo("c"));
@@ -84,34 +80,6 @@ namespace DictParse
             listp.Sort();
             System.Console.WriteLine("finished that");
             System.Console.WriteLine(" ");
-
-            // System.Console.WriteLine("sorting ordered vocabulary");
-            //for (int i = 0; i < lines.Length; i++)
-            //{
-            //    if (i % 100 == 0)
-            //    {
-            //        System.Console.Write(" " + i * 1.0 / lines.Length);
-            //    }
-            //    k = i;
-            //    for (int j = i + 1; j < lines.Length; j++)
-            //    {
-            //        if (lineo[k].CompareTo(lineo[j]) == 1)
-            //        {
-            //            k = j;
-            //        }
-            //    }
-            //    if (i != k) { 
-            //        stores = lines[i];
-            //        storeo = lineo[i];
-            //        lines[i] = lines[k];
-            //        lineo[i] = lineo[k];
-            //        lines[k] = stores;
-            //        lineo[k] = storeo;
-            //    }
-            //}
-            //System.Console.WriteLine(" ");
-            //System.Console.WriteLine("finished that");
-            //System.Console.WriteLine(" ");
 
             System.Console.WriteLine("  entries= "+lines.Length);
             for (int i=0; i < 5; i++)
