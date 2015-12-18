@@ -1,82 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="UTF-8">
-	<title>Links to Alan's works</title>
-	<meta name="description" content="Trying out github pages">
-	<meta name="keywords" content="Minesweeper, Javascript, learn coding">
-	<meta name="author" content="Alan Rominger">
-	<style>
-body {
-    background-color: #d0e4fe;
-	padding-top : 10px
-}
-h1 {
-	text-decoration: underline;
-	font-size : 15px;
-}
-table, tr, td, th {
-   border-collapse: collapse;
-}
-img, button{
-   display:block;
-}
-img.displayed {
-    display: block;
-  margin-left:auto;
-  margin-right:auto;
-}
-.gameSpace {
-	width : 480px;
-	background-color: white;
-	padding-top : 10px;
-  margin-left:auto;
-  margin-right:auto;
-}
-p {
-  text-align : center;
-}
-.copyright {
-	padding: 10px;
-}
-div#difficultity {
-	display : inline-block;
-}
-	</style>
-</head>
-<body>
+---
+layout: default
+---
 
-<div class="gameSpace">
+<div class="home">
 
-<center>
+  <h1 class="page-heading">Posts</h1>
 
-<h1>Alan Rominger</h1>
-<h2>Github home</h2>
-<h2>NOTE: Moving Web Presence to:<br />
-	<a href="http://www.alanr.xyz/">www.alanr.xyz</a></h2>
+  <ul class="post-list">
+    {% for post in site.posts %}
+      <li>
+        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
 
-<p>Profiles: <br />
-<a href="https://www.linkedin.com/profile/view?id=60599810">LinkedIn</a> &middot;
-<a href="https://github.com/AlanCoding">Github</a> &middot;
-<a href="http://physics.stackexchange.com/users/1255/alan-rominger">Physics Stack Exchange</a>
-</p>
+        <h2>
+          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+        </h2>
+      </li>
+    {% endfor %}
+  </ul>
 
-<h1>Two original Javascript games</h1>
-
-<ul>
-	<li><a href="mine.html">Minesweeper</a></li>
-	<li><a href="jumble.html">Word Jumble</a></li>
-</ul>
-
-<h1>Web app made at the Iron Yard</h1>
-<ul>
-	<li><a href="https://nameless-mountain-9760.herokuapp.com/index.html">Movie Ratings</a></li>
-</ul>
-
-
-</center>
-<p>&nbsp;</p>
+  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
 
 </div>
-
-</body>
