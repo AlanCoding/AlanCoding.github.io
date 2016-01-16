@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<script type="text/javascript" src="mine.js"></script>
+	<title>Javascript Land Mine Game - Now With More Faces!</title>
+	<meta name="description" content="A a straightforward homebrew Javascript game with page elements automatically generated, replaced, and updated. Click around and try to map all the mines on the board!">
+	<meta name="keywords" content="Minesweeper, Javascript, learn coding">
+	<meta name="author" content="Alan Rominger">
+	<style>
+body {
+    background-color: #d0e4fe;
+	padding-top : 10px
+}
+h1 {
+	text-decoration: underline;
+	font-size : 15px;
+}
+table, tr, td, th {
+   border-collapse: collapse;
+}
+img, button{
+   display:block;
+}
+img.displayed {
+    display: block;
+  margin-left:auto;
+  margin-right:auto;
+}
+.gameSpace {
+	width : 480px;
+	background-color: white;
+	padding-top : 10px;
+  margin-left:auto;
+  margin-right:auto;
+}
+p {
+  text-align : center;
+}
+.copyright {
+	padding: 10px;
+}
+div#difficultity {
+	display : inline-block;
+}
+	</style>
+</head>
+<body onload="drawBoard(9,9,10)">
+
+
+<div class="gameSpace">
+
+	<h1 align="center">Land Mine Mapper v0.1</h1>
+
+<div class="difficultity" align="center"><input type="submit" value="Easy" onclick="drawBoard(9,9,10)"></button>
+<input type="submit" onclick="drawBoard(16,16,40)" value="Harder"></button>
+<input type="submit" onclick="drawBoard(16,30,99)" value="Hardest"></button></div>
+
+<div class="gameHead">
+	<p>Click the face for a new game</p>
+    <p><img onclick="newGame()" class="displayed" id="theSmiley" src="minesweeper/smile.png" align="middle" width=16 height=16/></p>
+</div>
+
+<div id="boardDiv"></div>
+
+
+<p>Number of missing mines: <span id="mCount">10</span> </p>
+<p> <span id="mCountWin">-<br/></span></p>
+<p>Tiles to be cleared: <span id="tCount">90</span> </p>
+<p> <span id="tCountWin">-<br/></span></p>
+
+<hr>
+
+<div class="copyright">
+<p>Game Information:</p>
+<p>Produced by Alan Rominger, 2015, strictly for learning purposes.
+All images were made in Paint from scratch. Reuse whatever you want.</p>
+
+<p>Philosophy:</p>
+<p>The tiles of this game are created in a table, intentionally avoiding
+a canvas element, so all the interactions
+are coded to the page elements individually. That means you should
+experience some slowdown when using the "hardest" mode.</p>
+</div>
+
+</div>
+
+</body>
