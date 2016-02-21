@@ -4,6 +4,12 @@ layout: default
 
 <div class="home">
 
+  <h1 class="page-heading">Old github.io Page</h1>
+    <p class="post-meta">Before I got going with Jekyll, I had a static site served as a
+        github.io address. You can still see this in <a href="/old">the
+        /old folder</a>.
+    </p>
+
   <h1 class="page-heading">Posts</h1>
 
   <ul class="post-list">
@@ -14,6 +20,9 @@ layout: default
         <h2>
           <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
         </h2>
+
+        <span class="post-meta">{{ post.excerpt }}</span>
+
       </li>
     {% endfor %}
   </ul>
