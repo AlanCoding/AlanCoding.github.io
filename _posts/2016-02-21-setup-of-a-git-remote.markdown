@@ -39,6 +39,19 @@ git remote add my_server username@server_ip_address:/opt/git/AlanCoding.github.i
 So here I go, I'm going to make one commit, push it directly to this server, 
 then after that I'll make another commit and push this to github.
 
+...
+
+Well, that didn't quite go off without any problems. It turned out there was 
+a reason that tutorial started off with a bare repository. I opted to just set 
+the config variable:
+
+{% highlight bash %}
+git config receive.denyCurrentBranch ignore
+{% endhighlight %}
+
+After that, and a "push my_server master", it accepts the push. Then ssh in,
+and "git log", and we have the last commit I just made.
+
 
 [repo]: https://github.com/AlanCoding/AlanCoding.github.io.git
 [git-scm]: https://git-scm.com/book/en/v2/Git-on-the-Server-Setting-Up-the-Server
