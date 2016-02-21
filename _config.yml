@@ -1,22 +1,17 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely need to edit after that.
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'jekyll serve'. If you change this file, please restart the server process.
-
 # Site settings
 title: Alan github site home
 email: alan.rominger@gmail.com
+
 description: > # this means to ignore newlines until "baseurl:"
   This is my base github site, and project home.
-  My old html-based homepage should still be viewable from
-  [/old/](/old). I will have plenty of projects to exhibit here
+  I will have plenty of projects to exhibit here
   and content to share, once my hosting and posting environment
-  has stabilized a little better.
+  has stabilized a little.
   Jekyll seems to solve a problem that I've always had building
   static sites, but wanting just a little bit of automated
   aggregation.
+
+# More things which are YAML-y
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://alancoding.github.io" # the base hostname & protocol for your site
 twitter_username: AlanRominger
