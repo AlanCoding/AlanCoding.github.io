@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Process of setting up a git remote server"
-date:   2016-02-21 22:00:00 -0500
+date:   2016-02-21 13:00:00 -0500
 categories: raspberry git server practice
 ---
 
