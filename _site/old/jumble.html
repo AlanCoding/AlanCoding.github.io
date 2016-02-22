@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Javascript Word Unjumbling - no PHP!</title>
+	<meta name="description" content="A a straightforward homebrew Javascript 
+	widget thing that will give you valid english words which contain the same
+	characters that you type into the box, but in different orders">
+	<meta name="keywords" content="Word puzzle, Javascript, learn coding">
+	<meta name="author" content="Alan Rominger">
+<script type="text/javascript" src="key.js"></script>
+<script>
+function clearField() {
+	document.getElementById("userWord").value = "bat";
+	if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+		xmlhttp=new XMLHttpRequest();
+	} else {// code for IE6, IE5
+		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	closestWord();
+}
+
+function closestWord() {
+	var userIn;
+	var sortIn;
+	var i,j,xLen,foundFlag;
+	var dictWord;
+	var theHaul = ["","","","",""];
+	userIn = document.getElementById("userWord").value;
+	userIn = userIn.toLowerCase();
+	document.getElementById("userWord").value = userIn;
+	sortIn = transformWord(userIn);
+	i=0;
+	do {
+		if (sortIn<key[i]) {
+			break;
+		}
+		i++;
+	} while (i<key.length);
+	i = i-1;
+	
+	if ((i<0)) {
+		foundFlag = 0;
+	} else {
+		xmlhttp.open("GET","dump/"+key[i]+".xml",false);
+		xmlhttp.send();
+		xmlDoc=xmlhttp.responseXML; 
+		x=xmlDoc.getElementsByTagName("a");
+		xLen = x.length;
+		foundFlag = 0;
+		for (j=0; j<xLen; j++) {
+			dictWord=x[j].getElementsByTagName("b")[0].childNodes[0].nodeValue;
+			if (transformWord(dictWord)==sortIn) {
+				theHaul[foundFlag] = dictWord;
+				foundFlag += 1;
+				if (foundFlag>4) {
+					break;
+				}
+			}
+		}
+	}
+
+	console.log(" in: "+userIn+" dict: "+key.length+" found: "+i+" "+key[i]);
+	if (foundFlag == 0) {
+		document.getElementById("showIt").innerHTML="failed to unscramble";
+	} else {
+		document.getElementById("showIt").innerHTML=theHaul[0];
+	}
+	if (foundFlag > 1) {
+		document.getElementById("show1").innerHTML=theHaul[1];
+	} else {
+		document.getElementById("show1").innerHTML=" - ";
+	}
+	if (foundFlag > 2) {
+		document.getElementById("show2").innerHTML=theHaul[2];
+	} else {
+		document.getElementById("show2").innerHTML=" - ";
+	}
+	if (foundFlag > 3) {
+		document.getElementById("show3").innerHTML=theHaul[3];
+	} else {
+		document.getElementById("show3").innerHTML=" - ";
+	}
+	if (foundFlag > 4) {
+		document.getElementById("show4").innerHTML=theHaul[4];
+	} else {
+		document.getElementById("show4").innerHTML=" - ";
+	}
+}
+function transformWord(inWord) {
+	var outWord = "";
+	var charLow;
+	var inWord2;
+	inWord2 = inWord;
+	var j,k,l;
+	for (j=0; j<inWord.length; j++) {
+		l=0;
+		charLow = inWord2[0];
+		for (k=0; k<inWord2.length; k++) {
+			if (inWord2[k] < charLow) {
+				charLow = inWord2[k];
+				l = k;
+			}
+		}
+		outWord = outWord + charLow;
+		inWord2 = inWord2.substring(0,l)+inWord2.substring(l+1,inWord2.length);
+	}
+	return outWord;
+}
+</script>
+<style>
+body {
+    background-color: #d0e4fe;
+	padding-top : 10px
+}
+h1 {
+	text-decoration: underline;
+	font-size : 15px;
+    text-align: center;
+}
+p {
+    text-align: center;
+}
+.mainDiv {
+	width : 400px;
+	background-color: white;
+	padding : 10px;
+    margin-left:auto;
+    margin-right:auto; 
+}
+.mainOut {
+	font-size: 20px;
+	color: #00a;
+	text-align : center;
+}
+</style>
+</head>
+
+<body onload="clearField()">
+	
+<div class="mainDiv">
+	
+	<h1>Type a word to see if this page can unscramble it!</h1>
+	<p><input type="text" id="userWord" onkeyup="closestWord()" value=""/></p>
+	<p>Unscrambling attempt: </p>
+	<div id="showIt" class="mainOut"></div>
+	<p>Other possibilities: </p>
+	<p><ul>
+		<li><div id="show1" class="outField"></div></li>
+		<li><div id="show2" class="outField"></div></li>
+		<li><div id="show3" class="outField"></div></li>
+		<li><div id="show4" class="outField"></div></li>
+	</ul></p>
+
+	<hr/>
+
+	<p>About:</p>
+	<p>Created by Alan Rominger 2015 strictly for learning purposes.
+	Looks up words using a dictionary (<a href="http://www-01.sil.org/linguistics/wordlists/english/">
+		SIL English Wordlist</a>) broken up into xml files and 
+	sorted by ordered letter content.</p>
+	
+	<p>Tools Learned:</p>
+	<p>I wanted to do this without server-side scripting, in part
+	 because I've only just started learning that. Part of it was that the university webspace
+	 will not support it anyway. And another part is that I thought the 
+	 <a href="http://www.w3schools.com/xml/xml_http.asp">w3schools example</a>
+	 somewhat skirted the entire point of javascript xml readers.</p>
+	 <p>That created a bit of a problem with the (>1 MB) dictionary
+	 size, which required shifting more of the burden to dictionary pre-processing.
+	 I did this through <a href="Program.cs">a C# program</a>.</p>
+	 
+	 <p>Various parts of this project required:
+	 
+	 <a href="http://www.w3schools.com/xml/xml_http.asp">Javascript XMLHttpRequest</a> and
+	 <a href="https://msdn.microsoft.com/en-us/library/b0zbh7b6%28v=vs.110%29.aspx">C# comparator overrides</a>.
+	 Also, I discovered that the automatic C# list sorter can alphabetize a 
+	 dictionary in about .2 seconds whereas the brute force approach takes 1 hour.
+	  I knew that sorting can be heavily optimized but I was still surprised by
+	  the magnitude of the difference.
+	 </p>
+
+</div>
+
+
+</body>
+</html>
+
