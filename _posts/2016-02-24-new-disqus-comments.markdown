@@ -20,3 +20,11 @@ pages should be granted a comment box? Maybe they will create a new comment
 thread whenever it gets any traffic that seems to indicate the user came 
 via that webpage. That system seems extremely prone to abuse. But I don't know,
 maybe I haven't understood it yet? We'll see after this post.
+
+First attempt: did not work. Will try a little hacking.
+Here are some different variable attempts, we will see if any contain
+the comments variable.
+
+post.comments: {{ post.comments }}
+page.comments: {{ page.comments }}
+comments: {{ comments }}
