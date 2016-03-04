@@ -2,7 +2,7 @@
 layout: post
 comments: true
 title:  "Process of setting up a git remote server"
-date:   2016-03-03 13:00:00 -1800
+date:   2016-03-03 18:00:00 -0500
 categories: TIY machine_learning music
 ---
 
