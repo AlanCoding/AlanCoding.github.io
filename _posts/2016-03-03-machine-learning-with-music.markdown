@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: true
-title:  "Process of setting up a git remote server"
+title:  "Gordon Fierce Iron Yard Talk Links"
 date:   2016-03-03 18:00:00 -0500
 categories: TIY machine_learning music
 ---
