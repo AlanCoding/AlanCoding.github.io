@@ -32,7 +32,7 @@ layout: default
         
         s.setAttribute('data-timestamp', +new Date());
         (d.head || d.body).appendChild(s);
-    })().bind(disqus_config());
+    })(disqus_config()).bind(this);
 
         // // Cargo-cult material from leigh-johnson
         // var disqus_shortname = 'nuwen';
