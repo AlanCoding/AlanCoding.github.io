@@ -1,3 +1,5 @@
+[Visit AlanCoding.github.io](https://alancoding.github.io)
+
 # AlanCoding.github.io
 
 This repository contains the source for [Alan Rominger](https://github.com/AlanCoding)'s GitHub Pages site. The site is generated with [Jekyll](https://jekyllrb.com/) and includes blog posts, reusable layouts/includes, and an `old/` directory that preserves pre-Jekyll static demos.

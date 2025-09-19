@@ -3,30 +3,68 @@ layout: default
 ---
 
 <div class="home">
-
-  <h1 class="page-heading">Old github.io Page</h1>
-    <p class="post-meta">Before I got going with Jekyll, I had a static site served as a
-        github.io address. You can still see this in <a href="/old">the
-        /old folder</a>.
+  <header class="home-intro">
+    <h1 class="page-heading">Alan Rominger</h1>
+    <p class="home-lede">
+      Welcome to the refreshed hub that now blends the original static GitHub Pages experiments with the ongoing Jekyll-powered blog.
+      The classic demos live on in the <a href="{{ '/old/' | relative_url }}">archived <code>old/</code> directory</a> and the highlights sit below.
     </p>
+  </header>
 
-  <h1 class="page-heading">Posts</h1>
+  <section class="home-section">
+    <h2 class="section-heading">Profiles</h2>
+    <ul class="home-links">
+      <li><a href="https://www.linkedin.com/in/alan-rominger-40236518">LinkedIn</a></li>
+      <li><a href="https://github.com/AlanCoding">GitHub</a></li>
+      <li><a href="http://physics.stackexchange.com/users/1255/alan-rominger">Physics Stack Exchange</a></li>
+    </ul>
+  </section>
 
-  <ul class="post-list">
-    {% for post in site.posts %}
+  <section class="home-section">
+    <h2 class="section-heading">Original JavaScript Games</h2>
+    <p class="section-description">
+      Two browser games that kicked off the GitHub Pages journey are still happily running from their original code.
+    </p>
+    <ul class="home-links">
+      <li><a href="{{ '/old/mine.html' | relative_url }}">Minesweeper</a></li>
+      <li><a href="{{ '/old/jumble.html' | relative_url }}">Word Jumble</a></li>
+    </ul>
+  </section>
+
+  <section class="home-section">
+    <h2 class="section-heading">More Links Coming Soon</h2>
+    <ul class="home-links home-placeholders">
       <li>
-        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
-
-        <h2>
-          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        </h2>
-
-        <span class="post-meta">{{ post.excerpt }}</span>
-
+        <img class="under-construction-icon" src="{{ '/assets/img/under-construction-missing.gif' | relative_url }}" alt="Under construction icon placeholder">
+        <span>Future project slot &mdash; pardon the digital dust.</span>
       </li>
-    {% endfor %}
-  </ul>
+      <li>
+        <img class="under-construction-icon" src="{{ '/assets/img/under-construction-missing.gif' | relative_url }}" alt="Under construction icon placeholder">
+        <span>Another upcoming highlight is currently in the workshop.</span>
+      </li>
+    </ul>
+  </section>
 
-  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
+  <hr class="home-divider" />
 
+  <section class="blog-section">
+    <h2 class="section-heading">Posts</h2>
+
+    <ul class="post-list">
+      {% for post in site.posts %}
+        <li>
+          <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+
+          <h3>
+            <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+          </h3>
+
+          <span class="post-meta">{{ post.excerpt }}</span>
+
+        </li>
+      {% endfor %}
+    </ul>
+
+    <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
+  </section>
 </div>
