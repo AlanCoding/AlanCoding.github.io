@@ -54,6 +54,7 @@ const AUTO_STRATEGIES = {
 };
 
 const DEFAULT_AUTO_STRATEGY = 'solver';
+const AUTO_RESTART_DELAY_MS = 1000;
 
 function imageForValue(value) {
   if (value === MINE) {
@@ -90,6 +91,10 @@ export class MinesweeperUI {
     this.gameUsedAuto = false;
     this.lastAutoStrategyKey = DEFAULT_AUTO_STRATEGY;
     this.leaderboardUi = { human: new Map(), auto: new Map() };
+    this.autoRestartEnabled = false;
+    this.autoRestartTimer = null;
+    this._modalKeydownHandler = null;
+    this._previouslyFocusedElement = null;
   }
 
   init() {
@@ -99,6 +104,10 @@ export class MinesweeperUI {
     this._selectDifficulty('beginner');
     this._renderScoreboards();
     this._updateAutoUI();
+    this._updateAutoRestartUI();
+    if (this.controlsModal) {
+      this.controlsModal.setAttribute('aria-hidden', 'true');
+    }
   }
 
   _cacheElements() {
@@ -114,11 +123,17 @@ export class MinesweeperUI {
     this.autoStrategySelect = this.document.getElementById('autoStrategy');
     this.autoIndicator = this.document.getElementById('autoIndicator');
     this.autoIndicatorText = this.autoIndicator?.querySelector('.auto-text') ?? null;
+    this.autoRestartToggle = this.document.getElementById('autoRestartToggle');
+    this.autoRestartIndicator = this.document.getElementById('autoRestartIndicator');
+    this.autoRestartIndicatorText = this.autoRestartIndicator?.querySelector('.auto-text') ?? null;
     this.personaLink = this.document.getElementById('personaLink');
     this.playerNameInput = this.document.getElementById('playerName');
     this.scoreboardContainer = this.document.getElementById('leaderboardContainer');
     this.playerStatsContainer = this.document.getElementById('playerStats');
     this.difficultyButtons = Array.from(this.document.querySelectorAll('[data-difficulty]'));
+    this.controlsLink = this.document.getElementById('controlsLink');
+    this.controlsModal = this.document.getElementById('controlsModal');
+    this.controlsModalClose = this.document.getElementById('controlsModalClose');
   }
 
   _buildScoreboardLayout() {
@@ -234,6 +249,36 @@ export class MinesweeperUI {
         this._updatePersonaLink();
       });
     }
+    if (this.autoRestartToggle) {
+      this.autoRestartToggle.addEventListener('click', () => {
+        this.autoRestartEnabled = !this.autoRestartEnabled;
+        if (this.autoRestartEnabled) {
+          this._setStatus('Auto restart armed. Fresh boards will appear on their own.');
+        } else {
+          this._clearAutoRestartTimer();
+          this._setStatus('Auto restart disabled. Manual resets only.');
+        }
+        this._updateAutoRestartUI();
+      });
+    }
+    if (this.controlsLink) {
+      this.controlsLink.addEventListener('click', event => {
+        event.preventDefault();
+        this._openControlsModal();
+      });
+    }
+    if (this.controlsModal) {
+      this.controlsModal.addEventListener('click', event => {
+        if (event.target === this.controlsModal) {
+          this._closeControlsModal();
+        }
+      });
+    }
+    if (this.controlsModalClose) {
+      this.controlsModalClose.addEventListener('click', () => {
+        this._closeControlsModal();
+      });
+    }
     this.autoBtn.addEventListener('click', () => {
       if (this.autoRunning && !this.autoStopping) {
         this._stopAutoPlay();
@@ -248,6 +293,7 @@ export class MinesweeperUI {
     if (!config) {
       throw new Error(`Unknown difficulty: ${key}`);
     }
+    this._clearAutoRestartTimer();
     this.currentDifficultyKey = key;
     this.difficultyButtons.forEach(button => {
       button.classList.toggle('active', button.dataset.difficulty === key);
@@ -342,14 +388,14 @@ export class MinesweeperUI {
     }
     this._updateTimerDisplay();
     if (result.action === 'mine') {
-      this._handleLoss();
+      this._handleLoss({ fromAuto });
       return;
     }
     if (this.game.status === GameStatus.WON) {
       if (result.action === 'noop') {
         return;
       }
-      this._handleWin(fromAuto ? 'auto' : this.mode);
+      this._handleWin(fromAuto ? 'auto' : this.mode, { fromAuto });
     } else if (guessed) {
       this._setFace('uncertain');
     } else if (result.revealed.length > 0 && result.revealed.every(cell => cell.value === 0)) {
@@ -359,7 +405,7 @@ export class MinesweeperUI {
     }
   }
 
-  _handleLoss() {
+  _handleLoss({ fromAuto = false } = {}) {
     this._stopTimer();
     this._setFace('frown');
     this._setStatus('You tripped a mine. The crowd gasps.');
@@ -379,9 +425,11 @@ export class MinesweeperUI {
         }
       }
     }
+    const resumeAuto = fromAuto || this.mode === 'auto' || this.autoRunning;
+    this._scheduleAutoRestart({ resumeAuto });
   }
 
-  _handleWin(mode) {
+  _handleWin(mode, { fromAuto = false } = {}) {
     this._stopTimer();
     this._setFace('wink');
     this._setStatus('Victory! The townsfolk throw confetti.');
@@ -392,6 +440,8 @@ export class MinesweeperUI {
     const playerName = this._getResultName(leaderboardMode);
     this.scoreRepository.recordWin(leaderboardMode, this.currentDifficultyKey, difficultyLabel, seconds, playerName);
     this._renderScoreboards();
+    const resumeAuto = fromAuto || mode === 'auto' || this.autoRunning;
+    this._scheduleAutoRestart({ resumeAuto });
   }
 
   _setTileState(row, col, state, value = null) {
@@ -530,7 +580,7 @@ export class MinesweeperUI {
           timeSpan.textContent = formatSeconds(entry.seconds);
           const nameSpan = this.document.createElement('span');
           nameSpan.className = 'score-name';
-          nameSpan.textContent = `leaderboard name: ${entry.name}`;
+          nameSpan.textContent = entry.name;
           const recordedTime = this.document.createElement('time');
           recordedTime.className = 'score-recorded';
           recordedTime.dateTime = entry.recordedAt;
@@ -672,12 +722,107 @@ export class MinesweeperUI {
       return isoString;
     }
     return date.toLocaleString(undefined, {
-      year: 'numeric',
+      year: '2-digit',
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
     });
+  }
+
+  _clearAutoRestartTimer() {
+    if (this.autoRestartTimer) {
+      clearTimeout(this.autoRestartTimer);
+      this.autoRestartTimer = null;
+    }
+  }
+
+  _updateAutoRestartUI() {
+    if (this.autoRestartIndicator) {
+      this.autoRestartIndicator.dataset.state = this.autoRestartEnabled ? 'on' : 'off';
+    }
+    if (this.autoRestartIndicatorText) {
+      this.autoRestartIndicatorText.textContent = this.autoRestartEnabled
+        ? 'Auto Restart On'
+        : 'Auto Restart Off';
+    }
+    if (this.autoRestartToggle) {
+      this.autoRestartToggle.textContent = this.autoRestartEnabled
+        ? 'Disable Auto Restart'
+        : 'Enable Auto Restart';
+      this.autoRestartToggle.setAttribute('aria-pressed', this.autoRestartEnabled ? 'true' : 'false');
+      this.autoRestartToggle.classList.toggle('on', this.autoRestartEnabled);
+    }
+  }
+
+  _scheduleAutoRestart({ resumeAuto = false } = {}) {
+    if (!this.autoRestartEnabled) {
+      return;
+    }
+    this._clearAutoRestartTimer();
+    const shouldResumeAuto = resumeAuto;
+    this.autoRestartTimer = setTimeout(() => {
+      this._executeAutoRestart({ resumeAuto: shouldResumeAuto });
+    }, AUTO_RESTART_DELAY_MS);
+  }
+
+  _executeAutoRestart({ resumeAuto = false } = {}) {
+    this.autoRestartTimer = null;
+    if (!this.autoRestartEnabled) {
+      return;
+    }
+    if (this.autoRunning) {
+      this.autoRestartTimer = setTimeout(() => this._executeAutoRestart({ resumeAuto }), 100);
+      return;
+    }
+    this._selectDifficulty(this.currentDifficultyKey, { preserveAuto: resumeAuto });
+    if (resumeAuto) {
+      this._startAutoPlay();
+    }
+  }
+
+  _openControlsModal() {
+    if (!this.controlsModal || !this.controlsModal.hidden) {
+      return;
+    }
+    const active = this.document.activeElement;
+    this._previouslyFocusedElement =
+      active && typeof active.focus === 'function' ? active : null;
+    this.controlsModal.hidden = false;
+    this.controlsModal.setAttribute('aria-hidden', 'false');
+    if (this._modalKeydownHandler) {
+      this.document.removeEventListener('keydown', this._modalKeydownHandler);
+    }
+    this._modalKeydownHandler = event => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        this._closeControlsModal();
+      }
+    };
+    this.document.addEventListener('keydown', this._modalKeydownHandler);
+    if (this.controlsModalClose && typeof this.controlsModalClose.focus === 'function') {
+      this.controlsModalClose.focus();
+    }
+  }
+
+  _closeControlsModal() {
+    if (!this.controlsModal || this.controlsModal.hidden) {
+      return;
+    }
+    this.controlsModal.hidden = true;
+    this.controlsModal.setAttribute('aria-hidden', 'true');
+    if (this._modalKeydownHandler) {
+      this.document.removeEventListener('keydown', this._modalKeydownHandler);
+      this._modalKeydownHandler = null;
+    }
+    const candidate =
+      this._previouslyFocusedElement && typeof this._previouslyFocusedElement.focus === 'function'
+        ? this._previouslyFocusedElement
+        : this.controlsLink;
+    if (candidate && typeof candidate.focus === 'function') {
+      candidate.focus();
+    }
+    this._previouslyFocusedElement = null;
   }
 
   _getLeaderboardMode(mode = this.mode) {
