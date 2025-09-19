@@ -238,6 +238,9 @@ export class MinesweeperUI {
       return;
     }
     if (this.game.status === GameStatus.WON) {
+      if (result.action === 'noop') {
+        return;
+      }
       this._handleWin(fromAuto ? 'auto' : this.mode);
     } else if (guessed) {
       this._setFace('uncertain');
