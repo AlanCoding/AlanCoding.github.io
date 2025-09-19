@@ -54,6 +54,22 @@
       gap: 12px;
       margin-top: 12px;
     }
+    .control-links {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .controls-link {
+      color: #1d4ed8;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .controls-link:hover,
+    .controls-link:focus {
+      text-decoration: underline;
+    }
     .difficulty {
       display: flex;
       flex-wrap: wrap;
@@ -103,6 +119,17 @@
       border-radius: 8px;
       border: 1px solid rgba(59, 130, 246, 0.2);
       background: rgba(37, 99, 235, 0.08);
+    }
+    .auto-restart-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      background: rgba(16, 185, 129, 0.12);
     }
     .player-name-control {
       display: flex;
@@ -205,6 +232,19 @@
     .auto-indicator[data-state='stopping'] .auto-dot {
       background: #f97316;
       box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.28);
+    }
+    .auto-restart-toggle {
+      background-color: #10b981;
+    }
+    .auto-restart-toggle:hover {
+      background-color: #059669;
+    }
+    .auto-restart-toggle.on {
+      background-color: #047857;
+      box-shadow: 0 8px 14px rgba(16, 185, 129, 0.35);
+    }
+    .auto-restart-toggle.on:hover {
+      background-color: #03664d;
     }
     .status-panel {
       text-align: center;
@@ -414,6 +454,68 @@
       color: #0f172a;
       font-size: 0.95rem;
     }
+    .controls-modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 1000;
+    }
+    .controls-modal[hidden] {
+      display: none;
+    }
+    .controls-modal__content {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px 24px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.25);
+    }
+    .controls-modal__content h2 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 1.2rem;
+      color: #0f172a;
+    }
+    .controls-modal__close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: transparent;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      font-size: 1.25rem;
+      line-height: 1;
+      color: #475569;
+      border: none;
+      cursor: pointer;
+    }
+    .controls-modal__close:hover,
+    .controls-modal__close:focus {
+      background: rgba(226, 232, 240, 0.8);
+    }
+    .controls-modal__list {
+      margin: 0;
+      padding-left: 20px;
+      color: #334155;
+      font-size: 0.95rem;
+    }
+    .controls-modal__list li {
+      margin-bottom: 10px;
+    }
+    .controls-modal__list li:last-child {
+      margin-bottom: 0;
+    }
+    .controls-modal__list strong {
+      color: #1f2937;
+    }
     @media (min-width: 720px) {
       .mode-section {
         flex-direction: row;
@@ -464,8 +566,26 @@
           </span>
           <a id="personaLink" class="persona-link" href="minesweeper/ai-solver.html" target="_blank" rel="noopener">Meet this AI</a>
         </div>
+        <div class="auto-restart-controls">
+          <span id="autoRestartIndicator" class="auto-indicator" data-state="off">
+            <span class="auto-dot"></span>
+            <span class="auto-text">Auto Restart Off</span>
+          </span>
+          <button
+            id="autoRestartToggle"
+            type="button"
+            class="auto-restart-toggle"
+            aria-pressed="false"
+            title="Start a fresh board automatically after each game"
+          >
+            Enable Auto Restart
+          </button>
+        </div>
         <button id="autoButton" title="Let the AI take the wheel">Auto Pilot</button>
       </div>
+    </div>
+    <div class="control-links">
+      <a id="controlsLink" class="controls-link" href="#">Controls</a>
     </div>
     <div class="status-panel">
       <p>Tap the face to start over whenever the mood strikes.</p>
@@ -478,6 +598,18 @@
       <p id="statusMessage">Ready to map some mines.</p>
     </div>
     <div id="boardDiv" class="board-container"></div>
+    <div id="controlsModal" class="controls-modal" hidden>
+      <div class="controls-modal__content" role="dialog" aria-modal="true" aria-labelledby="controlsModalTitle">
+        <button type="button" id="controlsModalClose" class="controls-modal__close" aria-label="Close controls">&times;</button>
+        <h2 id="controlsModalTitle">Controls</h2>
+        <ul class="controls-modal__list">
+          <li><strong>Left click</strong> reveals a tile.</li>
+          <li><strong>Right click</strong> marks a suspected mine with a flag.</li>
+          <li><strong>Left click a revealed number</strong> once all adjacent mines are flagged to uncover the remaining hidden neighbors.</li>
+          <li><strong>Zero tiles</strong> fan out automatically, opening every safe neighbor for you.</li>
+        </ul>
+      </div>
+    </div>
     <div id="scoreboard">
       <div class="score-controls">
         <button id="downloadScores">Download Scores</button>
