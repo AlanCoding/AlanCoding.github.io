@@ -400,11 +400,17 @@ export class MinesweeperUI {
     if (this.autoRunning) {
       return;
     }
+    const shouldResetForAuto =
+      !this.game ||
+      this.game.status === GameStatus.LOST ||
+      this.game.status === GameStatus.WON;
+    if (shouldResetForAuto) {
+      this._selectDifficulty(this.currentDifficultyKey, { preserveAuto: true });
+    }
     this.mode = 'auto';
     this.autoRunning = true;
     this.autoAbort = false;
     this.autoStopping = false;
-    this._selectDifficulty(this.currentDifficultyKey, { preserveAuto: true });
     const strategyKey = this._getSelectedStrategyKey();
     const strategy = this._getStrategyConfig(strategyKey);
     this._setStatus(`Auto pilot engaged with ${strategy.label}. Watching the magic happen.`);
