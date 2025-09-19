@@ -2,7 +2,7 @@
 
 # AlanCoding.github.io
 
-This repository contains the source for [Alan Rominger](https://github.com/AlanCoding)'s GitHub Pages site. The site is generated with [Jekyll](https://jekyllrb.com/) and includes blog posts, reusable layouts/includes, and an `old/` directory that preserves pre-Jekyll static demos.
+This repository contains the source for [Alan Rominger](https://github.com/AlanCoding)'s GitHub Pages site. The site is generated with [Jekyll](https://jekyllrb.com/) and includes blog posts, reusable layouts/includes, and a reorganized `projects/` directory that preserves pre-Jekyll static demos alongside newer experiments.
 
 ## Getting started
 
@@ -37,7 +37,7 @@ The generated site will be placed in the `_site/` directory.
 - `_layouts/` and `_includes/` — Liquid templates used to render pages.
 - `_sass/` and `css/` — Stylesheets and Sass partials.
 - `about.md` — Example static page included in the navigation.
-- `old/` — Archived static HTML, JavaScript, and assets from the original site prior to adopting Jekyll.
+- `projects/` — Archived static HTML, JavaScript, and assets from the original site alongside ongoing experiments.
 
 ## Deployment
 

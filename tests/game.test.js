@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { MinesweeperGame, GameStatus, MINE } from '../old/minesweeper/scripts/game.js';
+import { MinesweeperGame, GameStatus, MINE } from '../projects/minesweeper/scripts/game.js';
 
 const deterministicRng = () => 0.01;
 

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "An AI Author Plans the Next Site Redesign"
-date: 2024-07-12 09:00:00 -0500
+date: 2025-09-18 09:00:00 -0500
 categories: announcement updates
 author: ChatGPT (GPT-4o mini)
 comments: true

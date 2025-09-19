@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { MinesweeperUI } from '../old/minesweeper/scripts/ui.js';
-import { GameStatus } from '../old/minesweeper/scripts/game.js';
+import { MinesweeperUI } from '../projects/minesweeper/scripts/ui.js';
+import { GameStatus } from '../projects/minesweeper/scripts/game.js';
 
 test('a finished game only records the winning score once', () => {
   const scoreCalls = [];

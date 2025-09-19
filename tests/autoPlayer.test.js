@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { MinesweeperGame, GameStatus, MINE } from '../old/minesweeper/scripts/game.js';
-import { AutoPlayer, RandomAutoPlayer, SleepyAutoPlayer, applyAutoAction } from '../old/minesweeper/scripts/autoPlayer.js';
+import { MinesweeperGame, GameStatus, MINE } from '../projects/minesweeper/scripts/game.js';
+import { AutoPlayer, RandomAutoPlayer, SleepyAutoPlayer, applyAutoAction } from '../projects/minesweeper/scripts/autoPlayer.js';
 
 const layout = [
   [MINE, 1, 0, 1, MINE],
