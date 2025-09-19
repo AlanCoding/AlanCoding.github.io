@@ -1,6 +1,6 @@
 import { MinesweeperGame, GameStatus, MINE } from './game.js';
 import { ScoreRepository, formatSeconds } from './scoreboard.js';
-import { AutoPlayer } from './autoPlayer.js';
+import { AutoPlayer, RandomAutoPlayer } from './autoPlayer.js';
 
 const difficulties = {
   beginner: { rows: 9, cols: 9, mines: 10, label: 'Beginner' },
@@ -26,6 +26,19 @@ const TILE_IMAGES = {
   zero: 'minesweeper/grey.png',
 };
 
+const AUTO_STRATEGIES = {
+  solver: {
+    label: 'Constraint Solver',
+    create: game => new AutoPlayer(game),
+  },
+  random: {
+    label: 'Random Explorer',
+    create: game => new RandomAutoPlayer(game),
+  },
+};
+
+const DEFAULT_AUTO_STRATEGY = 'solver';
+
 function imageForValue(value) {
   if (value === MINE) {
     return TILE_IMAGES.mine;
@@ -40,7 +53,10 @@ export class MinesweeperUI {
   constructor(doc, {
     difficultyConfig = difficulties,
     scoreRepository = new ScoreRepository(),
-    autoPlayerFactory = game => new AutoPlayer(game),
+    autoPlayerFactory = (game, strategyKey = DEFAULT_AUTO_STRATEGY) => {
+      const strategy = AUTO_STRATEGIES[strategyKey] ?? AUTO_STRATEGIES[DEFAULT_AUTO_STRATEGY];
+      return strategy.create(game);
+    },
   } = {}) {
     this.document = doc;
     this.difficulties = difficultyConfig;
@@ -54,6 +70,7 @@ export class MinesweeperUI {
     this.autoRunning = false;
     this.autoPlayer = null;
     this.autoAbort = false;
+    this.autoStopping = false;
   }
 
   init() {
@@ -61,6 +78,7 @@ export class MinesweeperUI {
     this._bindEvents();
     this._selectDifficulty('beginner');
     this._renderScoreboards();
+    this._updateAutoUI();
   }
 
   _cacheElements() {
@@ -75,6 +93,9 @@ export class MinesweeperUI {
     this.downloadBtn = this.document.getElementById('downloadScores');
     this.importInput = this.document.getElementById('importScores');
     this.autoBtn = this.document.getElementById('autoButton');
+    this.autoStrategySelect = this.document.getElementById('autoStrategy');
+    this.autoIndicator = this.document.getElementById('autoIndicator');
+    this.autoIndicatorText = this.autoIndicator?.querySelector('.auto-text') ?? null;
     this.difficultyButtons = Array.from(this.document.querySelectorAll('[data-difficulty]'));
   }
 
@@ -97,8 +118,21 @@ export class MinesweeperUI {
     this.importInput.addEventListener('change', event => {
       this._importScores(event);
     });
+    if (this.autoStrategySelect) {
+      this.autoStrategySelect.addEventListener('change', () => {
+        if (this.autoRunning) {
+          return;
+        }
+        const strategy = this._getStrategyConfig();
+        this._setStatus(`Strategy primed: ${strategy.label} ready for deployment.`);
+      });
+    }
     this.autoBtn.addEventListener('click', () => {
-      this._startAutoPlay();
+      if (this.autoRunning && !this.autoStopping) {
+        this._stopAutoPlay();
+      } else if (!this.autoRunning) {
+        this._startAutoPlay();
+      }
     });
   }
 
@@ -369,9 +403,17 @@ export class MinesweeperUI {
     this.mode = 'auto';
     this.autoRunning = true;
     this.autoAbort = false;
+    this.autoStopping = false;
     this._selectDifficulty(this.currentDifficultyKey, { preserveAuto: true });
-    this._setStatus('Auto pilot engaged. Watching the magic happen.');
-    const autoPlayer = this.autoPlayerFactory(this.game);
+    const strategyKey = this._getSelectedStrategyKey();
+    const strategy = this._getStrategyConfig(strategyKey);
+    this._setStatus(`Auto pilot engaged with ${strategy.label}. Watching the magic happen.`);
+    this._updateAutoUI();
+    let autoPlayer = this.autoPlayerFactory(this.game, strategyKey);
+    if (!autoPlayer) {
+      autoPlayer = strategy.create(this.game);
+    }
+    this.autoPlayer = autoPlayer;
     try {
       await autoPlayer.play(async action => {
         if (this.autoAbort) {
@@ -379,43 +421,117 @@ export class MinesweeperUI {
           error.name = 'AutoAbortError';
           throw error;
         }
-      if (action.type === 'flag') {
-        const result = this.game.toggleFlag(action.row, action.col);
-        if (result.changed) {
-          this._setTileState(action.row, action.col, result.flagged ? 'flagged' : 'hidden');
-          this._updateCounts();
+        if (action.type === 'flag') {
+          const result = this.game.toggleFlag(action.row, action.col);
+          if (result.changed) {
+            this._setTileState(action.row, action.col, result.flagged ? 'flagged' : 'hidden');
+            this._updateCounts();
+          }
+          return;
         }
-        return;
-      }
-      if (action.type === 'reveal') {
-        const outcome = this.game.revealCell(action.row, action.col);
-        this._applyRevealResult(outcome, { fromAuto: true, guessed: action.guess });
-      }
+        if (action.type === 'reveal') {
+          const outcome = this.game.revealCell(action.row, action.col);
+          this._applyRevealResult(outcome, { fromAuto: true, guessed: action.guess });
+        }
       });
     } catch (error) {
       if (error.name === 'AutoAbortError') {
         this._setStatus('Auto pilot cancelled. Manual control restored.');
         this.autoRunning = false;
         this.autoAbort = false;
+        this.autoStopping = false;
+        this.autoPlayer = null;
         this.mode = 'human';
+        this._updateAutoUI();
         return;
       }
+      this.autoRunning = false;
+      this.autoStopping = false;
+      this.autoPlayer = null;
+      this.mode = 'human';
+      this._updateAutoUI();
       throw error;
     }
     if (this.game.status !== GameStatus.WON) {
       this._setStatus('Auto pilot tapped out. Maybe next time.');
     }
     this.autoRunning = false;
+    this.autoAbort = false;
+    this.autoStopping = false;
+    this.autoPlayer = null;
     this.mode = 'human';
+    this._updateAutoUI();
   }
 
   _resetAutoState() {
     if (this.autoRunning) {
-      this.autoAbort = true;
-    } else {
-      this.autoAbort = false;
+      this._stopAutoPlay({ quiet: true });
+      return;
     }
+    this.autoAbort = false;
     this.autoRunning = false;
+    this.autoStopping = false;
     this.mode = 'human';
+    this._updateAutoUI();
+  }
+
+  _stopAutoPlay({ quiet = false } = {}) {
+    if (!this.autoRunning || this.autoStopping) {
+      return;
+    }
+    this.autoAbort = true;
+    this.autoStopping = true;
+    this.mode = 'human';
+    if (!quiet) {
+      this._setStatus('Auto pilot disengaging. Manual control incoming.');
+    }
+    this._updateAutoUI();
+  }
+
+  _getSelectedStrategyKey() {
+    if (!this.autoStrategySelect) {
+      return DEFAULT_AUTO_STRATEGY;
+    }
+    return this.autoStrategySelect.value || DEFAULT_AUTO_STRATEGY;
+  }
+
+  _getStrategyConfig(key = this._getSelectedStrategyKey()) {
+    return AUTO_STRATEGIES[key] ?? AUTO_STRATEGIES[DEFAULT_AUTO_STRATEGY];
+  }
+
+  _updateAutoUI() {
+    const indicator = this.autoIndicator;
+    const textEl = this.autoIndicatorText;
+    let indicatorState = 'off';
+    let indicatorText = 'Auto Pilot Off';
+    if (this.autoRunning) {
+      if (this.autoStopping) {
+        indicatorState = 'stopping';
+        indicatorText = 'Auto Pilot Pausing';
+      } else {
+        indicatorState = 'on';
+        indicatorText = 'Auto Pilot On';
+      }
+    }
+    if (indicator) {
+      indicator.dataset.state = indicatorState;
+    }
+    if (textEl) {
+      textEl.textContent = indicatorText;
+    }
+    if (this.autoBtn) {
+      if (this.autoRunning) {
+        this.autoBtn.textContent = this.autoStopping ? 'Stopping...' : 'Stop Auto Pilot';
+        this.autoBtn.disabled = this.autoStopping;
+        this.autoBtn.classList.toggle('active', !this.autoStopping);
+      } else {
+        this.autoBtn.textContent = 'Auto Pilot';
+        this.autoBtn.disabled = false;
+        this.autoBtn.classList.remove('active');
+      }
+    }
+    if (this.autoStrategySelect) {
+      this.autoStrategySelect.disabled = this.autoRunning;
+    }
   }
 }
