@@ -1,6 +1,6 @@
 import { MinesweeperGame, GameStatus, MINE } from './game.js';
 import { ScoreRepository, formatSeconds } from './scoreboard.js';
-import { AutoPlayer, RandomAutoPlayer } from './autoPlayer.js';
+import { AutoPlayer, RandomAutoPlayer, SleepyAutoPlayer } from './autoPlayer.js';
 
 const difficulties = {
   beginner: { rows: 9, cols: 9, mines: 10, label: 'Beginner' },
@@ -29,10 +29,26 @@ const TILE_IMAGES = {
 const AUTO_STRATEGIES = {
   solver: {
     label: 'Constraint Solver',
+    persona: {
+      name: 'Professor Gridlock',
+      page: 'minesweeper/ai-solver.html',
+    },
     create: game => new AutoPlayer(game),
+  },
+  sleepy: {
+    label: 'Sleepy Constraint Solver',
+    persona: {
+      name: 'Rookie Cartographer',
+      page: 'minesweeper/ai-sleepy.html',
+    },
+    create: game => new SleepyAutoPlayer(game),
   },
   random: {
     label: 'Random Explorer',
+    persona: {
+      name: 'Captain Scatter',
+      page: 'minesweeper/ai-random.html',
+    },
     create: game => new RandomAutoPlayer(game),
   },
 };
@@ -72,6 +88,7 @@ export class MinesweeperUI {
     this.autoAbort = false;
     this.autoStopping = false;
     this.gameUsedAuto = false;
+    this.lastAutoStrategyKey = DEFAULT_AUTO_STRATEGY;
     this.leaderboardUi = { human: new Map(), auto: new Map() };
   }
 
@@ -97,7 +114,10 @@ export class MinesweeperUI {
     this.autoStrategySelect = this.document.getElementById('autoStrategy');
     this.autoIndicator = this.document.getElementById('autoIndicator');
     this.autoIndicatorText = this.autoIndicator?.querySelector('.auto-text') ?? null;
+    this.personaLink = this.document.getElementById('personaLink');
+    this.playerNameInput = this.document.getElementById('playerName');
     this.scoreboardContainer = this.document.getElementById('leaderboardContainer');
+    this.playerStatsContainer = this.document.getElementById('playerStats');
     this.difficultyButtons = Array.from(this.document.querySelectorAll('[data-difficulty]'));
   }
 
@@ -211,6 +231,7 @@ export class MinesweeperUI {
         }
         const strategy = this._getStrategyConfig();
         this._setStatus(`Strategy primed: ${strategy.label} ready for deployment.`);
+        this._updatePersonaLink();
       });
     }
     this.autoBtn.addEventListener('click', () => {
@@ -345,7 +366,8 @@ export class MinesweeperUI {
     const difficultyConfig = this.difficulties[this.currentDifficultyKey];
     const difficultyLabel = difficultyConfig?.label ?? this.currentDifficultyKey;
     const leaderboardMode = this._getLeaderboardMode();
-    this.scoreRepository.recordLoss(leaderboardMode, this.currentDifficultyKey, difficultyLabel);
+    const playerName = this._getResultName(leaderboardMode);
+    this.scoreRepository.recordLoss(leaderboardMode, this.currentDifficultyKey, difficultyLabel, playerName);
     this._renderScoreboards();
     for (let r = 0; r < this.game.rows; r += 1) {
       for (let c = 0; c < this.game.cols; c += 1) {
@@ -367,7 +389,8 @@ export class MinesweeperUI {
     const difficultyLabel = difficultyConfig?.label ?? this.currentDifficultyKey;
     const seconds = this.game.getElapsedTimeSeconds();
     const leaderboardMode = this._getLeaderboardMode(mode);
-    this.scoreRepository.recordWin(leaderboardMode, this.currentDifficultyKey, difficultyLabel, seconds);
+    const playerName = this._getResultName(leaderboardMode);
+    this.scoreRepository.recordWin(leaderboardMode, this.currentDifficultyKey, difficultyLabel, seconds, playerName);
     this._renderScoreboards();
   }
 
@@ -505,17 +528,139 @@ export class MinesweeperUI {
           const timeSpan = this.document.createElement('span');
           timeSpan.className = 'score-time';
           timeSpan.textContent = formatSeconds(entry.seconds);
+          const nameSpan = this.document.createElement('span');
+          nameSpan.className = 'score-name';
+          nameSpan.textContent = `leaderboard name: ${entry.name}`;
           const recordedTime = this.document.createElement('time');
           recordedTime.className = 'score-recorded';
           recordedTime.dateTime = entry.recordedAt;
           recordedTime.textContent = this._formatRecordedAt(entry.recordedAt);
           item.appendChild(timeSpan);
           item.appendChild(this.document.createTextNode(' — '));
+          item.appendChild(nameSpan);
+          item.appendChild(this.document.createTextNode(' — '));
           item.appendChild(recordedTime);
           elements.listEl.appendChild(item);
         });
       });
     });
+    this._renderPlayerStats();
+  }
+
+  _renderPlayerStats() {
+    if (!this.playerStatsContainer || typeof this.scoreRepository?.getPlayerStats !== 'function') {
+      return;
+    }
+    const stats = this.scoreRepository.getPlayerStats();
+    this.playerStatsContainer.innerHTML = '';
+    const heading = this.document.createElement('h2');
+    heading.textContent = 'Leaderboard name stats';
+    this.playerStatsContainer.appendChild(heading);
+    const description = this.document.createElement('p');
+    description.textContent = 'Wins and losses by leaderboard name for each difficulty.';
+    this.playerStatsContainer.appendChild(description);
+    const difficultyEntries = Object.entries(this.difficulties);
+    const modeSections = [
+      { mode: 'human', title: 'Human competitors' },
+      { mode: 'auto', title: 'AI competitors' },
+    ];
+    modeSections.forEach(sectionConfig => {
+      const section = this.document.createElement('div');
+      section.className = 'player-mode-stats';
+      const modeHeading = this.document.createElement('h3');
+      modeHeading.textContent = sectionConfig.title;
+      section.appendChild(modeHeading);
+      const players = stats?.[sectionConfig.mode]
+        ? Object.values(stats[sectionConfig.mode])
+        : [];
+      if (!players || players.length === 0) {
+        const empty = this.document.createElement('p');
+        empty.className = 'empty-state';
+        empty.textContent = 'No games recorded yet.';
+        section.appendChild(empty);
+        this.playerStatsContainer.appendChild(section);
+        return;
+      }
+      players.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+      const table = this.document.createElement('table');
+      table.className = 'player-stats-table';
+      const thead = this.document.createElement('thead');
+      const headerRow = this.document.createElement('tr');
+      const nameHeader = this.document.createElement('th');
+      nameHeader.scope = 'col';
+      nameHeader.textContent = 'Leaderboard name';
+      headerRow.appendChild(nameHeader);
+      difficultyEntries.forEach(([difficultyKey, config]) => {
+        const th = this.document.createElement('th');
+        th.scope = 'col';
+        th.dataset.difficulty = difficultyKey;
+        th.textContent = config.label;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+      const tbody = this.document.createElement('tbody');
+      players.forEach(player => {
+        const row = this.document.createElement('tr');
+        const nameCell = this.document.createElement('th');
+        nameCell.scope = 'row';
+        nameCell.textContent = player.name;
+        row.appendChild(nameCell);
+        difficultyEntries.forEach(([difficultyKey]) => {
+          const cell = this.document.createElement('td');
+          const record = player.difficulties?.[difficultyKey] ?? { wins: 0, losses: 0 };
+          const wins = Number.isFinite(record.wins) ? record.wins : 0;
+          const losses = Number.isFinite(record.losses) ? record.losses : 0;
+          cell.dataset.difficulty = difficultyKey;
+          cell.textContent = `${wins}-${losses}`;
+          row.appendChild(cell);
+        });
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+      section.appendChild(table);
+      this.playerStatsContainer.appendChild(section);
+    });
+  }
+
+  _getPlayerName() {
+    if (!this.playerNameInput) {
+      return 'anonymous';
+    }
+    const value = this.playerNameInput.value ?? '';
+    const trimmed = value.trim();
+    return trimmed || 'anonymous';
+  }
+
+  _getStrategyPersonaName(strategyKey = this._getSelectedStrategyKey()) {
+    const strategy = this._getStrategyConfig(strategyKey);
+    if (strategy.persona?.name) {
+      return strategy.persona.name;
+    }
+    return strategy.label;
+  }
+
+  _getResultName(mode = this._getLeaderboardMode()) {
+    if (mode === 'auto') {
+      const strategyKey = this.lastAutoStrategyKey ?? this._getSelectedStrategyKey();
+      return this._getStrategyPersonaName(strategyKey);
+    }
+    return this._getPlayerName();
+  }
+
+  _updatePersonaLink(strategyKey = this._getSelectedStrategyKey()) {
+    if (!this.personaLink) {
+      return;
+    }
+    const strategy = this._getStrategyConfig(strategyKey);
+    if (!strategy.persona) {
+      this.personaLink.hidden = true;
+      return;
+    }
+    this.personaLink.hidden = false;
+    this.personaLink.href = strategy.persona.page;
+    this.personaLink.textContent = `Meet ${strategy.persona.name}`;
+    this.personaLink.setAttribute('aria-label', `Learn about ${strategy.label}`);
   }
 
   _formatRecordedAt(isoString) {
@@ -560,6 +705,7 @@ export class MinesweeperUI {
     this.autoStopping = false;
     const strategyKey = this._getSelectedStrategyKey();
     const strategy = this._getStrategyConfig(strategyKey);
+    this.lastAutoStrategyKey = strategyKey;
     this._setStatus(`Auto pilot engaged with ${strategy.label}. Watching the magic happen.`);
     this._updateAutoUI();
     let autoPlayer = this.autoPlayerFactory(this.game, strategyKey);
@@ -686,5 +832,6 @@ export class MinesweeperUI {
     if (this.autoStrategySelect) {
       this.autoStrategySelect.disabled = this.autoRunning;
     }
+    this._updatePersonaLink();
   }
 }

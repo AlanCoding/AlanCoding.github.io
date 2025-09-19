@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rookie Cartographer &mdash; Sleepy Constraint Solver</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #d0e4fe;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #0f172a;
+    }
+    .persona-card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+      padding: 32px 28px;
+      display: grid;
+      gap: 16px;
+    }
+    .back-link {
+      text-decoration: none;
+      color: #2563eb;
+      font-weight: 600;
+    }
+    .back-link:hover,
+    .back-link:focus {
+      text-decoration: underline;
+    }
+    .hero {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .hero img {
+      width: 96px;
+      height: 96px;
+      border-radius: 24px;
+      background: #e2e8f0;
+      padding: 12px;
+      box-shadow: inset 0 0 0 3px rgba(14, 165, 233, 0.3);
+      image-rendering: pixelated;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+    .tagline {
+      margin: 0;
+      font-size: 1rem;
+      color: #475569;
+    }
+    section {
+      background: rgba(14, 165, 233, 0.08);
+      border-radius: 12px;
+      padding: 20px;
+      display: grid;
+      gap: 12px;
+    }
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: #0369a1;
+    }
+    ul {
+      margin: 0;
+      padding-left: 20px;
+      color: #1f2937;
+    }
+    .footer-note {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+  <main class="persona-card">
+    <a class="back-link" href="../mine.html">&larr; Back to Minesweeper</a>
+    <div class="hero">
+      <img src="huh.png" alt="Rookie Cartographer avatar">
+      <div>
+        <h1>Rookie Cartographer</h1>
+        <p class="tagline">Sleepy Constraint Solver AI brain</p>
+      </div>
+    </div>
+    <section>
+      <h2>Personality</h2>
+      <p>
+        The Rookie Cartographer studied under Professor Gridlock but keeps nodding off mid-lesson. They follow most of
+        the logical playbook, yet they shy away from heavy calculations and are quick to make a hasty guess when the
+        board looks complicated.
+      </p>
+      <ul>
+        <li>Builds the same constraint graphs as the senior solver, but naps through anything bigger than eight tiles.</li>
+        <li>Flags certainties and reveals safe tiles uncovered by the reduced analysis.</li>
+        <li>When unsure, picks a random hidden tile using its personal RNG instead of evaluating risk.</li>
+        <li>Great for demonstrating how a tiny lapse in logic can spiral into more guesswork.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Under the hood</h2>
+      <p>
+        The sleepy solver still collects all numbered clues and groups neighbouring unknowns into components, but if a
+        cluster contains more than eight tiles it simply shrugs and walks away. Smaller components are fully enumerated
+        just like the main solver, so guaranteed mines and clears still appear. For the fallback guess, however, the
+        rookie discards probability calculations and chooses a random hidden cell instead, making it demonstrably less
+        reliable than the meticulous professor.
+      </p>
+    </section>
+    <p class="footer-note">Pair Rookie Cartographer against Professor Gridlock to see how missing logic changes the win rate.</p>
+  </main>
+</body>
+</html>

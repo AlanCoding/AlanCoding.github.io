@@ -401,6 +401,36 @@ export class AutoPlayer {
   }
 }
 
+export class SleepyAutoPlayer extends AutoPlayer {
+  constructor(game, { delayMs = 40, rng = Math.random } = {}) {
+    super(game, { delayMs });
+    this._rng = rng;
+  }
+
+  _enumerateComponent(component) {
+    if (component.cells.length > 8) {
+      return null;
+    }
+    return super._enumerateComponent(component);
+  }
+
+  _chooseFallbackGuess() {
+    const candidates = [];
+    for (let r = 0; r < this.game.rows; r += 1) {
+      for (let c = 0; c < this.game.cols; c += 1) {
+        if (!this.game.revealed[r][c] && !this.game.flagged[r][c]) {
+          candidates.push({ row: r, col: c });
+        }
+      }
+    }
+    if (candidates.length === 0) {
+      return null;
+    }
+    const index = Math.min(candidates.length - 1, Math.floor(this._rng() * candidates.length));
+    return candidates[index];
+  }
+}
+
 export class RandomAutoPlayer {
   constructor(game, { delayMs = 40, rng = Math.random } = {}) {
     this.game = game;

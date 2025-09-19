@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'minesweeper_scores_v2';
-const STORAGE_VERSION = 3;
+const STORAGE_VERSION = 4;
 const MODES = ['human', 'auto'];
 
 const defaultStorage = (() => {
@@ -81,6 +81,21 @@ function normalizeDifficultyLabel(key, label) {
   return String(label);
 }
 
+function normalizePlayerDisplayName(value) {
+  if (typeof value !== 'string') {
+    return 'anonymous';
+  }
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return 'anonymous';
+  }
+  return trimmed.slice(0, 40);
+}
+
+function playerKeyForName(value) {
+  return normalizePlayerDisplayName(value).toLowerCase();
+}
+
 function createEmptyBoard(label = '') {
   return {
     label,
@@ -95,7 +110,74 @@ function createEmptyData() {
     version: STORAGE_VERSION,
     human: {},
     auto: {},
+    players: {
+      human: {},
+      auto: {},
+    },
   };
+}
+
+function createEmptyPlayer(name = 'anonymous') {
+  return {
+    name: normalizePlayerDisplayName(name),
+    difficulties: {},
+  };
+}
+
+function clonePlayer(player = createEmptyPlayer()) {
+  const clone = createEmptyPlayer(player.name);
+  Object.entries(player.difficulties ?? {}).forEach(([difficultyKey, stats]) => {
+    const wins = Number(stats?.wins);
+    const losses = Number(stats?.losses);
+    clone.difficulties[difficultyKey] = {
+      wins: Number.isFinite(wins) && wins >= 0 ? wins : 0,
+      losses: Number.isFinite(losses) && losses >= 0 ? losses : 0,
+    };
+  });
+  return clone;
+}
+
+function clonePlayers(players = {}) {
+  const clone = { human: {}, auto: {} };
+  MODES.forEach(mode => {
+    clone[mode] = {};
+    Object.entries(players?.[mode] ?? {}).forEach(([key, player]) => {
+      clone[mode][key] = clonePlayer(player);
+    });
+  });
+  return clone;
+}
+
+function normalizePlayers(rawPlayers) {
+  const normalized = { human: {}, auto: {} };
+  if (!rawPlayers || typeof rawPlayers !== 'object') {
+    return normalized;
+  }
+  Object.entries(rawPlayers).forEach(([modeKey, value]) => {
+    const mode = normalizeMode(modeKey);
+    if (!value || typeof value !== 'object') {
+      return;
+    }
+    Object.entries(value).forEach(([playerKey, playerValue]) => {
+      const displayName = normalizePlayerDisplayName(playerValue?.name ?? playerKey);
+      const safeKey = playerKeyForName(displayName);
+      const player = createEmptyPlayer(displayName);
+      const difficulties = playerValue?.difficulties;
+      if (difficulties && typeof difficulties === 'object') {
+        Object.entries(difficulties).forEach(([difficultyKey, stats]) => {
+          const key = normalizeDifficultyKey(difficultyKey);
+          const wins = Number(stats?.wins);
+          const losses = Number(stats?.losses);
+          player.difficulties[key] = {
+            wins: Number.isFinite(wins) && wins >= 0 ? wins : 0,
+            losses: Number.isFinite(losses) && losses >= 0 ? losses : 0,
+          };
+        });
+      }
+      normalized[mode][safeKey] = player;
+    });
+  });
+  return normalized;
 }
 
 function normalizeEntry(entry = {}) {
@@ -115,6 +197,7 @@ function normalizeEntry(entry = {}) {
   return {
     seconds,
     recordedAt,
+    name: normalizePlayerDisplayName(entry.name ?? entry.playerName ?? entry.displayName ?? ''),
   };
 }
 
@@ -123,7 +206,18 @@ function sortEntries(entries) {
     .slice()
     .sort((a, b) => {
       if (a.seconds === b.seconds) {
-        return new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime();
+        const timeA = new Date(a.recordedAt).getTime();
+        const timeB = new Date(b.recordedAt).getTime();
+        if (Number.isFinite(timeA) && Number.isFinite(timeB) && timeA !== timeB) {
+          return timeA - timeB;
+        }
+        if (Number.isFinite(timeA) && !Number.isFinite(timeB)) {
+          return -1;
+        }
+        if (!Number.isFinite(timeA) && Number.isFinite(timeB)) {
+          return 1;
+        }
+        return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
       }
       return a.seconds - b.seconds;
     });
@@ -246,6 +340,7 @@ export class ScoreRepository {
       MODES.forEach(mode => {
         data[mode] = normalizeModeData(parsed?.[mode]);
       });
+      data.players = normalizePlayers(parsed?.players);
       return data;
     } catch (err) {
       return createEmptyData();
@@ -256,6 +351,7 @@ export class ScoreRepository {
     const payload = {
       version: STORAGE_VERSION,
     };
+    payload.players = {};
     MODES.forEach(mode => {
       payload[mode] = {};
       Object.entries(data[mode] ?? {}).forEach(([key, board]) => {
@@ -265,6 +361,23 @@ export class ScoreRepository {
           losses: board.losses,
           entries: sortEntries(board.entries ?? []).slice(0, 10).map(entry => ({ ...entry })),
         };
+      });
+      payload.players[mode] = {};
+      Object.entries(data.players?.[mode] ?? {}).forEach(([playerKey, player]) => {
+        const record = {
+          name: normalizePlayerDisplayName(player.name),
+          difficulties: {},
+        };
+        Object.entries(player.difficulties ?? {}).forEach(([difficultyKey, stats]) => {
+          const key = normalizeDifficultyKey(difficultyKey);
+          const wins = Number(stats?.wins);
+          const losses = Number(stats?.losses);
+          record.difficulties[key] = {
+            wins: Number.isFinite(wins) && wins >= 0 ? wins : 0,
+            losses: Number.isFinite(losses) && losses >= 0 ? losses : 0,
+          };
+        });
+        payload.players[mode][playerKey] = record;
       });
     });
     this.storage.setItem(this.storageKey, JSON.stringify(payload));
@@ -294,6 +407,53 @@ export class ScoreRepository {
     return board;
   }
 
+  _ensurePlayer(data, mode, playerName) {
+    const safeMode = normalizeMode(mode);
+    if (!data.players) {
+      data.players = { human: {}, auto: {} };
+    }
+    if (!data.players[safeMode]) {
+      data.players[safeMode] = {};
+    }
+    const displayName = normalizePlayerDisplayName(playerName);
+    const key = playerKeyForName(displayName);
+    if (!data.players[safeMode][key]) {
+      data.players[safeMode][key] = createEmptyPlayer(displayName);
+    } else {
+      data.players[safeMode][key].name = displayName;
+    }
+    if (!data.players[safeMode][key].difficulties) {
+      data.players[safeMode][key].difficulties = {};
+    }
+    return { key, player: data.players[safeMode][key] };
+  }
+
+  _ensurePlayerDifficulty(player, difficultyKey) {
+    const key = normalizeDifficultyKey(difficultyKey);
+    if (!player.difficulties[key]) {
+      player.difficulties[key] = { wins: 0, losses: 0 };
+    }
+    return player.difficulties[key];
+  }
+
+  _resetPlayerDifficulty(data, mode, difficultyKey) {
+    const safeMode = normalizeMode(mode);
+    const key = normalizeDifficultyKey(difficultyKey);
+    if (!data.players?.[safeMode]) {
+      return;
+    }
+    Object.values(data.players[safeMode]).forEach(player => {
+      if (!player.difficulties) {
+        player.difficulties = {};
+      }
+      if (!player.difficulties[key]) {
+        return;
+      }
+      player.difficulties[key].wins = 0;
+      player.difficulties[key].losses = 0;
+    });
+  }
+
   getLeaderboard(mode = 'human', difficultyKey, label = null) {
     const data = this._loadRaw();
     const board = this._ensureBoard(data, mode, difficultyKey, label);
@@ -306,26 +466,38 @@ export class ScoreRepository {
       version: data.version ?? STORAGE_VERSION,
       human: cloneMode(data.human),
       auto: cloneMode(data.auto),
+      players: clonePlayers(data.players),
     };
   }
 
-  recordWin(mode, difficultyKey, label, seconds) {
+  getPlayerStats() {
+    const data = this._loadRaw();
+    return clonePlayers(data.players);
+  }
+
+  recordWin(mode, difficultyKey, label, seconds, playerName = 'anonymous') {
     const data = this._loadRaw();
     const board = this._ensureBoard(data, mode, difficultyKey, label);
     const nextEntries = sortEntries([
       ...board.entries,
-      normalizeEntry({ seconds }),
+      normalizeEntry({ seconds, name: playerName }),
     ]).slice(0, 10);
     board.entries = nextEntries;
     board.wins += 1;
+    const { player } = this._ensurePlayer(data, mode, playerName);
+    const stats = this._ensurePlayerDifficulty(player, difficultyKey);
+    stats.wins += 1;
     this._saveRaw(data);
     return cloneBoard(board);
   }
 
-  recordLoss(mode, difficultyKey, label) {
+  recordLoss(mode, difficultyKey, label, playerName = 'anonymous') {
     const data = this._loadRaw();
     const board = this._ensureBoard(data, mode, difficultyKey, label);
     board.losses += 1;
+    const { player } = this._ensurePlayer(data, mode, playerName);
+    const stats = this._ensurePlayerDifficulty(player, difficultyKey);
+    stats.losses += 1;
     this._saveRaw(data);
     return cloneBoard(board);
   }
@@ -336,6 +508,7 @@ export class ScoreRepository {
     board.entries = [];
     board.wins = 0;
     board.losses = 0;
+    this._resetPlayerDifficulty(data, mode, difficultyKey);
     this._saveRaw(data);
     return cloneBoard(board);
   }
@@ -347,12 +520,29 @@ export class ScoreRepository {
     MODES.forEach(mode => {
       incoming[mode] = normalizeModeData(incomingRaw?.[mode]);
     });
+    incoming.players = normalizePlayers(incomingRaw?.players);
     MODES.forEach(mode => {
       Object.entries(incoming[mode]).forEach(([key, board]) => {
         const target = this._ensureBoard(data, mode, key, board.label);
         target.entries = sortEntries([...target.entries, ...board.entries]).slice(0, 10);
         target.wins += board.wins;
         target.losses += board.losses;
+      });
+    });
+    MODES.forEach(mode => {
+      Object.values(incoming.players?.[mode] ?? {}).forEach(player => {
+        const { player: targetPlayer } = this._ensurePlayer(data, mode, player.name);
+        Object.entries(player.difficulties ?? {}).forEach(([difficultyKey, stats]) => {
+          const record = this._ensurePlayerDifficulty(targetPlayer, difficultyKey);
+          const wins = Number(stats?.wins);
+          const losses = Number(stats?.losses);
+          if (Number.isFinite(wins) && wins > 0) {
+            record.wins += wins;
+          }
+          if (Number.isFinite(losses) && losses > 0) {
+            record.losses += losses;
+          }
+        });
       });
     });
     this._saveRaw(data);
