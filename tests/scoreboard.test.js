@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { ScoreRepository } from '../old/minesweeper/scripts/scoreboard.js';
+import { ScoreRepository } from '../projects/minesweeper/scripts/scoreboard.js';
 
 class MemoryStorage {
   constructor() {
