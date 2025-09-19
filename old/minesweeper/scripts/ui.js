@@ -131,6 +131,7 @@ export class MinesweeperUI {
     for (let r = 0; r < this.game.rows; r += 1) {
       const rowEl = this.document.createElement('tr');
       const rowCells = [];
+      this.cellElements.push(rowCells);
       for (let c = 0; c < this.game.cols; c += 1) {
         const cellEl = this.document.createElement('td');
         const button = this.document.createElement('button');
@@ -146,7 +147,6 @@ export class MinesweeperUI {
         this._setTileState(r, c, 'hidden');
       }
       table.appendChild(rowEl);
-      this.cellElements.push(rowCells);
     }
     this.boardContainer.appendChild(table);
   }
