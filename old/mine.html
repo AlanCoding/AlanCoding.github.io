@@ -246,29 +246,89 @@
       opacity: 0;
       cursor: pointer;
     }
-    .score-lists {
+    .score-groups {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
     }
-    .score-column h2 {
-      margin: 0 0 6px;
-      font-size: 1.1rem;
+    .mode-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
-    .score-column ol {
+    .mode-section > h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: #0f172a;
+    }
+    .difficulty-board {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      border-radius: 10px;
+      background: rgba(226, 232, 240, 0.4);
+    }
+    .board-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .board-header h3 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+    .clear-leaderboard {
+      padding: 4px 10px;
+      font-size: 0.85rem;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      border-radius: 999px;
+      background: rgba(241, 245, 249, 0.85);
+      color: #0f172a;
+      cursor: pointer;
+    }
+    .clear-leaderboard:hover {
+      background: rgba(226, 232, 240, 1);
+    }
+    .board-stats {
+      font-size: 0.9rem;
+      color: #475569;
+    }
+    .score-list {
       margin: 0;
       padding-left: 20px;
     }
-    .score-column li {
+    .score-list li {
       margin-bottom: 4px;
+      font-size: 0.95rem;
     }
-    @media (min-width: 520px) {
-      .score-lists {
+    .score-list .empty-state {
+      list-style: none;
+      padding-left: 0;
+      color: #64748b;
+      font-style: italic;
+    }
+    .score-time {
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .score-recorded {
+      color: #64748b;
+    }
+    @media (min-width: 720px) {
+      .mode-section {
         flex-direction: row;
-        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 16px;
       }
-      .score-column {
-        flex: 1;
+      .mode-section > h2 {
+        flex: 1 1 100%;
+      }
+      .difficulty-board {
+        flex: 1 1 220px;
       }
     }
     .copyright {
@@ -287,7 +347,7 @@
       <div class="difficulty">
         <button data-difficulty="beginner" class="active">Beginner</button>
         <button data-difficulty="intermediate">Intermediate</button>
-        <button data-difficulty="expert">Expert</button>
+        <button data-difficulty="expert">Advanced</button>
       </div>
       <div class="actions">
         <div class="auto-controls">
@@ -323,16 +383,7 @@
           <input type="file" id="importScores" accept="application/json">
         </label>
       </div>
-      <div class="score-lists">
-        <div class="score-column">
-          <h2>Player Leaderboard</h2>
-          <ol id="playerScores"></ol>
-        </div>
-        <div class="score-column">
-          <h2>Auto Leaderboard</h2>
-          <ol id="autoScores"></ol>
-        </div>
-      </div>
+      <div id="leaderboardContainer" class="score-groups"></div>
     </div>
     <div class="copyright">
       <p>Game originally produced by Alan Rominger, 2015, now tuned up with modern JavaScript flair.</p>

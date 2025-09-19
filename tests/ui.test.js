@@ -7,12 +7,13 @@ import { GameStatus } from '../old/minesweeper/scripts/game.js';
 test('a finished game only records the winning score once', () => {
   const scoreCalls = [];
   const scoreRepository = {
-    addScore(mode, difficulty, seconds) {
-      scoreCalls.push({ mode, difficulty, seconds });
-      return [];
+    recordWin(mode, difficultyKey, label, seconds) {
+      scoreCalls.push({ mode, difficultyKey, label, seconds });
+      return { label, wins: 0, losses: 0, entries: [] };
     },
-    getScores() {
-      return [];
+    recordLoss() {},
+    getLeaderboard() {
+      return { label: 'Test', wins: 0, losses: 0, entries: [] };
     },
   };
 
@@ -59,7 +60,8 @@ test('a finished game only records the winning score once', () => {
   assert.equal(scoreCalls.length, 1);
   assert.deepEqual(scoreCalls[0], {
     mode: 'human',
-    difficulty: 'Test',
+    difficultyKey: 'test',
+    label: 'Test',
     seconds: 12.34,
   });
 
