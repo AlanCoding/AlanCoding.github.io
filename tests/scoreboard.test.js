@@ -21,33 +21,53 @@ class MemoryStorage {
   }
 }
 
-test('scores are sorted and trimmed to a top ten', () => {
+test('recordWin keeps top ten scores per difficulty and tracks wins', () => {
   const repo = new ScoreRepository(new MemoryStorage(), 'scores');
   for (let i = 0; i < 14; i += 1) {
-    repo.addScore('human', 'Beginner', 20 - i);
+    repo.recordWin('human', 'beginner', 'Beginner', 20 - i);
   }
-  const scores = repo.getScores('human');
-  assert.equal(scores.length, 10);
-  assert.ok(scores.every((entry, index, arr) => index === 0 || entry.seconds >= arr[index - 1].seconds));
+  const leaderboard = repo.getLeaderboard('human', 'beginner', 'Beginner');
+  assert.equal(leaderboard.entries.length, 10);
+  assert.equal(leaderboard.wins, 14);
+  assert.equal(leaderboard.losses, 0);
+  assert.ok(
+    leaderboard.entries.every((entry, index, arr) => index === 0 || entry.seconds >= arr[index - 1].seconds),
+  );
+  assert.ok(leaderboard.entries.every(entry => typeof entry.recordedAt === 'string'));
 });
 
-test('import merges both leaderboards without losing the champs', () => {
+test('mergeScores combines legacy payloads and accumulates stats', () => {
   const storage = new MemoryStorage();
   const repo = new ScoreRepository(storage, 'scores');
-  repo.addScore('human', 'Beginner', 15);
-  repo.addScore('auto', 'Expert', 10);
+  repo.recordWin('human', 'beginner', 'Beginner', 15);
+  repo.recordLoss('human', 'beginner', 'Beginner');
+  repo.recordWin('auto', 'beginner', 'Beginner', 11);
   const payload = JSON.stringify({
     human: [
       { difficulty: 'Intermediate', seconds: 12 },
       { difficulty: 'Beginner', seconds: 8 },
     ],
-    auto: [
-      { difficulty: 'Beginner', seconds: 9 },
-    ],
+    auto: {
+      Beginner: {
+        wins: 2,
+        losses: 1,
+        entries: [{ seconds: 9, recordedAt: '2024-01-01T00:00:00.000Z' }],
+      },
+    },
   });
   repo.mergeScores(payload);
-  const human = repo.getScores('human');
-  const auto = repo.getScores('auto');
-  assert.equal(human[0].seconds, 8);
-  assert.equal(auto[0].seconds, 9);
+  const humanBeginner = repo.getLeaderboard('human', 'beginner', 'Beginner');
+  const humanIntermediate = repo.getLeaderboard('human', 'intermediate', 'Intermediate');
+  const autoBeginner = repo.getLeaderboard('auto', 'beginner', 'Beginner');
+
+  assert.equal(humanBeginner.entries[0].seconds, 8);
+  assert.equal(humanBeginner.wins, 2);
+  assert.equal(humanBeginner.losses, 1);
+
+  assert.equal(humanIntermediate.entries[0].seconds, 12);
+  assert.equal(humanIntermediate.wins, 1);
+
+  assert.equal(autoBeginner.entries[0].seconds, 9);
+  assert.equal(autoBeginner.wins, 3);
+  assert.equal(autoBeginner.losses, 1);
 });
