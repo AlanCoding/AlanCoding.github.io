@@ -104,6 +104,29 @@
       border: 1px solid rgba(59, 130, 246, 0.2);
       background: rgba(37, 99, 235, 0.08);
     }
+    .player-name-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      background: rgba(148, 163, 184, 0.12);
+    }
+    .player-name-control label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1f2937;
+    }
+    #playerName {
+      border: 1px solid rgba(15, 23, 42, 0.2);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.95rem;
+      min-width: 140px;
+    }
     .auto-controls label {
       font-size: 0.75rem;
       font-weight: 700;
@@ -133,6 +156,19 @@
     #autoStrategy:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+    }
+    .persona-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1d4ed8;
+      text-decoration: none;
+    }
+    .persona-link:hover,
+    .persona-link:focus {
+      text-decoration: underline;
     }
     .auto-indicator {
       display: inline-flex;
@@ -310,12 +346,73 @@
       color: #64748b;
       font-style: italic;
     }
+    .score-name {
+      font-weight: 600;
+      color: #1d4ed8;
+    }
     .score-time {
       font-weight: 600;
       color: #0f172a;
     }
     .score-recorded {
       color: #64748b;
+    }
+    .player-stats {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(15, 23, 42, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .player-stats h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: #0f172a;
+    }
+    .player-stats > p {
+      margin: 0;
+      color: #475569;
+    }
+    .player-mode-stats {
+      padding: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 10px;
+      background: rgba(226, 232, 240, 0.35);
+    }
+    .player-mode-stats h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1rem;
+      color: #1f2937;
+    }
+    .player-mode-stats p.empty-state {
+      margin: 0;
+      color: #64748b;
+      font-style: italic;
+    }
+    .player-stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .player-stats-table th,
+    .player-stats-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+      text-align: left;
+    }
+    .player-stats-table th {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #475569;
+    }
+    .player-stats-table th[scope='row'] {
+      text-transform: none;
+      letter-spacing: normal;
+      color: #0f172a;
+      font-size: 0.95rem;
     }
     @media (min-width: 720px) {
       .mode-section {
@@ -349,17 +446,23 @@
         <button data-difficulty="intermediate">Intermediate</button>
         <button data-difficulty="expert">Advanced</button>
       </div>
+      <div class="player-name-control">
+        <label for="playerName">Leaderboard name</label>
+        <input id="playerName" name="playerName" type="text" value="alan" maxlength="40" aria-label="Set leaderboard name">
+      </div>
       <div class="actions">
         <div class="auto-controls">
           <label for="autoStrategy">AI Brain</label>
           <select id="autoStrategy" aria-label="Choose an auto pilot strategy">
             <option value="solver">Constraint Solver</option>
+            <option value="sleepy">Sleepy Constraint Solver</option>
             <option value="random">Random Explorer</option>
           </select>
           <span id="autoIndicator" class="auto-indicator" data-state="off">
             <span class="auto-dot"></span>
             <span class="auto-text">Auto Pilot Off</span>
           </span>
+          <a id="personaLink" class="persona-link" href="minesweeper/ai-solver.html" target="_blank" rel="noopener">Meet this AI</a>
         </div>
         <button id="autoButton" title="Let the AI take the wheel">Auto Pilot</button>
       </div>
@@ -385,6 +488,7 @@
       </div>
       <div id="leaderboardContainer" class="score-groups"></div>
     </div>
+    <section id="playerStats" class="player-stats"></section>
     <div class="copyright">
       <p>Game originally produced by Alan Rominger, 2015, now tuned up with modern JavaScript flair.</p>
       <p>All images were crafted in Paint. Keep tinkering, keep sharing, keep dodging mines.</p>

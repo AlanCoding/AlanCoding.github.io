@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Captain Scatter &mdash; Random Explorer AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #d0e4fe;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #0f172a;
+    }
+    .persona-card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+      padding: 32px 28px;
+      display: grid;
+      gap: 16px;
+    }
+    .back-link {
+      text-decoration: none;
+      color: #2563eb;
+      font-weight: 600;
+    }
+    .back-link:hover,
+    .back-link:focus {
+      text-decoration: underline;
+    }
+    .hero {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .hero img {
+      width: 96px;
+      height: 96px;
+      border-radius: 24px;
+      background: #e2e8f0;
+      padding: 12px;
+      box-shadow: inset 0 0 0 3px rgba(234, 179, 8, 0.35);
+      image-rendering: pixelated;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+    .tagline {
+      margin: 0;
+      font-size: 1rem;
+      color: #475569;
+    }
+    section {
+      background: rgba(234, 179, 8, 0.08);
+      border-radius: 12px;
+      padding: 20px;
+      display: grid;
+      gap: 12px;
+    }
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: #b45309;
+    }
+    ul {
+      margin: 0;
+      padding-left: 20px;
+      color: #1f2937;
+    }
+    .footer-note {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+  <main class="persona-card">
+    <a class="back-link" href="../mine.html">&larr; Back to Minesweeper</a>
+    <div class="hero">
+      <img src="uncertain.png" alt="Captain Scatter avatar">
+      <div>
+        <h1>Captain Scatter</h1>
+        <p class="tagline">Random Explorer AI brain</p>
+      </div>
+    </div>
+    <section>
+      <h2>Personality</h2>
+      <p>
+        Captain Scatter is the bold adventurer who lives for the thrill of the unknown. No complicated planning,
+        no constraint math&mdash;just pure exploratory spirit with a finger hovering over every unrevealed tile.
+      </p>
+      <ul>
+        <li>Ignores flags, probabilities, and patterns altogether.</li>
+        <li>Picks any hidden, unflagged tile uniformly at random each turn.</li>
+        <li>Clicks with reckless abandon until a mine appears or the board is miraculously cleared.</li>
+        <li>Perfect for stress-testing the lose counter and showing what pure luck looks like.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Under the hood</h2>
+      <p>
+        Captain Scatter keeps a running list of every cell that remains hidden and unflagged. Each move draws a random
+        index using the provided pseudo-random number generator and reveals that tile immediately. There is no memory
+        of previous outcomes and no regard for mine density&mdash;the algorithm is intentionally naive so players can
+        compare true logic against sheer chance.
+      </p>
+    </section>
+    <p class="footer-note">Warning: expect many dramatic explosions and almost zero victories.</p>
+  </main>
+</body>
+</html>

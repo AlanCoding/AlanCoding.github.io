@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Professor Gridlock &mdash; Constraint Solver AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #d0e4fe;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #0f172a;
+    }
+    .persona-card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+      padding: 32px 28px;
+      display: grid;
+      gap: 16px;
+    }
+    .back-link {
+      text-decoration: none;
+      color: #2563eb;
+      font-weight: 600;
+    }
+    .back-link:hover,
+    .back-link:focus {
+      text-decoration: underline;
+    }
+    .hero {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .hero img {
+      width: 96px;
+      height: 96px;
+      border-radius: 24px;
+      background: #e2e8f0;
+      padding: 12px;
+      box-shadow: inset 0 0 0 3px rgba(37, 99, 235, 0.2);
+      image-rendering: pixelated;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+    .tagline {
+      margin: 0;
+      font-size: 1rem;
+      color: #475569;
+    }
+    section {
+      background: rgba(37, 99, 235, 0.05);
+      border-radius: 12px;
+      padding: 20px;
+      display: grid;
+      gap: 12px;
+    }
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: #1e3a8a;
+    }
+    ul {
+      margin: 0;
+      padding-left: 20px;
+      color: #1f2937;
+    }
+    .footer-note {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+  <main class="persona-card">
+    <a class="back-link" href="../mine.html">&larr; Back to Minesweeper</a>
+    <div class="hero">
+      <img src="smile.png" alt="Professor Gridlock avatar">
+      <div>
+        <h1>Professor Gridlock</h1>
+        <p class="tagline">Constraint Solver AI brain</p>
+      </div>
+    </div>
+    <section>
+      <h2>Personality</h2>
+      <p>
+        Professor Gridlock is the methodical academic of the minefield. They catalog every numbered tile,
+        stitch together logical constraints, and refuse to click until the math checks out.
+      </p>
+      <ul>
+        <li>Meticulously builds a network of constraint groups from revealed numbers.</li>
+        <li>Enumerates every valid configuration for connected components up to 15 tiles wide.</li>
+        <li>Flags guaranteed mines and uncovers provably safe tiles without breaking a sweat.</li>
+        <li>When logic runs dry, they compute probabilities and pick the safest-looking guess on the board.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Under the hood</h2>
+      <p>
+        The constraint solver inspects each revealed number and records which hidden neighbours must contain mines.
+        Components of interdependent tiles are enumerated so that every consistent assignment is considered.
+        A tile is cleared immediately if its probability drops to 0, while certain mines are flagged when the
+        probability hits 1. If ambiguity remains, the professor chooses the lowest-risk candidate based on those
+        calculated odds, with a slight preference for tiles that touch fewer numbers.
+      </p>
+    </section>
+    <p class="footer-note">Tip: let Professor Gridlock loose on advanced boards to watch deliberate logic in action.</p>
+  </main>
+</body>
+</html>
