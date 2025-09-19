@@ -76,6 +76,86 @@
     .actions {
       display: flex;
       gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .auto-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      background: rgba(37, 99, 235, 0.08);
+    }
+    .auto-controls label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1d4ed8;
+    }
+    #autoStrategy {
+      appearance: none;
+      border: 1px solid rgba(37, 99, 235, 0.35);
+      border-radius: 6px;
+      padding: 6px 28px 6px 10px;
+      font-weight: 600;
+      min-width: 160px;
+      background-color: #fff;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5L6 6.5L11 1.5" stroke="%233b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 12px 8px;
+      color: #1e3a8a;
+      cursor: pointer;
+    }
+    #autoStrategy:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
+    }
+    #autoStrategy:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .auto-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #475569;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    .auto-indicator .auto-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #94a3b8;
+      box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.35);
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .auto-indicator[data-state='on'] {
+      background: rgba(34, 197, 94, 0.15);
+      color: #15803d;
+    }
+    .auto-indicator[data-state='on'] .auto-dot {
+      background: #22c55e;
+      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+    }
+    .auto-indicator[data-state='stopping'] {
+      background: rgba(249, 115, 22, 0.18);
+      color: #c2410c;
+    }
+    .auto-indicator[data-state='stopping'] .auto-dot {
+      background: #f97316;
+      box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.28);
     }
     .status-panel {
       text-align: center;
@@ -196,6 +276,17 @@
         <button data-difficulty="expert">Expert</button>
       </div>
       <div class="actions">
+        <div class="auto-controls">
+          <label for="autoStrategy">AI Brain</label>
+          <select id="autoStrategy" aria-label="Choose an auto pilot strategy">
+            <option value="solver">Constraint Solver</option>
+            <option value="random">Random Explorer</option>
+          </select>
+          <span id="autoIndicator" class="auto-indicator" data-state="off">
+            <span class="auto-dot"></span>
+            <span class="auto-text">Auto Pilot Off</span>
+          </span>
+        </div>
         <button id="autoButton" title="Let the AI take the wheel">Auto Pilot</button>
       </div>
     </div>

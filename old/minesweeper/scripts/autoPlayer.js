@@ -401,6 +401,50 @@ export class AutoPlayer {
   }
 }
 
+export class RandomAutoPlayer {
+  constructor(game, { delayMs = 40, rng = Math.random } = {}) {
+    this.game = game;
+    this.delayMs = delayMs;
+    this._rng = rng;
+  }
+
+  async play(applyAction = async () => {}) {
+    if (this.game.status === GameStatus.LOST) {
+      return { status: this.game.status };
+    }
+    while (this.game.status !== GameStatus.LOST && this.game.status !== GameStatus.WON) {
+      const choices = this._hiddenUnflaggedCells();
+      if (choices.length === 0) {
+        break;
+      }
+      const index = Math.min(choices.length - 1, Math.floor(this._rng() * choices.length));
+      const pick = choices[index];
+      await applyAction({ type: 'reveal', row: pick.row, col: pick.col, guess: true });
+      await this._sleep();
+    }
+    return { status: this.game.status };
+  }
+
+  _hiddenUnflaggedCells() {
+    const cells = [];
+    for (let r = 0; r < this.game.rows; r += 1) {
+      for (let c = 0; c < this.game.cols; c += 1) {
+        if (!this.game.revealed[r][c] && !this.game.flagged[r][c]) {
+          cells.push({ row: r, col: c });
+        }
+      }
+    }
+    return cells;
+  }
+
+  _sleep() {
+    if (this.delayMs <= 0) {
+      return Promise.resolve();
+    }
+    return new Promise(resolve => setTimeout(resolve, this.delayMs));
+  }
+}
+
 export function applyAutoAction(game, action) {
   if (action.type === 'flag') {
     return game.toggleFlag(action.row, action.col);
