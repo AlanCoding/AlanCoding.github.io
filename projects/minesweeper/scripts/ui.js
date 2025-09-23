@@ -9,21 +9,21 @@ const difficulties = {
 };
 
 const FACE_IMAGES = {
-  smile: 'minesweeper/smile.png',
-  frown: 'minesweeper/frown.png',
-  glasses: 'minesweeper/glasses.png',
-  wink: 'minesweeper/wink.png',
-  smug: 'minesweeper/smug.png',
-  huh: 'minesweeper/huh.png',
-  uncertain: 'minesweeper/uncertain.png',
+  smile: './smile.png',
+  frown: './frown.png',
+  glasses: './glasses.png',
+  wink: './wink.png',
+  smug: './smug.png',
+  huh: './huh.png',
+  uncertain: './uncertain.png',
 };
 
 const TILE_IMAGES = {
-  hidden: 'minesweeper/tile.png',
-  flag: 'minesweeper/flag.png',
-  mine: 'minesweeper/mine.png',
-  exploded: 'minesweeper/blown.png',
-  zero: 'minesweeper/grey.png',
+  hidden: './tile.png',
+  flag: './flag.png',
+  mine: './mine.png',
+  exploded: './blown.png',
+  zero: './grey.png',
 };
 
 const AUTO_STRATEGIES = {
@@ -31,7 +31,7 @@ const AUTO_STRATEGIES = {
     label: 'Constraint Solver',
     persona: {
       name: 'Professor Gridlock',
-      page: 'minesweeper/ai-solver.html',
+      page: './ai-solver.html',
     },
     create: game => new AutoPlayer(game),
   },
@@ -39,7 +39,7 @@ const AUTO_STRATEGIES = {
     label: 'Sleepy Constraint Solver',
     persona: {
       name: 'Rookie Cartographer',
-      page: 'minesweeper/ai-sleepy.html',
+      page: './ai-sleepy.html',
     },
     create: game => new SleepyAutoPlayer(game),
   },
@@ -47,7 +47,7 @@ const AUTO_STRATEGIES = {
     label: 'Random Explorer',
     persona: {
       name: 'Captain Scatter',
-      page: 'minesweeper/ai-random.html',
+      page: './ai-random.html',
     },
     create: game => new RandomAutoPlayer(game),
   },
@@ -63,7 +63,7 @@ function imageForValue(value) {
   if (value === 0) {
     return TILE_IMAGES.zero;
   }
-  return `minesweeper/${value}.png`;
+  return `./${value}.png`;
 }
 
 export class MinesweeperUI {
