@@ -92,6 +92,35 @@
       background: linear-gradient(#9acbff, #87b7ff);
     }
 
+    #controls {
+      display: grid;
+      gap: 0.8rem 1.2rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-bottom: 1.4rem;
+      color: #1f2b5c;
+      font-weight: 600;
+    }
+
+    #controls label {
+      display: grid;
+      gap: 0.35rem;
+      font-size: 0.95rem;
+      padding: 0.9rem 1rem;
+      border-radius: 12px;
+      background: rgba(71, 92, 156, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    #controls input[type="range"] {
+      width: 100%;
+      accent-color: #ff6c3c;
+    }
+
+    #controls span {
+      font-size: 0.9rem;
+      color: #293a7a;
+    }
+
     p {
       margin-top: 1.75rem;
       line-height: 1.6;
@@ -109,6 +138,18 @@
       <span id="timer">Timer: 0.0s</span>
       <button id="shoot">Start Shooting</button>
     </div>
+    <div id="controls">
+      <label for="angle-control">
+        Angle boost
+        <input type="range" id="angle-control" min="-0.25" max="0.55" step="0.01" value="0.18" />
+        <span id="angle-display">+10.3°</span>
+      </label>
+      <label for="power-control">
+        Launch power
+        <input type="range" id="power-control" min="14" max="26" step="0.1" value="19.5" />
+        <span id="power-display">19.5 u/s</span>
+      </label>
+    </div>
     <canvas id="court" width="960" height="540"></canvas>
     <p>Unleash a cascade of free throws! Hit the button to fire 20 balls a second for ten straight seconds. Shots ricochet off the floor, the wall, and even each other. Sink them through the hoop before time runs out.</p>
   </main>
@@ -120,6 +161,10 @@
       const hudBalls = document.getElementById('balls');
       const hudTimer = document.getElementById('timer');
       const shootButton = document.getElementById('shoot');
+      const angleSlider = document.getElementById('angle-control');
+      const powerSlider = document.getElementById('power-control');
+      const angleDisplay = document.getElementById('angle-display');
+      const powerDisplay = document.getElementById('power-display');
 
       if (!gl) {
         shootButton.disabled = true;
@@ -191,14 +236,16 @@
       }
 
       function spawnBall(time) {
+        const angleAdjustment = parseFloat(angleSlider.value);
+        const baseSpeed = parseFloat(powerSlider.value);
         const angleOffset = (Math.random() - 0.5) * 0.24;
         const baseTargetX = hoop.x - spawn.x;
         const baseTargetY = (hoop.y + 1.1) - spawn.y;
-        const baseAngle = Math.atan2(baseTargetY, baseTargetX) + 0.08;
+        const baseAngle = Math.atan2(baseTargetY, baseTargetX) + angleAdjustment;
         const angle = baseAngle + angleOffset;
         const directionX = Math.cos(angle);
         const directionY = Math.sin(angle);
-        const speed = 18.5 + Math.random() * 3.6;
+        const speed = baseSpeed + (Math.random() - 0.5) * 3.0;
         const newBall = {
           x: spawn.x + (Math.random() - 0.5) * 0.28,
           y: spawn.y + (Math.random() - 0.1) * 0.14,
@@ -216,6 +263,15 @@
         hudBalls.textContent = `Balls in play: ${balls.filter(b => b.active).length}`;
         const remaining = Math.max(0, (simulationEnd - time) / 1000);
         hudTimer.textContent = `Timer: ${remaining.toFixed(1)}s`;
+      }
+
+      function updateControls() {
+        const angleValue = parseFloat(angleSlider.value);
+        const powerValue = parseFloat(powerSlider.value);
+        const angleDegrees = angleValue * (180 / Math.PI);
+        const formattedAngle = `${angleDegrees >= 0 ? '+' : ''}${angleDegrees.toFixed(1)}°`;
+        angleDisplay.textContent = formattedAngle;
+        powerDisplay.textContent = `${powerValue.toFixed(1)} u/s`;
       }
 
       function updatePhysics(dt, now) {
@@ -459,6 +515,10 @@
         resetGame();
         requestAnimationFrame(loop);
       });
+
+      angleSlider.addEventListener('input', updateControls);
+      powerSlider.addEventListener('input', updateControls);
+      updateControls();
 
       function createCircleProgram(gl, geometry) {
         const vertexSource = `#version 300 es\nlayout(location = 0) in vec2 aVertex;\nlayout(location = 1) in vec2 aCenter;\nlayout(location = 2) in float aRadius;\nlayout(location = 3) in float aInnerRatio;\nlayout(location = 4) in vec4 aColor;\nuniform vec2 uWorldSize;\nout vec2 vLocal;\nout float vInnerRatio;\nout vec4 vColor;\nvoid main() {\n  vec2 worldPos = aCenter + aVertex * aRadius;\n  vec2 normalized = worldPos / uWorldSize;\n  vec2 clip = normalized * 2.0 - 1.0;\n  vLocal = aVertex;\n  vInnerRatio = aInnerRatio;\n  vColor = aColor;\n  gl_Position = vec4(clip, 0.0, 1.0);\n}`;
