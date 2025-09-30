@@ -56,24 +56,30 @@
       font-size: 1.05rem;
     }
 
-    #shoot {
+    #hud button {
       appearance: none;
       border: none;
       padding: 0.85rem 2.4rem;
       border-radius: 999px;
       font-size: 1.1rem;
-      background: linear-gradient(135deg, #ff782c, #ff4e4e);
+      font-weight: 700;
       color: #fff;
       cursor: pointer;
-      font-weight: 700;
-      box-shadow: 0 18px 24px rgba(240, 80, 40, 0.3);
       transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
     }
 
-    #shoot:disabled {
+    #hud button:disabled {
       cursor: not-allowed;
       filter: grayscale(40%);
       box-shadow: none;
+    }
+
+    #shoot {
+      background: linear-gradient(135deg, #ff782c, #ff4e4e);
+      box-shadow: 0 18px 24px rgba(240, 80, 40, 0.3);
+    }
+
+    #shoot:disabled {
       background: #ffb48d;
       color: rgba(255, 255, 255, 0.8);
     }
@@ -81,6 +87,21 @@
     #shoot:not(:disabled):hover {
       transform: translateY(-2px);
       box-shadow: 0 20px 28px rgba(240, 80, 40, 0.35);
+    }
+
+    #stop {
+      background: linear-gradient(135deg, #4f67ff, #3849d7);
+      box-shadow: 0 18px 24px rgba(60, 82, 220, 0.3);
+    }
+
+    #stop:disabled {
+      background: #9ba5ff;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    #stop:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 28px rgba(60, 82, 220, 0.35);
     }
 
     canvas {
@@ -127,6 +148,51 @@
       color: #2b3570;
       text-align: center;
     }
+
+    #run-history {
+      margin-top: 2.6rem;
+    }
+
+    #run-history h2 {
+      font-size: clamp(1.4rem, 2vw + 1rem, 1.9rem);
+      color: #24316d;
+      text-align: center;
+      margin-bottom: 1.1rem;
+    }
+
+    #run-history table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.86);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 12px 22px rgba(32, 44, 98, 0.14);
+    }
+
+    #run-history th,
+    #run-history td {
+      padding: 0.75rem 0.9rem;
+      font-size: 0.95rem;
+      text-align: left;
+      color: #1f2b5c;
+    }
+
+    #run-history thead {
+      background: linear-gradient(135deg, rgba(76, 99, 196, 0.95), rgba(56, 73, 175, 0.95));
+      color: #fff;
+    }
+
+    #run-history tbody tr:nth-child(even) {
+      background: rgba(132, 148, 220, 0.08);
+    }
+
+    #run-history tbody tr:hover {
+      background: rgba(255, 193, 126, 0.25);
+    }
+
+    #run-history td:last-child {
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
@@ -137,6 +203,7 @@
       <span id="balls">Balls in play: 0</span>
       <span id="timer">Timer: 0.0s</span>
       <button id="shoot">Start Shooting</button>
+      <button id="stop" disabled>Stop</button>
     </div>
     <div id="controls">
       <label for="angle-control">
@@ -152,6 +219,23 @@
     </div>
     <canvas id="court" width="960" height="540"></canvas>
     <p>Unleash a cascade of free throws! Hit the button to fire 20 balls a second for ten straight seconds. Shots ricochet off the floor, the wall, and even each other. Sink them through the hoop before time runs out.</p>
+    <section id="run-history">
+      <h2>Top 20 Runs</h2>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Rank</th>
+            <th scope="col">Timestamp</th>
+            <th scope="col">Angle Boost</th>
+            <th scope="col">Launch Power</th>
+            <th scope="col">Spawn Rate</th>
+            <th scope="col">Duration</th>
+            <th scope="col">Score</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
   </main>
   <script>
     (() => {
@@ -161,13 +245,19 @@
       const hudBalls = document.getElementById('balls');
       const hudTimer = document.getElementById('timer');
       const shootButton = document.getElementById('shoot');
+      const stopButton = document.getElementById('stop');
       const angleSlider = document.getElementById('angle-control');
       const powerSlider = document.getElementById('power-control');
       const angleDisplay = document.getElementById('angle-display');
       const powerDisplay = document.getElementById('power-display');
+      const historyBody = document.querySelector('#run-history tbody');
+
+      const HISTORY_COOKIE = 'rapid_fire_runs_v1';
+      const MAX_HISTORY = 20;
 
       if (!gl) {
         shootButton.disabled = true;
+        stopButton.disabled = true;
         canvas.replaceWith(Object.assign(document.createElement('p'), {
           textContent: 'WebGL2 is required to run this demo. Please try a modern browser!'
         }));
@@ -189,7 +279,10 @@
       const spawn = { x: 5, y: floorY + 1.65 };
       const wallRestitution = 0.76;
       const ballRestitution = 0.84;
-      const spawnInterval = 1000 / 20; // milliseconds between balls
+      const spawnRate = 20;
+      const spawnInterval = 1000 / spawnRate; // milliseconds between balls
+      const runDurationMs = 10000;
+      const extraSimulationMs = 3000;
       const ballRadius = 0.36;
 
       const balls = [];
@@ -200,6 +293,9 @@
       let lastSpawn = 0;
       let lastFrame = 0;
       let animationActive = false;
+      let animationFrameId = null;
+      let currentRun = null;
+      let runHistory = loadHistory();
 
       const circleGeometry = createCircleGeometry(gl, 48);
       const circleProgram = createCircleProgram(gl, circleGeometry);
@@ -222,17 +318,45 @@
       window.addEventListener('resize', resizeCanvas);
       resizeCanvas();
 
-      function resetGame() {
+      function startNewRun() {
+        const now = performance.now();
+
+        if (currentRun && currentRun.state === 'running') {
+          finalizeRun('canceled', now);
+        }
+
+        const initialAngle = parseFloat(angleSlider.value);
+        const initialPower = parseFloat(powerSlider.value);
+
         balls.length = 0;
         score = 0;
-        shootStart = performance.now();
-        shootEnd = shootStart + 10000;
-        simulationEnd = shootStart + 13000;
+        shootStart = now;
+        shootEnd = shootStart + runDurationMs;
+        simulationEnd = shootEnd + extraSimulationMs;
         lastSpawn = shootStart;
         lastFrame = shootStart;
         animationActive = true;
+
+        currentRun = {
+          state: 'running',
+          startedAt: now,
+          params: {
+            angleBoost: initialAngle,
+            launchPower: initialPower,
+            spawnRate,
+            duration: runDurationMs / 1000
+          }
+        };
+
         shootButton.disabled = true;
-        updateHud(shootStart);
+        stopButton.disabled = false;
+        updateHud(now);
+        renderScene();
+
+        if (animationFrameId !== null) {
+          cancelAnimationFrame(animationFrameId);
+        }
+        animationFrameId = requestAnimationFrame(loop);
       }
 
       function spawnBall(time) {
@@ -367,6 +491,43 @@
         updateHud(now);
       }
 
+      function finalizeRun(outcome, time = performance.now()) {
+        if (!currentRun || currentRun.state !== 'running') {
+          return;
+        }
+
+        const record = {
+          timestamp: new Date().toISOString(),
+          angleBoost: currentRun.params.angleBoost,
+          launchPower: currentRun.params.launchPower,
+          spawnRate: currentRun.params.spawnRate,
+          duration: currentRun.params.duration,
+          score: outcome === 'completed' ? score : null,
+          status: outcome
+        };
+
+        addRunRecord(record);
+        saveHistory(runHistory);
+        renderHistory();
+
+        currentRun.state = outcome;
+        currentRun = null;
+        animationActive = false;
+        if (animationFrameId !== null) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = null;
+        }
+        balls.length = 0;
+        lastSpawn = 0;
+        lastFrame = 0;
+        shootButton.disabled = false;
+        stopButton.disabled = true;
+        shootEnd = 0;
+        simulationEnd = 0;
+        updateHud(time);
+        renderScene();
+      }
+
       function renderScene() {
         resizeCanvas();
         gl.viewport(0, 0, canvas.width, canvas.height);
@@ -487,7 +648,11 @@
       }
 
       function loop(now) {
-        if (!animationActive) return;
+        if (!animationActive || !currentRun || currentRun.state !== 'running') {
+          animationFrameId = null;
+          return;
+        }
+
         if (!lastFrame) lastFrame = now;
         const dt = Math.min(0.05, (now - lastFrame) / 1000);
 
@@ -502,23 +667,200 @@
         renderScene();
         lastFrame = now;
 
-        if (now > simulationEnd && balls.length === 0) {
-          animationActive = false;
-          shootButton.disabled = false;
-          updateHud(now);
+        if (!animationActive || !currentRun || currentRun.state !== 'running') {
+          animationFrameId = null;
           return;
         }
-        requestAnimationFrame(loop);
+
+        if (now > simulationEnd && balls.length === 0) {
+          animationFrameId = null;
+          finalizeRun('completed', now);
+          return;
+        }
+
+        animationFrameId = requestAnimationFrame(loop);
       }
 
-      shootButton.addEventListener('click', () => {
-        resetGame();
-        requestAnimationFrame(loop);
-      });
+      function addRunRecord(record) {
+        runHistory.push(record);
+        runHistory = sortHistory(runHistory);
+        if (runHistory.length > MAX_HISTORY) {
+          runHistory.length = MAX_HISTORY;
+        }
+      }
 
-      angleSlider.addEventListener('input', updateControls);
-      powerSlider.addEventListener('input', updateControls);
+      function sortHistory(records) {
+        return records
+          .slice()
+          .sort((a, b) => {
+            const scoreDiff = sortScore(b) - sortScore(a);
+            if (scoreDiff !== 0) {
+              return scoreDiff;
+            }
+            const aTime = Date.parse(a.timestamp);
+            const bTime = Date.parse(b.timestamp);
+            if (Number.isNaN(aTime) && Number.isNaN(bTime)) {
+              return 0;
+            }
+            if (Number.isNaN(aTime)) {
+              return 1;
+            }
+            if (Number.isNaN(bTime)) {
+              return -1;
+            }
+            return bTime - aTime;
+          });
+      }
+
+      function sortScore(record) {
+        return Number.isFinite(record?.score) ? record.score : -Infinity;
+      }
+
+      function renderHistory() {
+        historyBody.innerHTML = '';
+        if (!runHistory.length) {
+          const row = document.createElement('tr');
+          const cell = document.createElement('td');
+          cell.colSpan = 7;
+          cell.textContent = 'No runs recorded yet. Play a round to see your stats!';
+          cell.style.textAlign = 'center';
+          row.appendChild(cell);
+          historyBody.appendChild(row);
+          return;
+        }
+
+        runHistory.forEach((record, index) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${formatTimestamp(record.timestamp)}</td>
+            <td>${formatAngle(record.angleBoost)}</td>
+            <td>${formatLaunchPower(record.launchPower)}</td>
+            <td>${formatSpawnRate(record.spawnRate)}</td>
+            <td>${formatDuration(record.duration)}</td>
+            <td>${formatScore(record)}</td>
+          `;
+          historyBody.appendChild(row);
+        });
+      }
+
+      function formatTimestamp(timestamp) {
+        const parsed = Date.parse(timestamp);
+        if (Number.isNaN(parsed)) {
+          return timestamp;
+        }
+        return new Date(parsed).toLocaleString();
+      }
+
+      function formatAngle(angleRad) {
+        const safeAngle = Number.isFinite(angleRad) ? angleRad : 0;
+        const degrees = safeAngle * (180 / Math.PI);
+        const sign = degrees >= 0 ? '+' : '';
+        return `${sign}${degrees.toFixed(1)}°`;
+      }
+
+      function formatLaunchPower(power) {
+        const value = Number.isFinite(power) ? power : 0;
+        return `${value.toFixed(1)} u/s`;
+      }
+
+      function formatSpawnRate(rate) {
+        const value = Number.isFinite(rate) ? rate : spawnRate;
+        return `${Math.round(value)} balls/s`;
+      }
+
+      function formatDuration(durationSeconds) {
+        const value = Number.isFinite(durationSeconds) ? durationSeconds : runDurationMs / 1000;
+        return `${value.toFixed(1)} s`;
+      }
+
+      function formatScore(record) {
+        return Number.isFinite(record?.score) ? record.score : 'CANCELED';
+      }
+
+      function loadHistory() {
+        const raw = getCookie(HISTORY_COOKIE);
+        if (!raw) {
+          return [];
+        }
+        try {
+          const parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) {
+            return [];
+          }
+          const normalized = parsed
+            .map(normalizeRecord)
+            .filter(Boolean);
+          return sortHistory(normalized).slice(0, MAX_HISTORY);
+        } catch (error) {
+          console.warn('Unable to parse saved runs', error);
+          return [];
+        }
+      }
+
+      function normalizeRecord(entry) {
+        if (!entry || typeof entry !== 'object') {
+          return null;
+        }
+        const timestamp = typeof entry.timestamp === 'string' ? entry.timestamp : null;
+        if (!timestamp) {
+          return null;
+        }
+        const angleBoost = Number(entry.angleBoost);
+        const launchPower = Number(entry.launchPower);
+        const rate = Number(entry.spawnRate);
+        const duration = Number(entry.duration);
+        const status = entry.status === 'completed' ? 'completed' : 'canceled';
+        const scoreValue = Number(entry.score);
+        return {
+          timestamp,
+          angleBoost: Number.isFinite(angleBoost) ? angleBoost : 0,
+          launchPower: Number.isFinite(launchPower) ? launchPower : 0,
+          spawnRate: Number.isFinite(rate) && rate > 0 ? Math.round(rate) : spawnRate,
+          duration: Number.isFinite(duration) && duration > 0 ? duration : runDurationMs / 1000,
+          score: status === 'completed' && Number.isFinite(scoreValue) ? Math.max(0, Math.floor(scoreValue)) : null,
+          status
+        };
+      }
+
+      function saveHistory(records) {
+        try {
+          setCookie(HISTORY_COOKIE, JSON.stringify(records.slice(0, MAX_HISTORY)));
+        } catch (error) {
+          console.warn('Unable to save run history', error);
+        }
+      }
+
+      function setCookie(name, value, days = 365) {
+        const maxAge = Math.floor(days * 24 * 60 * 60);
+        document.cookie = `${name}=${encodeURIComponent(value)};max-age=${maxAge};path=/;SameSite=Lax`;
+      }
+
+      function getCookie(name) {
+        const escapedName = name.replace(/([.*+?^${}()|[\]\\])/g, '\\$1');
+        const match = document.cookie.match(new RegExp(`(?:^|; )${escapedName}=([^;]*)`));
+        return match ? decodeURIComponent(match[1]) : null;
+      }
+
+      shootButton.addEventListener('click', startNewRun);
+      stopButton.addEventListener('click', () => finalizeRun('canceled'));
+
+      angleSlider.addEventListener('input', () => {
+        updateControls();
+        if (currentRun && currentRun.state === 'running') {
+          currentRun.params.angleBoost = parseFloat(angleSlider.value);
+        }
+      });
+      powerSlider.addEventListener('input', () => {
+        updateControls();
+        if (currentRun && currentRun.state === 'running') {
+          currentRun.params.launchPower = parseFloat(powerSlider.value);
+        }
+      });
       updateControls();
+      renderHistory();
+      renderScene();
+      updateHud(performance.now());
 
       function createCircleProgram(gl, geometry) {
         const vertexSource = `#version 300 es\nlayout(location = 0) in vec2 aVertex;\nlayout(location = 1) in vec2 aCenter;\nlayout(location = 2) in float aRadius;\nlayout(location = 3) in float aInnerRatio;\nlayout(location = 4) in vec4 aColor;\nuniform vec2 uWorldSize;\nout vec2 vLocal;\nout float vInnerRatio;\nout vec4 vColor;\nvoid main() {\n  vec2 worldPos = aCenter + aVertex * aRadius;\n  vec2 normalized = worldPos / uWorldSize;\n  vec2 clip = normalized * 2.0 - 1.0;\n  vLocal = aVertex;\n  vInnerRatio = aInnerRatio;\n  vColor = aColor;\n  gl_Position = vec4(clip, 0.0, 1.0);\n}`;
