@@ -132,15 +132,16 @@
       const worldWidth = 28;
       const worldHeight = 16;
       const gravity = -24;
-      const floorY = 0.2;
+      const floorHeight = 0.85;
+      const floorY = floorHeight;
       const hoop = {
         x: 23.5,
-        y: 9.2,
+        y: 9.6,
         radius: 0.95,
         innerRatio: 0.68,
         color: [0.85, 0.1, 0.1, 1.0]
       };
-      const spawn = { x: 5, y: 2.1 };
+      const spawn = { x: 5, y: floorY + 1.65 };
       const wallRestitution = 0.76;
       const ballRestitution = 0.84;
       const spawnInterval = 1000 / 20; // milliseconds between balls
@@ -190,10 +191,10 @@
       }
 
       function spawnBall(time) {
-        const angleOffset = (Math.random() - 0.5) * 0.28;
+        const angleOffset = (Math.random() - 0.5) * 0.24;
         const baseTargetX = hoop.x - spawn.x;
-        const baseTargetY = (hoop.y + 0.6) - spawn.y;
-        const baseAngle = Math.atan2(baseTargetY, baseTargetX);
+        const baseTargetY = (hoop.y + 1.1) - spawn.y;
+        const baseAngle = Math.atan2(baseTargetY, baseTargetX) + 0.08;
         const angle = baseAngle + angleOffset;
         const directionX = Math.cos(angle);
         const directionY = Math.sin(angle);
@@ -317,8 +318,8 @@
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         // floor
-        drawRect(0, 0, worldWidth, 3.2, [0.91, 0.6, 0.26, 1.0]);
-        drawRect(0, 3.2, worldWidth, 0.18, [0.75, 0.48, 0.2, 1.0]);
+        drawRect(0, 0, worldWidth, floorHeight, [0.91, 0.6, 0.26, 1.0]);
+        drawRect(0, Math.max(0, floorHeight - 0.16), worldWidth, 0.16, [0.75, 0.48, 0.2, 1.0]);
         // left wall
         drawRect(0, 0, 0.4, worldHeight, [0.82, 0.85, 0.92, 1]);
         // backboard & support
@@ -330,12 +331,15 @@
         drawCircle(hoop.x, hoop.y, hoop.radius, hoop.innerRatio, hoop.color);
 
         // stick figure shooter (simple limbs)
-        drawCircle(spawn.x - 0.85, spawn.y + 2.1, 0.55, -1, [0.99, 0.89, 0.72, 1]);
-        drawRect(spawn.x - 1.02, spawn.y + 1.2, 0.34, 1.0, [0.1, 0.18, 0.3, 1]);
-        drawRect(spawn.x - 1.28, spawn.y + 0.2, 0.18, 1.1, [0.1, 0.18, 0.3, 1]);
-        drawRect(spawn.x - 0.78, spawn.y + 0.2, 0.18, 1.05, [0.1, 0.18, 0.3, 1]);
-        drawRect(spawn.x - 1.36, spawn.y + 1.5, 0.58, 0.16, [0.1, 0.18, 0.3, 1]);
-        drawRect(spawn.x - 0.8, spawn.y + 1.5, 0.58, 0.16, [0.1, 0.18, 0.3, 1]);
+        const playerFootY = floorY + 0.05;
+        const playerBodyColor = [0.1, 0.18, 0.3, 1];
+        drawRect(spawn.x - 1.3, playerFootY, 0.22, 1.35, playerBodyColor);
+        drawRect(spawn.x - 0.88, playerFootY, 0.22, 1.32, playerBodyColor);
+        const playerTorsoY = playerFootY + 1.28;
+        drawRect(spawn.x - 1.28, playerTorsoY, 0.86, 1.18, playerBodyColor);
+        drawRect(spawn.x - 1.68, playerTorsoY + 0.72, 0.72, 0.16, playerBodyColor);
+        drawRect(spawn.x - 0.5, playerTorsoY + 0.62, 0.96, 0.16, playerBodyColor);
+        drawCircle(spawn.x - 0.88, playerTorsoY + 1.65, 0.55, -1, [0.99, 0.89, 0.72, 1]);
 
         // balls
         if (balls.length) {
@@ -457,7 +461,7 @@
       });
 
       function createCircleProgram(gl, geometry) {
-        const vertexSource = `#version 300 es\nlayout(location = 0) in vec2 aVertex;\nlayout(location = 1) in vec2 aCenter;\nlayout(location = 2) in float aRadius;\nlayout(location = 3) in float aInnerRatio;\nlayout(location = 4) in vec4 aColor;\nuniform vec2 uWorldSize;\nout vec2 vLocal;\nout float vInnerRatio;\nout vec4 vColor;\nvoid main() {\n  vec2 worldPos = aCenter + aVertex * aRadius;\n  vec2 normalized = worldPos / uWorldSize;\n  vec2 clip = normalized * 2.0 - 1.0;\n  clip.y = -clip.y;\n  vLocal = aVertex;\n  vInnerRatio = aInnerRatio;\n  vColor = aColor;\n  gl_Position = vec4(clip, 0.0, 1.0);\n}`;
+        const vertexSource = `#version 300 es\nlayout(location = 0) in vec2 aVertex;\nlayout(location = 1) in vec2 aCenter;\nlayout(location = 2) in float aRadius;\nlayout(location = 3) in float aInnerRatio;\nlayout(location = 4) in vec4 aColor;\nuniform vec2 uWorldSize;\nout vec2 vLocal;\nout float vInnerRatio;\nout vec4 vColor;\nvoid main() {\n  vec2 worldPos = aCenter + aVertex * aRadius;\n  vec2 normalized = worldPos / uWorldSize;\n  vec2 clip = normalized * 2.0 - 1.0;\n  vLocal = aVertex;\n  vInnerRatio = aInnerRatio;\n  vColor = aColor;\n  gl_Position = vec4(clip, 0.0, 1.0);\n}`;
         const fragmentSource = `#version 300 es\nprecision highp float;\nin vec2 vLocal;\nin float vInnerRatio;\nin vec4 vColor;\nout vec4 outColor;\nvoid main() {\n  float dist = length(vLocal);\n  if (dist > 1.0) discard;\n  if (vInnerRatio >= 0.0 && dist < vInnerRatio) discard;\n  outColor = vColor;\n}`;
         const program = buildProgram(gl, vertexSource, fragmentSource);
         const vao = gl.createVertexArray();
@@ -473,7 +477,7 @@
       }
 
       function createRectProgram(gl) {
-        const vertexSource = `#version 300 es\nlayout(location = 0) in vec2 aPosition;\nuniform vec2 uWorldSize;\nvoid main() {\n  vec2 normalized = aPosition / uWorldSize;\n  vec2 clip = normalized * 2.0 - 1.0;\n  clip.y = -clip.y;\n  gl_Position = vec4(clip, 0.0, 1.0);\n}`;
+        const vertexSource = `#version 300 es\nlayout(location = 0) in vec2 aPosition;\nuniform vec2 uWorldSize;\nvoid main() {\n  vec2 normalized = aPosition / uWorldSize;\n  vec2 clip = normalized * 2.0 - 1.0;\n  gl_Position = vec4(clip, 0.0, 1.0);\n}`;
         const fragmentSource = `#version 300 es\nprecision mediump float;\nuniform vec4 uColor;\nout vec4 outColor;\nvoid main() {\n  outColor = uColor;\n}`;
         const program = buildProgram(gl, vertexSource, fragmentSource);
         const vao = gl.createVertexArray();
