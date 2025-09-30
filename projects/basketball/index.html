@@ -30,6 +30,23 @@
       padding: 2rem clamp(1rem, 3vw, 2.5rem) 3rem;
     }
 
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: #2f3d86;
+      text-decoration: none;
+      transition: transform 0.15s ease, color 0.15s ease;
+    }
+
+    .back-link:hover,
+    .back-link:focus {
+      color: #ff6c3c;
+      transform: translateX(-3px);
+    }
+
     h1 {
       font-size: clamp(2.2rem, 3vw + 1rem, 3.2rem);
       text-align: center;
@@ -149,6 +166,13 @@
       text-align: center;
     }
 
+    .level-intro {
+      margin: 0 0 1.3rem;
+      text-align: left;
+      font-size: 1.05rem;
+      color: #1f2b5c;
+    }
+
     #run-history {
       margin-top: 2.6rem;
     }
@@ -197,6 +221,10 @@
 </head>
 <body>
   <main>
+    <a class="back-link" href="/index.html" aria-label="Back to projects">
+      <span aria-hidden="true">⟵</span>
+      Back to projects
+    </a>
     <h1>Rapid Fire Free Throws</h1>
     <div id="hud">
       <span id="score">Score: 0</span>
@@ -205,15 +233,19 @@
       <button id="shoot">Start Shooting</button>
       <button id="stop" disabled>Stop</button>
     </div>
+    <p class="level-intro">
+      Level 1: the opposing team hacked your shooter 200 times, so you now get free throws.
+      Nail as many as you can—NBA elites clear 90% (a score of 180!). Future levels are on the drawing board.
+    </p>
     <div id="controls">
       <label for="angle-control">
         Angle boost
-        <input type="range" id="angle-control" min="-0.25" max="0.55" step="0.01" value="0.18" />
+        <input type="range" id="angle-control" min="-0.25" max="0.83" step="0.01" value="0.18" />
         <span id="angle-display">+10.3°</span>
       </label>
       <label for="power-control">
         Launch power
-        <input type="range" id="power-control" min="14" max="26" step="0.1" value="19.5" />
+        <input type="range" id="power-control" min="14" max="39" step="0.1" value="19.5" />
         <span id="power-display">19.5 u/s</span>
       </label>
     </div>
