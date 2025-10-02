@@ -414,7 +414,7 @@
 
 .achievements-hero__copy h1 {
     margin: 0 0 0.35rem;
-    font-size: clamp(1.8rem, 2.2vw + 1rem, 2.4rem);
+    font-size: clamp(1.8rem, calc(1rem + 2.2vw), 2.4rem);
 }
 
 .achievements-hero__copy p {
