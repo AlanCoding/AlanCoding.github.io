@@ -164,6 +164,18 @@ p {
 
         <p class="back-link"><a href="/">&larr; Back to site index</a></p>
 
+        <h1>Type a word to see if this page can unscramble it!</h1>
+	<p><input type="text" id="userWord" onkeyup="closestWord()" value=""/></p>
+	<p>Unscrambling attempt: </p>
+	<div id="showIt" class="mainOut"></div>
+	<p>Other possibilities: </p>
+        <p><ul>
+                <li><div id="show1" class="outField"></div></li>
+                <li><div id="show2" class="outField"></div></li>
+                <li><div id="show3" class="outField"></div></li>
+                <li><div id="show4" class="outField"></div></li>
+        </ul></p>
+
         <img
             src="assets/letters.png"
             alt="A colorful jumble of letter tiles"
@@ -172,19 +184,7 @@ p {
             height="1024"
         />
 
-        <h1>Type a word to see if this page can unscramble it!</h1>
-	<p><input type="text" id="userWord" onkeyup="closestWord()" value=""/></p>
-	<p>Unscrambling attempt: </p>
-	<div id="showIt" class="mainOut"></div>
-	<p>Other possibilities: </p>
-	<p><ul>
-		<li><div id="show1" class="outField"></div></li>
-		<li><div id="show2" class="outField"></div></li>
-		<li><div id="show3" class="outField"></div></li>
-		<li><div id="show4" class="outField"></div></li>
-	</ul></p>
-
-	<hr/>
+        <hr/>
 
 	<p>About:</p>
 	<p>Created by Alan Rominger 2015 strictly for learning purposes.
