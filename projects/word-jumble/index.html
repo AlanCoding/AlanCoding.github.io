@@ -8,6 +8,7 @@
 	characters that you type into the box, but in different orders">
 	<meta name="keywords" content="Word puzzle, Javascript, learn coding">
 	<meta name="author" content="Alan Rominger">
+        <script src="../shared/achievements.js"></script>
 <script type="text/javascript" src="key.js"></script>
 <script>
 function clearField() {
@@ -170,6 +171,9 @@ function updateLeaderboard(word, count) {
                 return a.word.localeCompare(b.word);
         });
         saveLeaderboard(entries.slice(0, 50));
+        if (normalized === "aeprs" && window.gameAchievements) {
+                window.gameAchievements.setStatus("word-jumble", "word-aeprs", true);
+        }
         renderLeaderboard();
 }
 

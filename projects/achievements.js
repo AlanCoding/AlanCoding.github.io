@@ -12,25 +12,11 @@ const BASKETBALL_LEVELS = [
   { key: 'level2', label: 'Level 2', cookie: 'rapid_fire_runs_level2_v1' },
 ];
 const DATA_EXPORT_VERSION = 1;
-const ACHIEVEMENT_STATE_KEY = 'game_zone_achievement_state_v1';
-const ACHIEVEMENTS = [
-  {
-    id: 'word-aeprs',
-    name: 'aeprs creepers!',
-    description: "Log the chilling letter combo 'aeprs' in your Word Jumble history.",
-    check: facts => facts.wordEntries.some(entry => typeof entry.word === 'string' && entry.word.toLowerCase() === 'aeprs'),
-  },
-  {
-    id: 'basketball-curry-hurry',
-    name: 'Curry hurry!',
-    description: 'Drop at least 180 points on Level 2 to prove a blistering 90% free throw percentage.',
-    check: facts => (facts.basketball.level2?.bestScore ?? 0) >= 180,
-  },
-];
-
-const achievementToastQueue = [];
-let activeAchievementTimer = null;
-let achievementStateMemory = null;
+const ACHIEVEMENT_GAME_LABELS = {
+  'word-jumble': 'Word Jumble',
+  basketball: 'Rapid Fire Free Throws',
+  minesweeper: 'Minesweeper',
+};
 
 function renderMinesweeperSummary(repo) {
   const tbody = document.getElementById('minesweeperSummary');
@@ -215,19 +201,42 @@ function collectAchievementFacts() {
   const basketball = {};
   BASKETBALL_LEVELS.forEach(level => {
     const records = parseBasketballHistory(level.cookie);
+    const bestScore = records.length > 0 ? Number(records[0].score || 0) : 0;
+    const hasZeroScore = records.some(entry => Number(entry.score || 0) === 0);
     basketball[level.key] = {
       records,
-      bestScore: records.length > 0 ? Number(records[0].score || 0) : 0,
+      bestScore,
+      hasZeroScore,
     };
   });
   return { wordEntries, basketball };
 }
 
-function evaluateAchievementStates(facts) {
-  return ACHIEVEMENTS.map(({ check, ...meta }) => ({
-    ...meta,
-    unlocked: Boolean(check(facts)),
-  }));
+function syncAchievementsFromFacts(facts, options = {}) {
+  const achievements = window.gameAchievements;
+  if (!achievements) {
+    return [];
+  }
+  const { announce = false } = options;
+  const updateOptions = { silent: !announce };
+
+  const hasAeprs = facts.wordEntries.some(
+    entry => typeof entry.word === 'string' && entry.word.toLowerCase() === 'aeprs'
+  );
+  achievements.setStatus('word-jumble', 'word-aeprs', hasAeprs, updateOptions);
+
+  const level2Score = facts.basketball.level2?.bestScore ?? 0;
+  achievements.setStatus(
+    'basketball',
+    'basketball-curry-hurry',
+    level2Score >= 180,
+    updateOptions
+  );
+
+  const hasZeroScore = Boolean(facts.basketball.level1?.hasZeroScore) || Boolean(facts.basketball.level2?.hasZeroScore);
+  achievements.setStatus('basketball', 'basketball-zero-hero', hasZeroScore, updateOptions);
+
+  return achievements.getAllStates();
 }
 
 function renderAchievementsSection(states) {
@@ -258,6 +267,9 @@ function renderAchievementsSection(states) {
   states.forEach(state => {
     const item = document.createElement('li');
     item.className = `achievement-item${state.unlocked ? ' achievement-item--unlocked' : ''}`;
+    if (state.gameId) {
+      item.dataset.game = state.gameId;
+    }
 
     const status = document.createElement('span');
     status.className = 'achievement-item__status';
@@ -267,6 +279,13 @@ function renderAchievementsSection(states) {
 
     const body = document.createElement('div');
     body.className = 'achievement-item__body';
+
+    if (state.gameId) {
+      const meta = document.createElement('p');
+      meta.className = 'achievement-item__game';
+      meta.textContent = ACHIEVEMENT_GAME_LABELS[state.gameId] || 'Game achievement';
+      body.appendChild(meta);
+    }
 
     const title = document.createElement('h3');
     title.textContent = state.name;
@@ -288,116 +307,10 @@ function renderAchievementsSection(states) {
 }
 
 function refreshAchievementSection(options = {}) {
-  const { announce = true } = options;
+  const { announce = false } = options;
   const facts = collectAchievementFacts();
-  const states = evaluateAchievementStates(facts);
+  const states = syncAchievementsFromFacts(facts, { announce });
   renderAchievementsSection(states);
-
-  if (achievementStateMemory === null) {
-    achievementStateMemory = loadAchievementState();
-  }
-
-  const previousState = achievementStateMemory || {};
-  const nextState = {};
-  const newlyUnlocked = [];
-
-  states.forEach(state => {
-    nextState[state.id] = state.unlocked;
-    if (announce && state.unlocked && !previousState[state.id]) {
-      newlyUnlocked.push(state);
-    }
-  });
-
-  achievementStateMemory = nextState;
-  saveAchievementState(nextState);
-
-  if (announce) {
-    newlyUnlocked.forEach(achievement => enqueueAchievementToast(achievement));
-  }
-}
-
-function enqueueAchievementToast(achievement) {
-  achievementToastQueue.push(achievement);
-  if (!activeAchievementTimer) {
-    showNextAchievementToast();
-  }
-}
-
-function showNextAchievementToast() {
-  const container = document.getElementById('achievementToastContainer');
-  if (!container) {
-    achievementToastQueue.length = 0;
-    activeAchievementTimer = null;
-    return;
-  }
-
-  if (activeAchievementTimer) {
-    return;
-  }
-
-  if (achievementToastQueue.length === 0) {
-    container.classList.remove('is-active');
-    container.innerHTML = '';
-    activeAchievementTimer = null;
-    return;
-  }
-
-  const achievement = achievementToastQueue.shift();
-  container.innerHTML = '';
-  const toast = document.createElement('div');
-  toast.className = 'achievement-toast';
-
-  const eyebrow = document.createElement('p');
-  eyebrow.className = 'achievement-toast__eyebrow';
-  eyebrow.textContent = 'Achievement unlocked!';
-
-  const title = document.createElement('p');
-  title.className = 'achievement-toast__title';
-  title.textContent = achievement.name;
-
-  const description = document.createElement('p');
-  description.className = 'achievement-toast__body';
-  description.textContent = achievement.description;
-
-  toast.appendChild(eyebrow);
-  toast.appendChild(title);
-  toast.appendChild(description);
-
-  container.appendChild(toast);
-  container.classList.add('is-active');
-
-  activeAchievementTimer = window.setTimeout(() => {
-    container.classList.remove('is-active');
-    container.innerHTML = '';
-    activeAchievementTimer = null;
-    if (achievementToastQueue.length > 0) {
-      window.setTimeout(showNextAchievementToast, 250);
-    }
-  }, 5000);
-}
-
-function loadAchievementState() {
-  try {
-    const raw = window.localStorage.getItem(ACHIEVEMENT_STATE_KEY);
-    if (!raw) {
-      return {};
-    }
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object') {
-      return {};
-    }
-    return parsed;
-  } catch (error) {
-    return {};
-  }
-}
-
-function saveAchievementState(state) {
-  try {
-    window.localStorage.setItem(ACHIEVEMENT_STATE_KEY, JSON.stringify(state));
-  } catch (error) {
-    // ignore persistence errors
-  }
 }
 
 function setupMinesweeperManagement(repo) {
@@ -449,7 +362,10 @@ function setupWordJumbleManagement() {
       // ignore storage removal failures
     }
     renderWordJumbleSummary();
-    refreshAchievementSection();
+    if (window.gameAchievements) {
+      window.gameAchievements.resetGame('word-jumble');
+    }
+    refreshAchievementSection({ announce: false });
     if (messageEl) {
       messageEl.textContent = 'Word Jumble leaderboard cleared.';
     }
@@ -467,7 +383,10 @@ function setupBasketballManagement() {
       writeCookie(level.cookie, '', -1);
     });
     renderBasketballSummary();
-    refreshAchievementSection();
+    if (window.gameAchievements) {
+      window.gameAchievements.resetGame('basketball');
+    }
+    refreshAchievementSection({ announce: false });
     if (messageEl) {
       messageEl.textContent = 'Rapid Fire run history cleared.';
     }
@@ -570,7 +489,7 @@ function applyImportedData(repo, data) {
   renderMinesweeperSummary(repo);
   renderWordJumbleSummary();
   renderBasketballSummary();
-  refreshAchievementSection();
+  refreshAchievementSection({ announce: false });
 }
 
 function setupGlobalManagement(repo) {
@@ -636,7 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderMinesweeperSummary(repo);
   renderWordJumbleSummary();
   renderBasketballSummary();
-  refreshAchievementSection();
+  refreshAchievementSection({ announce: false });
   setupGlobalManagement(repo);
   setupMinesweeperManagement(repo);
   setupWordJumbleManagement();

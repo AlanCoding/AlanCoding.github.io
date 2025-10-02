@@ -71,6 +71,9 @@
     const ballRadius = config.ballRadius || 0.36;
 
     const historyCookie = config.historyCookie || 'rapid_fire_runs_level1_v1';
+    const levelKey = config.levelKey || (typeof historyCookie === 'string' && historyCookie.indexOf('level2') !== -1 ? 'level2' : 'level1');
+    const isLevelTwo = levelKey === 'level2';
+    const achievements = global.gameAchievements || null;
     const maxHistory = config.maxHistory || 10;
     const unlockStorageKey = config.unlockStorageKey || 'rapid_fire_free_throws_level2_unlocked';
     const unlockThreshold = typeof config.unlockThreshold === 'number' ? config.unlockThreshold : 70;
@@ -300,13 +303,14 @@
         return;
       }
 
+      const completedScore = outcome === 'completed' ? score : null;
       const record = {
         timestamp: new Date().toISOString(),
         angleBoost: currentRun.params.angleBoost,
         launchPower: currentRun.params.launchPower,
         spawnRate: currentRun.params.spawnRate,
         duration: currentRun.params.duration,
-        score: outcome === 'completed' ? score : null,
+        score: completedScore,
         status: outcome
       };
 
@@ -314,7 +318,16 @@
       saveHistory(runHistory);
       renderHistory();
       levelUnlocked = updateLevelUnlockState();
-      updateWinState(outcome === 'completed' ? score : null);
+      updateWinState(completedScore);
+
+      if (achievements && outcome === 'completed') {
+        if (isLevelTwo && Number.isFinite(completedScore) && completedScore >= 180) {
+          achievements.setStatus('basketball', 'basketball-curry-hurry', true);
+        }
+        if (Number.isFinite(completedScore) && completedScore === 0) {
+          achievements.setStatus('basketball', 'basketball-zero-hero', true);
+        }
+      }
 
       currentRun.state = outcome;
       currentRun = null;

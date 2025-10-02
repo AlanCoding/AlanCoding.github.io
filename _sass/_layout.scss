@@ -673,6 +673,15 @@
     color: darken($grey-color, 12%);
 }
 
+.achievement-item__game {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: lighten($grey-color, 10%);
+    font-weight: 600;
+}
+
 .achievement-toast-container {
     position: fixed;
     top: 0;
