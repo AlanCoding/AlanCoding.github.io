@@ -25,6 +25,93 @@
         description: 'Finish a rapid-fire run with a perfect goose egg—celebrate the art of missing every shot.',
       },
     ],
+    minesweeper: [
+      {
+        id: 'minesweeper-land-mapper',
+        name: 'Land Mine Mapper',
+        description: 'Flag every hidden mine on a single board without a single false alarm.',
+      },
+      {
+        id: 'minesweeper-sun-early',
+        name: 'Sun Dial Spin',
+        description: 'Tap the sun reset before revealing a single tile—fresh board, fresh start.',
+      },
+      {
+        id: 'minesweeper-preemptive-flag',
+        name: 'Premonition Planter',
+        description: 'Drop your first flag before uncovering any tiles.',
+      },
+      {
+        id: 'minesweeper-flag-oops',
+        name: 'Flagged and Fragged',
+        description: 'Trigger a mine while a bogus flag still waves over a safe square.',
+      },
+      {
+        id: 'minesweeper-auto-down',
+        name: 'Autopilot Flameout',
+        description: 'Watch the AI crash and burn with a loss in auto pilot mode.',
+      },
+      {
+        id: 'minesweeper-beginner-champion',
+        name: 'Beginner’s Bragging Rights',
+        description: 'Win a Beginner board at least once.',
+      },
+      {
+        id: 'minesweeper-beginner-5',
+        name: 'Beginner Binge',
+        description: 'Finish five Beginner boards, win or lose.',
+      },
+      {
+        id: 'minesweeper-beginner-10',
+        name: 'Beginner Marathon',
+        description: 'Finish ten Beginner boards, no matter the outcome.',
+      },
+      {
+        id: 'minesweeper-intermediate-champion',
+        name: 'Intermediate Instincts',
+        description: 'Conquer an Intermediate board at least once.',
+      },
+      {
+        id: 'minesweeper-intermediate-5',
+        name: 'Intermediate Itinerary',
+        description: 'Wrap up five Intermediate games of Minesweeper.',
+      },
+      {
+        id: 'minesweeper-intermediate-10',
+        name: 'Intermediate Ironperson',
+        description: 'Complete ten Intermediate sessions, regardless of outcome.',
+      },
+      {
+        id: 'minesweeper-advanced-champion',
+        name: 'Advanced Avalanche',
+        description: 'Defuse every mine on an Advanced board for a win.',
+      },
+      {
+        id: 'minesweeper-advanced-5',
+        name: 'Advanced Adventurer',
+        description: 'Finish five Advanced boards from start to finish.',
+      },
+      {
+        id: 'minesweeper-advanced-10',
+        name: 'Advanced Marathoner',
+        description: 'See ten Advanced boards through to the end.',
+      },
+      {
+        id: 'minesweeper-flag-overflow',
+        name: 'Flag Frenzy',
+        description: 'Plant more flags than there are mines on the board.',
+      },
+      {
+        id: 'minesweeper-flag-all',
+        name: 'Wallpaper of Warnings',
+        description: 'Cover every single tile with a flag, just in case.',
+      },
+      {
+        id: 'minesweeper-chordmaster',
+        name: 'Chord Conductor',
+        description: 'Reveal a cluster by chording on a number with all adjacent mines flagged.',
+      },
+    ],
   };
 
   let memoryState = loadState();

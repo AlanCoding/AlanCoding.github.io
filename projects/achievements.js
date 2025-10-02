@@ -209,7 +209,29 @@ function collectAchievementFacts() {
       hasZeroScore,
     };
   });
-  return { wordEntries, basketball };
+
+  const repo = new ScoreRepository();
+  const leaderboards = repo.getAllLeaderboards();
+  const minesweeper = {
+    difficulties: {},
+    totalAutoLosses: 0,
+  };
+  MINESWEEPER_DIFFICULTIES.forEach(difficulty => {
+    const humanBoard = leaderboards.human?.[difficulty.key] ?? { wins: 0, losses: 0 };
+    const autoBoard = leaderboards.auto?.[difficulty.key] ?? { wins: 0, losses: 0 };
+    const wins = Number(humanBoard.wins || 0) + Number(autoBoard.wins || 0);
+    const losses = Number(humanBoard.losses || 0) + Number(autoBoard.losses || 0);
+    const autoLosses = Number(autoBoard.losses || 0);
+    minesweeper.difficulties[difficulty.key] = {
+      wins,
+      losses,
+      totalGames: wins + losses,
+      autoLosses,
+    };
+    minesweeper.totalAutoLosses += autoLosses;
+  });
+
+  return { wordEntries, basketball, minesweeper };
 }
 
 function syncAchievementsFromFacts(facts, options = {}) {
@@ -235,6 +257,38 @@ function syncAchievementsFromFacts(facts, options = {}) {
 
   const hasZeroScore = Boolean(facts.basketball.level1?.hasZeroScore) || Boolean(facts.basketball.level2?.hasZeroScore);
   achievements.setStatus('basketball', 'basketball-zero-hero', hasZeroScore, updateOptions);
+
+  const minesweeperFacts = facts.minesweeper || {};
+  const minesweeperDifficulties = minesweeperFacts.difficulties || {};
+  const autoLosses = Number(minesweeperFacts.totalAutoLosses || 0);
+  achievements.setStatus('minesweeper', 'minesweeper-auto-down', autoLosses > 0, updateOptions);
+
+  const difficultyAchievementMap = {
+    beginner: {
+      win: 'minesweeper-beginner-champion',
+      five: 'minesweeper-beginner-5',
+      ten: 'minesweeper-beginner-10',
+    },
+    intermediate: {
+      win: 'minesweeper-intermediate-champion',
+      five: 'minesweeper-intermediate-5',
+      ten: 'minesweeper-intermediate-10',
+    },
+    expert: {
+      win: 'minesweeper-advanced-champion',
+      five: 'minesweeper-advanced-5',
+      ten: 'minesweeper-advanced-10',
+    },
+  };
+
+  Object.entries(difficultyAchievementMap).forEach(([key, ids]) => {
+    const stats = minesweeperDifficulties[key] || {};
+    const wins = Number(stats.wins || 0);
+    const totalGames = Number(stats.totalGames || 0);
+    achievements.setStatus('minesweeper', ids.win, wins > 0, updateOptions);
+    achievements.setStatus('minesweeper', ids.five, totalGames >= 5, updateOptions);
+    achievements.setStatus('minesweeper', ids.ten, totalGames >= 10, updateOptions);
+  });
 
   return achievements.getAllStates();
 }
@@ -335,6 +389,10 @@ function setupMinesweeperManagement(repo) {
       const difficulty = MINESWEEPER_DIFFICULTIES.find(item => item.key === difficultyKey) || MINESWEEPER_DIFFICULTIES[0];
       repo.clearLeaderboard(mode, difficulty.key, difficulty.label);
       renderMinesweeperSummary(repo);
+      if (window.gameAchievements) {
+        window.gameAchievements.resetGame('minesweeper');
+      }
+      refreshAchievementSection({ announce: false });
       const modeLabel = mode === 'auto' ? 'Auto' : 'Human';
       setMessage(`${modeLabel} ${difficulty.label} leaderboard cleared.`, 'warning');
     });
@@ -344,6 +402,10 @@ function setupMinesweeperManagement(repo) {
     clearAllBtn.addEventListener('click', () => {
       repo.clear();
       renderMinesweeperSummary(repo);
+      if (window.gameAchievements) {
+        window.gameAchievements.resetGame('minesweeper');
+      }
+      refreshAchievementSection({ announce: false });
       setMessage('All minesweeper leaderboards cleared.', 'warning');
     });
   }
