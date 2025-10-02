@@ -36,10 +36,46 @@ layout: default
       TODO: Add acheivements. Games unified progress page. Add records for word jumble.
       Add levels to basketball game. Add tentative "pink goo" game.
     </p>
-    <ul class="home-links">
-      <li><a href="{{ '/projects/minesweeper/' | relative_url }}">Minesweeper</a></li>
-      <li><a href="{{ '/projects/word-jumble/' | relative_url }}">Word Jumble</a></li>
-      <li><a href="{{ '/projects/basketball/' | relative_url }}">Rapid Fire Free Throws</a></li>
+    <ul class="home-links home-links--games">
+      <li>
+        <img
+          class="home-game-icon"
+          src="{{ '/projects/minesweeper/flag.png' | relative_url }}"
+          alt="Minesweeper flag icon"
+          width="48"
+          height="48"
+        />
+        <div class="home-game-meta">
+          <a href="{{ '/projects/minesweeper/' | relative_url }}">Minesweeper</a>
+          <p class="home-game-description">Classic mine-clearing puzzle with custom board sizes.</p>
+        </div>
+      </li>
+      <li>
+        <img
+          class="home-game-icon"
+          src="{{ '/projects/word-jumble/assets/letters_small.png' | relative_url }}"
+          alt="Word jumble icon"
+          width="48"
+          height="48"
+        />
+        <div class="home-game-meta">
+          <a href="{{ '/projects/word-jumble/' | relative_url }}">Word Jumble</a>
+          <p class="home-game-description">Unscramble letters instantly using the built-in dictionary.</p>
+        </div>
+      </li>
+      <li>
+        <img
+          class="home-game-icon"
+          src="{{ '/projects/basketball/assets/player.png' | relative_url }}"
+          alt="Basketball shooter icon"
+          width="48"
+          height="48"
+        />
+        <div class="home-game-meta">
+          <a href="{{ '/projects/basketball/' | relative_url }}">Rapid Fire Free Throws</a>
+          <p class="home-game-description">Launch nonstop free throws in a frantic showdown.</p>
+        </div>
+      </li>
     </ul>
   </section>
 

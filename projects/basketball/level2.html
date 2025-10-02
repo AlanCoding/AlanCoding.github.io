@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Rapid Fire Free Throws</title>
+  <title>Rapid Fire Free Throws — Level 2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
@@ -97,6 +97,15 @@
       font-weight: 700;
     }
 
+    .level-lock-banner {
+      margin: 0 0 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      background: rgba(63, 79, 155, 0.12);
+      color: #1f2b5c;
+      font-weight: 600;
+    }
+
     h1 {
       font-size: clamp(2.2rem, 3vw + 1rem, 3.2rem);
       text-align: center;
@@ -178,6 +187,68 @@
       border-radius: 12px;
       border: 2px solid rgba(25, 40, 92, 0.15);
       background: linear-gradient(#9acbff, #87b7ff);
+    }
+
+    canvas.board-enabled {
+      cursor: grab;
+    }
+
+    canvas.board-enabled.board-dragging {
+      cursor: grabbing;
+    }
+
+    .win-progress {
+      margin: 1.5rem auto 0.75rem;
+      padding: 0.85rem 1.25rem;
+      max-width: 640px;
+      text-align: center;
+      border-radius: 12px;
+      background: rgba(63, 79, 155, 0.14);
+      color: #263474;
+      font-weight: 600;
+      box-shadow: 0 10px 18px rgba(40, 52, 120, 0.18);
+    }
+
+    .win-progress--unlocked {
+      background: rgba(255, 120, 44, 0.18);
+      color: #8c3515;
+      box-shadow: 0 12px 22px rgba(214, 102, 49, 0.24);
+    }
+
+    .win-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      margin: 0 auto 2rem;
+      padding: 0.95rem 2.6rem;
+      border-radius: 999px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: #fff;
+      background: linear-gradient(135deg, #ff782c, #ff4e9c);
+      box-shadow: 0 18px 30px rgba(240, 80, 120, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    }
+
+    .win-link--available {
+      box-shadow: 0 20px 34px rgba(240, 80, 120, 0.32);
+    }
+
+    .win-link:hover,
+    .win-link:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 34px rgba(240, 80, 120, 0.35);
+      outline: none;
+    }
+
+    .win-link:focus-visible {
+      box-shadow: 0 0 0 3px rgba(255, 120, 44, 0.35), 0 22px 34px rgba(240, 80, 120, 0.35);
+    }
+
+    .win-link[hidden] {
+      display: none;
     }
 
     .court-wrapper {
@@ -302,10 +373,13 @@
     <h1>Rapid Fire Free Throws</h1>
     <nav class="level-nav" aria-label="Basketball levels">
       <span>Levels:</span>
-      <a class="level-link level-link--current" href="./">Level 1</a>
-      <a id="level2-link" class="level-link level-link--locked" href="./level2.html" aria-disabled="true" tabindex="-1">Level 2</a>
-      <span id="level2-lock-text" class="level-lock-text">Score 70+ on Level 1 to unlock.</span>
+      <a class="level-link" href="./">Level 1</a>
+      <a id="level2-link" class="level-link level-link--current" href="./level2.html">Level 2</a>
+      <span id="level2-lock-text" class="level-lock-text">Reach 70 on Level 1 to unlock this level.</span>
     </nav>
+    <p id="level2-locked-message" class="level-lock-banner" hidden>
+      Score 70 or more on Level 1 to unlock this advanced drill. Your best runs will appear here once unlocked.
+    </p>
     <div id="hud">
       <span id="score">Score: 0</span>
       <span id="balls">Balls in play: 0</span>
@@ -314,8 +388,9 @@
       <button id="stop" disabled>Stop</button>
     </div>
     <p class="level-intro">
-      Level 1: the opposing team hacked your shooter 200 times, so you now get free throws.
-      Nail as many as you can—NBA elites clear 90% (a score of 180!). Future levels are on the drawing board.
+      Level 2: the practice court added a roaming backboard. Drag it with your pointer or nudge it with WASD/arrow keys
+      to send ricocheting shots into the hoop. Keep your rhythm—balls still launch for ten frantic seconds, and the clock
+      gives rebounds a couple extra beats to settle before tallying your score.
     </p>
     <div id="controls">
       <label for="angle-control">
@@ -333,6 +408,19 @@
       <canvas id="court" width="960" height="540"></canvas>
       <div id="score-flash" role="status" aria-live="polite"></div>
     </div>
+    <p id="win-progress" class="win-progress">
+      Score 170 or more on Level 2 to unlock the victory celebration.
+    </p>
+    <a
+      id="win-link"
+      class="win-link"
+      href="win.html"
+      hidden
+      aria-hidden="true"
+      tabindex="-1"
+    >
+      🎉 Visit the victory celebration
+    </a>
     <p>Unleash a cascade of free throws! Hit the button to fire 20 balls a second for ten straight seconds. Shots ricochet off the floor, the wall, and even each other. Sink them through the hoop before time runs out.</p>
     <section id="run-history">
       <h2>Top 10 Runs</h2>
@@ -352,17 +440,42 @@
       </table>
     </section>
   </main>
+
   <script src="common.js"></script>
   <script>
     window.RapidFireFreeThrows.initGame({
-      historyCookie: 'rapid_fire_runs_level1_v1',
+      historyCookie: 'rapid_fire_runs_level2_v1',
       unlockThreshold: 70,
-      unlockLockedText: 'Score 70+ on Level 1 to unlock.',
-      unlockUnlockedText: 'Level 2 unlocked!',
-      level2LinkId: 'level2-link',
+      unlockLockedText: 'Reach 70+ on Level 1 to unlock this level.',
+      unlockUnlockedText: 'Level 2 unlocked! Guide the board to redirect shots.',
       level2LockTextId: 'level2-lock-text',
-      scoreFlashId: 'score-flash'
+      lockBannerId: 'level2-locked-message',
+      scoreFlashId: 'score-flash',
+      simulationDurationMs: 12000,
+      disableUntilUnlocked: true,
+      board: {
+        width: 11.5,
+        aspect: 264 / 8000,
+        x: 19.2,
+        y: 8.4,
+        speed: 13,
+        restitution: 0.92,
+        padding: 0.6,
+        verticalPadding: 0.6,
+        textureUrl: 'assets/board.png'
+      },
+      win: {
+        threshold: 170,
+        linkId: 'win-link',
+        messageId: 'win-progress',
+        storageKey: 'rapid_fire_free_throws_victory_unlocked',
+        lockedText: 'Score 170 or more on Level 2 to unlock the celebration.',
+        unlockedText: 'Victory unlocked! Tap the button below to celebrate your win.'
+      },
+      getUnlockScore: helpers => helpers.getBestScoreFromCookie('rapid_fire_runs_level1_v1')
     });
   </script>
+
+
 </body>
 </html>

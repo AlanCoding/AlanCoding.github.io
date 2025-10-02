@@ -146,6 +146,15 @@ p {
         color: #00a;
         text-align : center;
 }
+
+.hero-image {
+    display: block;
+    margin: 0 auto 18px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+}
 </style>
 </head>
 
@@ -160,14 +169,22 @@ p {
 	<p>Unscrambling attempt: </p>
 	<div id="showIt" class="mainOut"></div>
 	<p>Other possibilities: </p>
-	<p><ul>
-		<li><div id="show1" class="outField"></div></li>
-		<li><div id="show2" class="outField"></div></li>
-		<li><div id="show3" class="outField"></div></li>
-		<li><div id="show4" class="outField"></div></li>
-	</ul></p>
+        <p><ul>
+                <li><div id="show1" class="outField"></div></li>
+                <li><div id="show2" class="outField"></div></li>
+                <li><div id="show3" class="outField"></div></li>
+                <li><div id="show4" class="outField"></div></li>
+        </ul></p>
 
-	<hr/>
+        <img
+            src="assets/letters.png"
+            alt="A colorful jumble of letter tiles"
+            class="hero-image"
+            width="1024"
+            height="1024"
+        />
+
+        <hr/>
 
 	<p>About:</p>
 	<p>Created by Alan Rominger 2015 strictly for learning purposes.
