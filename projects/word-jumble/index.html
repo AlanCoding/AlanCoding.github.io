@@ -146,6 +146,15 @@ p {
         color: #00a;
         text-align : center;
 }
+
+.hero-image {
+    display: block;
+    margin: 0 auto 18px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+}
 </style>
 </head>
 
@@ -154,6 +163,14 @@ p {
 <div class="mainDiv">
 
         <p class="back-link"><a href="/">&larr; Back to site index</a></p>
+
+        <img
+            src="assets/letters.png"
+            alt="A colorful jumble of letter tiles"
+            class="hero-image"
+            width="1024"
+            height="1024"
+        />
 
         <h1>Type a word to see if this page can unscramble it!</h1>
 	<p><input type="text" id="userWord" onkeyup="closestWord()" value=""/></p>

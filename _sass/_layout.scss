@@ -277,6 +277,38 @@
     }
 }
 
+.home-links--games > li {
+    display: flex;
+    align-items: center;
+    gap: $spacing-unit / 2;
+    padding: ($spacing-unit / 3);
+    background: lighten($background-color, 2%);
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+}
+
+.home-game-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 1px rgba(30, 40, 80, 0.12);
+}
+
+.home-game-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.home-game-description {
+    margin: 0;
+    font-size: 0.92rem;
+    color: $text-color;
+    opacity: 0.8;
+}
+
 .home-links a {
     font-weight: 600;
 }
@@ -303,6 +335,12 @@
 }
 
 @include media-query($on-palm) {
+    .home-links--games > li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: $spacing-unit / 4;
+    }
+
     .home-placeholders > li {
         flex-direction: column;
         text-align: center;
