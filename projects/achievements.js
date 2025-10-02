@@ -12,6 +12,25 @@ const BASKETBALL_LEVELS = [
   { key: 'level2', label: 'Level 2', cookie: 'rapid_fire_runs_level2_v1' },
 ];
 const DATA_EXPORT_VERSION = 1;
+const ACHIEVEMENT_STATE_KEY = 'game_zone_achievement_state_v1';
+const ACHIEVEMENTS = [
+  {
+    id: 'word-aeprs',
+    name: 'aeprs creepers!',
+    description: "Log the chilling letter combo 'aeprs' in your Word Jumble history.",
+    check: facts => facts.wordEntries.some(entry => typeof entry.word === 'string' && entry.word.toLowerCase() === 'aeprs'),
+  },
+  {
+    id: 'basketball-curry-hurry',
+    name: 'Curry hurry!',
+    description: 'Drop at least 180 points on Level 2 to prove a blistering 90% free throw percentage.',
+    check: facts => (facts.basketball.level2?.bestScore ?? 0) >= 180,
+  },
+];
+
+const achievementToastQueue = [];
+let activeAchievementTimer = null;
+let achievementStateMemory = null;
 
 function renderMinesweeperSummary(repo) {
   const tbody = document.getElementById('minesweeperSummary');
@@ -191,6 +210,196 @@ function renderBasketballSummary() {
   }
 }
 
+function collectAchievementFacts() {
+  const wordEntries = loadWordJumbleEntries();
+  const basketball = {};
+  BASKETBALL_LEVELS.forEach(level => {
+    const records = parseBasketballHistory(level.cookie);
+    basketball[level.key] = {
+      records,
+      bestScore: records.length > 0 ? Number(records[0].score || 0) : 0,
+    };
+  });
+  return { wordEntries, basketball };
+}
+
+function evaluateAchievementStates(facts) {
+  return ACHIEVEMENTS.map(({ check, ...meta }) => ({
+    ...meta,
+    unlocked: Boolean(check(facts)),
+  }));
+}
+
+function renderAchievementsSection(states) {
+  const list = document.getElementById('achievementList');
+  const progress = document.getElementById('achievementProgress');
+  if (!list) {
+    return;
+  }
+  list.innerHTML = '';
+
+  const unlockedCount = states.filter(state => state.unlocked).length;
+  if (progress) {
+    if (states.length === 0) {
+      progress.textContent = 'Achievements coming soon.';
+    } else {
+      progress.textContent = `You have gotten ${unlockedCount} of ${states.length} achievements.`;
+    }
+  }
+
+  if (states.length === 0) {
+    const emptyItem = document.createElement('li');
+    emptyItem.className = 'achievement-empty';
+    emptyItem.textContent = 'No achievements to display just yet.';
+    list.appendChild(emptyItem);
+    return;
+  }
+
+  states.forEach(state => {
+    const item = document.createElement('li');
+    item.className = `achievement-item${state.unlocked ? ' achievement-item--unlocked' : ''}`;
+
+    const status = document.createElement('span');
+    status.className = 'achievement-item__status';
+    status.textContent = state.unlocked ? '✓' : '✗';
+    status.setAttribute('role', 'img');
+    status.setAttribute('aria-label', state.unlocked ? 'Completed achievement' : 'Locked achievement');
+
+    const body = document.createElement('div');
+    body.className = 'achievement-item__body';
+
+    const title = document.createElement('h3');
+    title.textContent = state.name;
+    const srStatus = document.createElement('span');
+    srStatus.className = 'u-screen-reader-text';
+    srStatus.textContent = state.unlocked ? ' (achievement completed)' : ' (achievement locked)';
+    title.appendChild(srStatus);
+
+    const description = document.createElement('p');
+    description.textContent = state.description;
+
+    body.appendChild(title);
+    body.appendChild(description);
+
+    item.appendChild(status);
+    item.appendChild(body);
+    list.appendChild(item);
+  });
+}
+
+function refreshAchievementSection(options = {}) {
+  const { announce = true } = options;
+  const facts = collectAchievementFacts();
+  const states = evaluateAchievementStates(facts);
+  renderAchievementsSection(states);
+
+  if (achievementStateMemory === null) {
+    achievementStateMemory = loadAchievementState();
+  }
+
+  const previousState = achievementStateMemory || {};
+  const nextState = {};
+  const newlyUnlocked = [];
+
+  states.forEach(state => {
+    nextState[state.id] = state.unlocked;
+    if (announce && state.unlocked && !previousState[state.id]) {
+      newlyUnlocked.push(state);
+    }
+  });
+
+  achievementStateMemory = nextState;
+  saveAchievementState(nextState);
+
+  if (announce) {
+    newlyUnlocked.forEach(achievement => enqueueAchievementToast(achievement));
+  }
+}
+
+function enqueueAchievementToast(achievement) {
+  achievementToastQueue.push(achievement);
+  if (!activeAchievementTimer) {
+    showNextAchievementToast();
+  }
+}
+
+function showNextAchievementToast() {
+  const container = document.getElementById('achievementToastContainer');
+  if (!container) {
+    achievementToastQueue.length = 0;
+    activeAchievementTimer = null;
+    return;
+  }
+
+  if (activeAchievementTimer) {
+    return;
+  }
+
+  if (achievementToastQueue.length === 0) {
+    container.classList.remove('is-active');
+    container.innerHTML = '';
+    activeAchievementTimer = null;
+    return;
+  }
+
+  const achievement = achievementToastQueue.shift();
+  container.innerHTML = '';
+  const toast = document.createElement('div');
+  toast.className = 'achievement-toast';
+
+  const eyebrow = document.createElement('p');
+  eyebrow.className = 'achievement-toast__eyebrow';
+  eyebrow.textContent = 'Achievement unlocked!';
+
+  const title = document.createElement('p');
+  title.className = 'achievement-toast__title';
+  title.textContent = achievement.name;
+
+  const description = document.createElement('p');
+  description.className = 'achievement-toast__body';
+  description.textContent = achievement.description;
+
+  toast.appendChild(eyebrow);
+  toast.appendChild(title);
+  toast.appendChild(description);
+
+  container.appendChild(toast);
+  container.classList.add('is-active');
+
+  activeAchievementTimer = window.setTimeout(() => {
+    container.classList.remove('is-active');
+    container.innerHTML = '';
+    activeAchievementTimer = null;
+    if (achievementToastQueue.length > 0) {
+      window.setTimeout(showNextAchievementToast, 250);
+    }
+  }, 5000);
+}
+
+function loadAchievementState() {
+  try {
+    const raw = window.localStorage.getItem(ACHIEVEMENT_STATE_KEY);
+    if (!raw) {
+      return {};
+    }
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') {
+      return {};
+    }
+    return parsed;
+  } catch (error) {
+    return {};
+  }
+}
+
+function saveAchievementState(state) {
+  try {
+    window.localStorage.setItem(ACHIEVEMENT_STATE_KEY, JSON.stringify(state));
+  } catch (error) {
+    // ignore persistence errors
+  }
+}
+
 function setupMinesweeperManagement(repo) {
   const modeSelect = document.getElementById('manageMode');
   const difficultySelect = document.getElementById('manageDifficulty');
@@ -240,6 +449,7 @@ function setupWordJumbleManagement() {
       // ignore storage removal failures
     }
     renderWordJumbleSummary();
+    refreshAchievementSection();
     if (messageEl) {
       messageEl.textContent = 'Word Jumble leaderboard cleared.';
     }
@@ -257,6 +467,7 @@ function setupBasketballManagement() {
       writeCookie(level.cookie, '', -1);
     });
     renderBasketballSummary();
+    refreshAchievementSection();
     if (messageEl) {
       messageEl.textContent = 'Rapid Fire run history cleared.';
     }
@@ -359,6 +570,7 @@ function applyImportedData(repo, data) {
   renderMinesweeperSummary(repo);
   renderWordJumbleSummary();
   renderBasketballSummary();
+  refreshAchievementSection();
 }
 
 function setupGlobalManagement(repo) {
@@ -424,6 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderMinesweeperSummary(repo);
   renderWordJumbleSummary();
   renderBasketballSummary();
+  refreshAchievementSection();
   setupGlobalManagement(repo);
   setupMinesweeperManagement(repo);
   setupWordJumbleManagement();

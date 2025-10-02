@@ -86,6 +86,17 @@ permalink: /projects/
     </article>
   </section>
 
+  <section class="achievements-trophies" aria-labelledby="trophiesHeading">
+    <div class="achievements-trophies__header">
+      <div>
+        <h2 id="trophiesHeading">Achievements</h2>
+        <p class="achievements-trophies__lead">Goals unlocked across every leaderboard.</p>
+      </div>
+      <p id="achievementProgress" class="achievements-trophies__count" role="status" aria-live="polite"></p>
+    </div>
+    <ul id="achievementList" class="achievements-trophies__list" role="list"></ul>
+  </section>
+
   <section class="achievements-management" aria-labelledby="managementHeading">
     <h2 id="managementHeading">Leaderboard Management</h2>
     <p class="achievements-management__intro">Export backups, import shared records, or clear the slate across every game.</p>
@@ -142,5 +153,7 @@ permalink: /projects/
     </div>
   </section>
 </div>
+
+<div id="achievementToastContainer" class="achievement-toast-container" aria-live="assertive" aria-atomic="true"></div>
 
 <script type="module" src="{{ '/projects/achievements.js' | relative_url }}"></script>
