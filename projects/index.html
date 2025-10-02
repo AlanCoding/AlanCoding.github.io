@@ -4,6 +4,13 @@ permalink: /projects/
 ---
 
 <div class="achievements-page">
+  <nav class="achievements-nav" aria-label="Game navigation">
+    <a class="achievements-nav__link" href="{{ '/' | relative_url }}">&larr; Back to home</a>
+    <a class="achievements-nav__link" href="{{ '/projects/minesweeper/' | relative_url }}">Play Minesweeper</a>
+    <a class="achievements-nav__link" href="{{ '/projects/word-jumble/' | relative_url }}">Play Word Jumble</a>
+    <a class="achievements-nav__link" href="{{ '/projects/basketball/' | relative_url }}">Play Rapid Fire Free Throws</a>
+  </nav>
+
   <header class="achievements-hero">
     <div class="achievements-hero__art">
       <img src="{{ '/projects/minesweeper/flag.png' | relative_url }}" alt="Minesweeper flag icon" width="64" height="64" />
@@ -64,20 +71,17 @@ permalink: /projects/
           <p class="achievement-card__lead">Top scores from the free throw cannon.</p>
         </div>
       </header>
-      <dl class="achievement-stats" id="basketballStats">
-        <div class="achievement-stats__row">
-          <dt>Best Score</dt>
-          <dd id="basketballBest">—</dd>
-        </div>
-        <div class="achievement-stats__row">
-          <dt>High Score Date</dt>
-          <dd id="basketballBestDate">—</dd>
-        </div>
-        <div class="achievement-stats__row">
-          <dt>Runs Logged</dt>
-          <dd id="basketballRuns">0</dd>
-        </div>
-      </dl>
+      <table class="achievement-table">
+        <thead>
+          <tr>
+            <th scope="col">Level</th>
+            <th scope="col">Best Score</th>
+            <th scope="col">High Score Date</th>
+            <th scope="col">Runs Logged</th>
+          </tr>
+        </thead>
+        <tbody id="basketballSummary"></tbody>
+      </table>
       <p id="basketballEmpty" class="achievement-empty" hidden>Launch a volley of shots to begin charting history.</p>
     </article>
   </section>
@@ -86,15 +90,21 @@ permalink: /projects/
     <h2 id="managementHeading">Leaderboard Management</h2>
     <p class="achievements-management__intro">Export backups, import shared records, or clear the slate across every game.</p>
 
-    <div class="management-card" data-manage="minesweeper">
-      <h3>Minesweeper Leaderboards</h3>
+    <div class="management-card" data-manage="all">
+      <h3>All Game Data</h3>
+      <p>Download your complete game history or import a shared save to sync every leaderboard.</p>
       <div class="management-card__controls">
-        <button id="manageDownloadScores" type="button">Download Scores</button>
+        <button id="manageDownloadAll" type="button">Download All Scores</button>
         <label class="management-import">
-          <span>Import Scores</span>
-          <input type="file" id="manageImportScores" accept="application/json" />
+          <span>Import All Scores</span>
+          <input type="file" id="manageImportAll" accept="application/json" />
         </label>
       </div>
+      <p id="manageAllMessage" class="management-message" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="management-card" data-manage="minesweeper">
+      <h3>Minesweeper Leaderboards</h3>
       <div class="management-card__grid">
         <label>
           Mode

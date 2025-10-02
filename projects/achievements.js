@@ -7,7 +7,11 @@ const MINESWEEPER_DIFFICULTIES = [
 ];
 
 const WORD_JUMBLE_STORAGE_KEY = 'word_jumble_power_stats_v1';
-const BASKETBALL_COOKIE = 'rapid_fire_runs_level1_v1';
+const BASKETBALL_LEVELS = [
+  { key: 'level1', label: 'Level 1', cookie: 'rapid_fire_runs_level1_v1' },
+  { key: 'level2', label: 'Level 2', cookie: 'rapid_fire_runs_level2_v1' },
+];
+const DATA_EXPORT_VERSION = 1;
 
 function renderMinesweeperSummary(repo) {
   const tbody = document.getElementById('minesweeperSummary');
@@ -57,6 +61,14 @@ function loadWordJumbleEntries() {
   }
 }
 
+function saveWordJumbleEntries(entries) {
+  try {
+    window.localStorage.setItem(WORD_JUMBLE_STORAGE_KEY, JSON.stringify(entries));
+  } catch (error) {
+    // ignore storage failures
+  }
+}
+
 function renderWordJumbleSummary() {
   const list = document.getElementById('wordJumbleHighlights');
   const emptyState = document.getElementById('wordJumbleEmpty');
@@ -100,8 +112,8 @@ function renderWordJumbleSummary() {
   });
 }
 
-function parseBasketballHistory() {
-  const cookieValue = readCookie(BASKETBALL_COOKIE);
+function parseBasketballHistory(cookieName) {
+  const cookieValue = readCookie(cookieName);
   if (!cookieValue) {
     return [];
   }
@@ -140,36 +152,46 @@ function normalizeBasketballEntry(entry) {
 }
 
 function renderBasketballSummary() {
-  const statsContainer = document.getElementById('basketballStats');
+  const tbody = document.getElementById('basketballSummary');
   const emptyState = document.getElementById('basketballEmpty');
-  const bestEl = document.getElementById('basketballBest');
-  const bestDateEl = document.getElementById('basketballBestDate');
-  const runsEl = document.getElementById('basketballRuns');
-  const records = parseBasketballHistory();
-  if (!statsContainer || !bestEl || !bestDateEl || !runsEl) {
+  if (!tbody) {
     return;
   }
-  runsEl.textContent = String(records.length);
-  if (records.length === 0) {
-    bestEl.textContent = '—';
-    bestDateEl.textContent = '—';
-    if (emptyState) {
-      emptyState.hidden = false;
+  tbody.innerHTML = '';
+  let hasRuns = false;
+  BASKETBALL_LEVELS.forEach(level => {
+    const records = parseBasketballHistory(level.cookie);
+    const best = records.length > 0 ? records[0] : null;
+    const row = document.createElement('tr');
+    const levelCell = document.createElement('th');
+    levelCell.scope = 'row';
+    levelCell.textContent = level.label;
+    const scoreCell = document.createElement('td');
+    scoreCell.textContent = best ? String(best.score) : '—';
+    const dateCell = document.createElement('td');
+    if (best && best.timestamp) {
+      const date = new Date(best.timestamp);
+      dateCell.textContent = Number.isNaN(date.getTime()) ? best.timestamp : date.toLocaleString();
+    } else {
+      dateCell.textContent = '—';
     }
-    return;
-  }
+    const runsCell = document.createElement('td');
+    runsCell.textContent = String(records.length);
+    row.appendChild(levelCell);
+    row.appendChild(scoreCell);
+    row.appendChild(dateCell);
+    row.appendChild(runsCell);
+    tbody.appendChild(row);
+    if (records.length > 0) {
+      hasRuns = true;
+    }
+  });
   if (emptyState) {
-    emptyState.hidden = true;
+    emptyState.hidden = hasRuns;
   }
-  const best = records[0];
-  bestEl.textContent = `${best.score}`;
-  const date = new Date(best.timestamp);
-  bestDateEl.textContent = Number.isNaN(date.getTime()) ? best.timestamp : date.toLocaleString();
 }
 
 function setupMinesweeperManagement(repo) {
-  const downloadBtn = document.getElementById('manageDownloadScores');
-  const importInput = document.getElementById('manageImportScores');
   const modeSelect = document.getElementById('manageMode');
   const difficultySelect = document.getElementById('manageDifficulty');
   const clearSelectedBtn = document.getElementById('manageClearSelected');
@@ -182,39 +204,6 @@ function setupMinesweeperManagement(repo) {
     }
     messageEl.textContent = text;
     messageEl.dataset.state = type;
-  }
-
-  if (downloadBtn) {
-    downloadBtn.addEventListener('click', () => {
-      const payload = repo.exportScores();
-      const blob = new Blob([payload], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement('a');
-      anchor.href = url;
-      anchor.download = 'minesweeper-scores.json';
-      anchor.click();
-      URL.revokeObjectURL(url);
-      setMessage('Scores downloaded to your device.');
-    });
-  }
-
-  if (importInput) {
-    importInput.addEventListener('change', async event => {
-      const file = event.target.files?.[0];
-      if (!file) {
-        return;
-      }
-      try {
-        const text = await file.text();
-        repo.mergeScores(text);
-        renderMinesweeperSummary(repo);
-        setMessage('Scores imported successfully.', 'success');
-      } catch (error) {
-        setMessage('Unable to import scores. Try a valid minesweeper JSON export.', 'error');
-      } finally {
-        event.target.value = '';
-      }
-    });
   }
 
   if (clearSelectedBtn && modeSelect && difficultySelect) {
@@ -264,12 +253,159 @@ function setupBasketballManagement() {
     return;
   }
   resetBtn.addEventListener('click', () => {
-    writeCookie(BASKETBALL_COOKIE, '', -1);
+    BASKETBALL_LEVELS.forEach(level => {
+      writeCookie(level.cookie, '', -1);
+    });
     renderBasketballSummary();
     if (messageEl) {
       messageEl.textContent = 'Rapid Fire run history cleared.';
     }
   });
+}
+
+function normalizeWordJumbleEntries(entries) {
+  if (!Array.isArray(entries)) {
+    return [];
+  }
+  const normalized = entries
+    .map(entry => {
+      if (!entry || typeof entry !== 'object') {
+        return null;
+      }
+      const rawWord = typeof entry.word === 'string' ? entry.word.trim().toLowerCase() : '';
+      if (!rawWord) {
+        return null;
+      }
+      const display = typeof entry.display === 'string' && entry.display.trim() ? entry.display : entry.word;
+      const countNumber = Number(entry.count);
+      const count = Number.isFinite(countNumber) && countNumber > 0 ? Math.floor(countNumber) : 0;
+      const updatedAt = typeof entry.updatedAt === 'string' && entry.updatedAt ? entry.updatedAt : new Date().toISOString();
+      return { word: rawWord, display: display || rawWord, count, updatedAt };
+    })
+    .filter(Boolean);
+  normalized.sort((a, b) => {
+    if ((b.count || 0) !== (a.count || 0)) {
+      return (b.count || 0) - (a.count || 0);
+    }
+    if ((b.updatedAt || '') !== (a.updatedAt || '')) {
+      return (b.updatedAt || '').localeCompare(a.updatedAt || '');
+    }
+    return (a.word || '').localeCompare(b.word || '');
+  });
+  return normalized.slice(0, 50);
+}
+
+function normalizeBasketballEntries(entries) {
+  if (!Array.isArray(entries)) {
+    return [];
+  }
+  return entries
+    .map(entry => normalizeBasketballEntry(entry))
+    .filter(Boolean)
+    .sort((a, b) => {
+      if ((b.score || 0) !== (a.score || 0)) {
+        return (b.score || 0) - (a.score || 0);
+      }
+      return (b.timestamp || '').localeCompare(a.timestamp || '');
+    })
+    .slice(0, 10);
+}
+
+function collectAllGameData(repo) {
+  const payload = {
+    version: DATA_EXPORT_VERSION,
+    exportedAt: new Date().toISOString(),
+    games: {
+      minesweeper: null,
+      wordJumble: [],
+      basketball: {},
+    },
+  };
+  try {
+    payload.games.minesweeper = JSON.parse(repo.exportScores());
+  } catch (error) {
+    payload.games.minesweeper = null;
+  }
+  payload.games.wordJumble = loadWordJumbleEntries();
+  BASKETBALL_LEVELS.forEach(level => {
+    payload.games.basketball[level.key] = parseBasketballHistory(level.cookie);
+  });
+  return payload;
+}
+
+function applyImportedData(repo, data) {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid import format.');
+  }
+  const games = data.games && typeof data.games === 'object' ? data.games : data;
+  if (games.minesweeper) {
+    repo.mergeScores(JSON.stringify(games.minesweeper));
+  }
+  if (Array.isArray(games.wordJumble)) {
+    const normalized = normalizeWordJumbleEntries(games.wordJumble);
+    saveWordJumbleEntries(normalized);
+  }
+  if (games.basketball && typeof games.basketball === 'object') {
+    BASKETBALL_LEVELS.forEach(level => {
+      const rawEntries = games.basketball[level.key] ?? games.basketball[level.cookie] ?? [];
+      const normalized = normalizeBasketballEntries(rawEntries);
+      if (normalized.length > 0) {
+        writeCookie(level.cookie, JSON.stringify(normalized));
+      } else {
+        writeCookie(level.cookie, '', -1);
+      }
+    });
+  }
+  renderMinesweeperSummary(repo);
+  renderWordJumbleSummary();
+  renderBasketballSummary();
+}
+
+function setupGlobalManagement(repo) {
+  const downloadBtn = document.getElementById('manageDownloadAll');
+  const importInput = document.getElementById('manageImportAll');
+  const messageEl = document.getElementById('manageAllMessage');
+
+  function setMessage(text, type = 'info') {
+    if (!messageEl) {
+      return;
+    }
+    messageEl.textContent = text;
+    messageEl.dataset.state = type;
+  }
+
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', () => {
+      const payload = collectAllGameData(repo);
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'game-zone-scores.json';
+      anchor.click();
+      URL.revokeObjectURL(url);
+      setMessage('All scores downloaded to your device.', 'success');
+    });
+  }
+
+  if (importInput) {
+    importInput.addEventListener('change', async event => {
+      const file = event.target.files?.[0];
+      if (!file) {
+        return;
+      }
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        applyImportedData(repo, parsed);
+        setMessage('All scores imported successfully.', 'success');
+      } catch (error) {
+        setMessage('Unable to import scores. Please select a valid export.', 'error');
+      } finally {
+        event.target.value = '';
+      }
+    });
+  }
 }
 
 function readCookie(name) {
@@ -288,6 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderMinesweeperSummary(repo);
   renderWordJumbleSummary();
   renderBasketballSummary();
+  setupGlobalManagement(repo);
   setupMinesweeperManagement(repo);
   setupWordJumbleManagement();
   setupBasketballManagement();

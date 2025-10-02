@@ -268,6 +268,12 @@ p {
     border-radius: 12px;
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
 }
+.other-list {
+    margin: 0 0 12px 24px;
+}
+.other-list li {
+    margin: 4px 0;
+}
 .power-zone {
     margin-top: 16px;
     padding: 12px;
@@ -383,13 +389,17 @@ p {
 	<p><input type="text" id="userWord" onkeyup="closestWord()" value=""/></p>
 	<p>Unscrambling attempt: </p>
 	<div id="showIt" class="mainOut"></div>
+        <p>Other possibilities: </p>
+        <ul class="other-list">
+                <li><div id="show1" class="outField"></div></li>
+                <li><div id="show2" class="outField"></div></li>
+                <li><div id="show3" class="outField"></div></li>
+                <li><div id="show4" class="outField"></div></li>
+        </ul>
+
         <div class="power-zone">
                 <h2 class="power-heading">POWER ANAGRAMS</h2>
                 <ul class="power-list">
-                        <li class="power-item"><div id="show1" class="outField"></div></li>
-                        <li class="power-item"><div id="show2" class="outField"></div></li>
-                        <li class="power-item"><div id="show3" class="outField"></div></li>
-                        <li class="power-item"><div id="show4" class="outField"></div></li>
                         <li class="power-item power-item--charged"><div id="show5" class="outField"></div></li>
                         <li class="power-item power-item--hyper"><div id="show6" class="outField"></div></li>
                 </ul>
