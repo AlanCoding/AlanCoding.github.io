@@ -33,6 +33,11 @@
     const level2Link = config.level2LinkId ? doc.getElementById(config.level2LinkId) : null;
     const level2LockText = config.level2LockTextId ? doc.getElementById(config.level2LockTextId) : null;
     const lockBanner = config.lockBannerId ? doc.getElementById(config.lockBannerId) : null;
+    const winConfig = config.win || null;
+    const winLink = winConfig && winConfig.linkId ? doc.getElementById(winConfig.linkId) : null;
+    const winMessage = winConfig && winConfig.messageId ? doc.getElementById(winConfig.messageId) : null;
+    const winThreshold = winConfig && typeof winConfig.threshold === 'number' ? winConfig.threshold : null;
+    const winStorageKey = winConfig && winConfig.storageKey ? winConfig.storageKey : null;
 
     if (!gl) {
       if (shootButton) shootButton.disabled = true;
@@ -130,6 +135,7 @@
     updateControls();
     renderHistory();
     levelUnlocked = updateLevelUnlockState();
+    updateWinState();
     renderScene();
     updateHud(performance.now());
     hideScoreFlash();
@@ -308,6 +314,7 @@
       saveHistory(runHistory);
       renderHistory();
       levelUnlocked = updateLevelUnlockState();
+      updateWinState(outcome === 'completed' ? score : null);
 
       currentRun.state = outcome;
       currentRun = null;
@@ -716,6 +723,69 @@
       return unlocked;
     }
 
+    function updateWinState(latestScore = null) {
+      if (!winConfig || !Number.isFinite(winThreshold)) {
+        if (winLink) {
+          winLink.hidden = true;
+        }
+        if (winMessage) {
+          winMessage.hidden = true;
+        }
+        return false;
+      }
+
+      let bestScore = getBestScore(runHistory);
+      if (Number.isFinite(latestScore) && latestScore > bestScore) {
+        bestScore = latestScore;
+      }
+
+      const unlockedFromScore = Number.isFinite(bestScore) && bestScore >= winThreshold;
+      const unlockedFromStorage = winStorageKey ? getStoredFlag(winStorageKey) : false;
+      const unlocked = unlockedFromScore || unlockedFromStorage;
+
+      if (unlockedFromScore && winStorageKey && !unlockedFromStorage) {
+        setStoredFlag(winStorageKey, true);
+      }
+
+      if (winLink) {
+        if (unlocked) {
+          winLink.hidden = false;
+          winLink.removeAttribute('hidden');
+          winLink.classList.add('win-link--available');
+          winLink.setAttribute('aria-hidden', 'false');
+          winLink.removeAttribute('tabindex');
+        } else {
+          winLink.hidden = true;
+          winLink.setAttribute('hidden', '');
+          winLink.classList.remove('win-link--available');
+          winLink.setAttribute('aria-hidden', 'true');
+          winLink.setAttribute('tabindex', '-1');
+        }
+      }
+
+      if (winMessage) {
+        const lockedText = winConfig.lockedText
+          ? String(winConfig.lockedText)
+          : `Score ${winThreshold}+ on Level 2 to unlock the celebration.`;
+        const unlockedText = winConfig.unlockedText
+          ? String(winConfig.unlockedText)
+          : 'Victory unlocked! Celebrate your win below!';
+        winMessage.hidden = false;
+        winMessage.textContent = unlocked ? unlockedText : lockedText;
+        winMessage.classList.toggle('win-progress--unlocked', unlocked);
+      }
+
+      if (typeof winConfig.onStateChange === 'function') {
+        winConfig.onStateChange(unlocked, {
+          bestScore,
+          unlockedFromScore,
+          unlockedFromStorage
+        });
+      }
+
+      return unlocked;
+    }
+
     function computeUnlockScore() {
       if (typeof config.getUnlockScore === 'function') {
         return config.getUnlockScore({
@@ -799,19 +869,33 @@
     }
 
     function getStoredUnlockFlag() {
+      return getStoredFlag(unlockStorageKey);
+    }
+
+    function setStoredUnlockFlag(value) {
+      setStoredFlag(unlockStorageKey, value);
+    }
+
+    function getStoredFlag(key) {
+      if (!key) {
+        return false;
+      }
       try {
-        return global.localStorage.getItem(unlockStorageKey) === 'true';
+        return global.localStorage.getItem(key) === 'true';
       } catch (error) {
         return false;
       }
     }
 
-    function setStoredUnlockFlag(value) {
+    function setStoredFlag(key, value) {
+      if (!key) {
+        return;
+      }
       try {
         if (value) {
-          global.localStorage.setItem(unlockStorageKey, 'true');
+          global.localStorage.setItem(key, 'true');
         } else {
-          global.localStorage.removeItem(unlockStorageKey);
+          global.localStorage.removeItem(key);
         }
       } catch (error) {
         // storage may be unavailable

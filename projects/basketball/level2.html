@@ -197,6 +197,60 @@
       cursor: grabbing;
     }
 
+    .win-progress {
+      margin: 1.5rem auto 0.75rem;
+      padding: 0.85rem 1.25rem;
+      max-width: 640px;
+      text-align: center;
+      border-radius: 12px;
+      background: rgba(63, 79, 155, 0.14);
+      color: #263474;
+      font-weight: 600;
+      box-shadow: 0 10px 18px rgba(40, 52, 120, 0.18);
+    }
+
+    .win-progress--unlocked {
+      background: rgba(255, 120, 44, 0.18);
+      color: #8c3515;
+      box-shadow: 0 12px 22px rgba(214, 102, 49, 0.24);
+    }
+
+    .win-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      margin: 0 auto 2rem;
+      padding: 0.95rem 2.6rem;
+      border-radius: 999px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: #fff;
+      background: linear-gradient(135deg, #ff782c, #ff4e9c);
+      box-shadow: 0 18px 30px rgba(240, 80, 120, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    }
+
+    .win-link--available {
+      box-shadow: 0 20px 34px rgba(240, 80, 120, 0.32);
+    }
+
+    .win-link:hover,
+    .win-link:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 34px rgba(240, 80, 120, 0.35);
+      outline: none;
+    }
+
+    .win-link:focus-visible {
+      box-shadow: 0 0 0 3px rgba(255, 120, 44, 0.35), 0 22px 34px rgba(240, 80, 120, 0.35);
+    }
+
+    .win-link[hidden] {
+      display: none;
+    }
+
     .court-wrapper {
       position: relative;
     }
@@ -335,7 +389,8 @@
     </div>
     <p class="level-intro">
       Level 2: the practice court added a roaming backboard. Drag it with your pointer or nudge it with WASD/arrow keys
-      to send ricocheting shots into the hoop. Keep your rhythm—balls still launch for ten frantic seconds.
+      to send ricocheting shots into the hoop. Keep your rhythm—balls still launch for ten frantic seconds, and the clock
+      gives rebounds a couple extra beats to settle before tallying your score.
     </p>
     <div id="controls">
       <label for="angle-control">
@@ -353,6 +408,19 @@
       <canvas id="court" width="960" height="540"></canvas>
       <div id="score-flash" role="status" aria-live="polite"></div>
     </div>
+    <p id="win-progress" class="win-progress">
+      Score 170 or more on Level 2 to unlock the victory celebration.
+    </p>
+    <a
+      id="win-link"
+      class="win-link"
+      href="win.html"
+      hidden
+      aria-hidden="true"
+      tabindex="-1"
+    >
+      🎉 Visit the victory celebration
+    </a>
     <p>Unleash a cascade of free throws! Hit the button to fire 20 balls a second for ten straight seconds. Shots ricochet off the floor, the wall, and even each other. Sink them through the hoop before time runs out.</p>
     <section id="run-history">
       <h2>Top 10 Runs</h2>
@@ -383,6 +451,7 @@
       level2LockTextId: 'level2-lock-text',
       lockBannerId: 'level2-locked-message',
       scoreFlashId: 'score-flash',
+      simulationDurationMs: 12000,
       disableUntilUnlocked: true,
       board: {
         width: 11.5,
@@ -394,6 +463,14 @@
         padding: 0.6,
         verticalPadding: 0.6,
         textureUrl: 'assets/board.png'
+      },
+      win: {
+        threshold: 170,
+        linkId: 'win-link',
+        messageId: 'win-progress',
+        storageKey: 'rapid_fire_free_throws_victory_unlocked',
+        lockedText: 'Score 170 or more on Level 2 to unlock the celebration.',
+        unlockedText: 'Victory unlocked! Tap the button below to celebrate your win.'
       },
       getUnlockScore: helpers => helpers.getBestScoreFromCookie('rapid_fire_runs_level1_v1')
     });
