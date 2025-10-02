@@ -166,15 +166,6 @@ export class MinesweeperUI {
         titleEl.textContent = config.label;
         header.appendChild(titleEl);
 
-        const clearBtn = this.document.createElement('button');
-        clearBtn.type = 'button';
-        clearBtn.className = 'clear-leaderboard';
-        clearBtn.dataset.mode = sectionConfig.mode;
-        clearBtn.dataset.difficulty = difficultyKey;
-        clearBtn.dataset.label = config.label;
-        clearBtn.textContent = 'Clear';
-        header.appendChild(clearBtn);
-
         board.appendChild(header);
 
         const statsEl = this.document.createElement('div');
@@ -192,7 +183,6 @@ export class MinesweeperUI {
           titleEl,
           statsEl,
           listEl: list,
-          clearButton: clearBtn,
         });
       });
       this.scoreboardContainer.appendChild(section);
@@ -212,31 +202,14 @@ export class MinesweeperUI {
         this._selectDifficulty(button.dataset.difficulty);
       });
     });
-    this.downloadBtn.addEventListener('click', () => {
-      this._downloadScores();
-    });
-    this.importInput.addEventListener('change', event => {
-      this._importScores(event);
-    });
-    if (this.scoreboardContainer) {
-      this.scoreboardContainer.addEventListener('click', event => {
-        const target = event.target;
-        if (!target || typeof target.closest !== 'function') {
-          return;
-        }
-        const button = target.closest('.clear-leaderboard');
-        if (!button) {
-          return;
-        }
-        const { mode, difficulty, label } = button.dataset;
-        if (!mode || !difficulty) {
-          return;
-        }
-        const difficultyLabel = label ?? this.difficulties[difficulty]?.label ?? difficulty;
-        this.scoreRepository.clearLeaderboard(mode, difficulty, difficultyLabel);
-        this._renderScoreboards();
-        const modeLabel = mode === 'auto' ? 'Auto' : 'User';
-        this._setStatus(`${modeLabel} ${difficultyLabel} leaderboard cleared.`);
+    if (this.downloadBtn) {
+      this.downloadBtn.addEventListener('click', () => {
+        this._downloadScores();
+      });
+    }
+    if (this.importInput) {
+      this.importInput.addEventListener('change', event => {
+        this._importScores(event);
       });
     }
     if (this.autoStrategySelect) {
@@ -558,9 +531,6 @@ export class MinesweeperUI {
         const boardLabel = board.label ?? fallbackLabel;
         if (elements.titleEl) {
           elements.titleEl.textContent = boardLabel;
-        }
-        if (elements.clearButton) {
-          elements.clearButton.dataset.label = boardLabel;
         }
         const totalGames = board.wins + board.losses;
         const winRate = totalGames === 0 ? 0 : board.wins / totalGames;

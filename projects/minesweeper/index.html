@@ -303,25 +303,6 @@
       padding-top: 12px;
       border-top: 1px solid rgba(15, 23, 42, 0.15);
     }
-    .score-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 12px;
-    }
-    .import-label {
-      position: relative;
-      overflow: hidden;
-      display: inline-flex;
-      align-items: center;
-    }
-    .import-label input {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-    }
     .score-groups {
       display: flex;
       flex-direction: column;
@@ -349,24 +330,12 @@
     .board-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       gap: 12px;
     }
     .board-header h3 {
       margin: 0;
       font-size: 1.05rem;
-    }
-    .clear-leaderboard {
-      padding: 4px 10px;
-      font-size: 0.85rem;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      border-radius: 999px;
-      background: rgba(241, 245, 249, 0.85);
-      color: #0f172a;
-      cursor: pointer;
-    }
-    .clear-leaderboard:hover {
-      background: rgba(226, 232, 240, 1);
     }
     .board-stats {
       font-size: 0.9rem;
@@ -611,13 +580,6 @@
       </div>
     </div>
     <div id="scoreboard">
-      <div class="score-controls">
-        <button id="downloadScores">Download Scores</button>
-        <label class="import-label">
-          <span>Import Scores</span>
-          <input type="file" id="importScores" accept="application/json">
-        </label>
-      </div>
       <div id="leaderboardContainer" class="score-groups"></div>
     </div>
     <section id="playerStats" class="player-stats"></section>
