@@ -8,6 +8,7 @@
 	characters that you type into the box, but in different orders">
 	<meta name="keywords" content="Word puzzle, Javascript, learn coding">
 	<meta name="author" content="Alan Rominger">
+        <script src="../shared/achievements.js"></script>
 <script type="text/javascript" src="key.js"></script>
 <script>
 function clearField() {
@@ -24,8 +25,10 @@ function closestWord() {
 	var userIn;
 	var sortIn;
 	var i,j,xLen,foundFlag;
-	var dictWord;
-	var theHaul = ["","","","",""];
+        var dictWord;
+        var theHaul = ["","","","","","",""];
+        var showIds = ["show1","show2","show3","show4","show5","show6"];
+        var overNineThousand = document.getElementById("over9000");
 	userIn = document.getElementById("userWord").value;
 	userIn = userIn.toLowerCase();
 	document.getElementById("userWord").value = userIn;
@@ -53,9 +56,9 @@ function closestWord() {
 			if (transformWord(dictWord)==sortIn) {
 				theHaul[foundFlag] = dictWord;
 				foundFlag += 1;
-				if (foundFlag>4) {
-					break;
-				}
+                                if (foundFlag>6) {
+                                        break;
+                                }
 			}
 		}
 	}
@@ -66,32 +69,31 @@ function closestWord() {
 	} else {
 		document.getElementById("showIt").innerHTML=theHaul[0];
 	}
-	if (foundFlag > 1) {
-		document.getElementById("show1").innerHTML=theHaul[1];
-	} else {
-		document.getElementById("show1").innerHTML=" - ";
-	}
-	if (foundFlag > 2) {
-		document.getElementById("show2").innerHTML=theHaul[2];
-	} else {
-		document.getElementById("show2").innerHTML=" - ";
-	}
-	if (foundFlag > 3) {
-		document.getElementById("show3").innerHTML=theHaul[3];
-	} else {
-		document.getElementById("show3").innerHTML=" - ";
-	}
-	if (foundFlag > 4) {
-		document.getElementById("show4").innerHTML=theHaul[4];
-	} else {
-		document.getElementById("show4").innerHTML=" - ";
-	}
+        for (var slot = 0; slot < showIds.length; slot++) {
+                var field = document.getElementById(showIds[slot]);
+                if (!field) {
+                        continue;
+                }
+                if (foundFlag > slot + 1) {
+                        field.innerHTML = theHaul[slot + 1];
+                } else {
+                        field.innerHTML = " - ";
+                }
+        }
+        if (overNineThousand) {
+                if (foundFlag > showIds.length) {
+                        overNineThousand.className = "over-9000 over-9000--active";
+                } else {
+                        overNineThousand.className = "over-9000";
+                }
+        }
+        updateLeaderboard(userIn, foundFlag);
 }
 function transformWord(inWord) {
-	var outWord = "";
-	var charLow;
-	var inWord2;
-	inWord2 = inWord;
+        var outWord = "";
+        var charLow;
+        var inWord2;
+        inWord2 = inWord;
 	var j,k,l;
 	for (j=0; j<inWord.length; j++) {
 		l=0;
@@ -104,9 +106,124 @@ function transformWord(inWord) {
 		}
 		outWord = outWord + charLow;
 		inWord2 = inWord2.substring(0,l)+inWord2.substring(l+1,inWord2.length);
-	}
-	return outWord;
+        }
+        return outWord;
 }
+
+var leaderboardKey = "word_jumble_power_stats_v1";
+
+function loadLeaderboard() {
+        try {
+                var payload = window.localStorage.getItem(leaderboardKey);
+                if (!payload) {
+                        return [];
+                }
+                var data = JSON.parse(payload);
+                if (!Array.isArray(data)) {
+                        return [];
+                }
+                return data;
+        } catch (err) {
+                return [];
+        }
+}
+
+function saveLeaderboard(entries) {
+        try {
+                window.localStorage.setItem(leaderboardKey, JSON.stringify(entries));
+        } catch (err) {
+                // ignore storage failures
+        }
+}
+
+function updateLeaderboard(word, count) {
+        if (!word || count <= 0) {
+                renderLeaderboard();
+                return;
+        }
+        var normalized = word.trim().toLowerCase();
+        if (!normalized) {
+                renderLeaderboard();
+                return;
+        }
+        var entries = loadLeaderboard();
+        var timestamp = new Date().toISOString();
+        var found = false;
+        for (var i = 0; i < entries.length; i++) {
+                if (entries[i].word === normalized) {
+                        entries[i].count = Math.max(entries[i].count || 0, count);
+                        entries[i].display = word;
+                        entries[i].updatedAt = timestamp;
+                        found = true;
+                        break;
+                }
+        }
+        if (!found) {
+                entries.push({ word: normalized, display: word, count: count, updatedAt: timestamp });
+        }
+        entries.sort(function(a, b) {
+                if ((b.count || 0) !== (a.count || 0)) {
+                        return (b.count || 0) - (a.count || 0);
+                }
+                if (b.updatedAt !== a.updatedAt) {
+                        return (b.updatedAt || "").localeCompare(a.updatedAt || "");
+                }
+                return a.word.localeCompare(b.word);
+        });
+        saveLeaderboard(entries.slice(0, 50));
+        if (normalized === "aeprs" && window.gameAchievements) {
+                window.gameAchievements.setStatus("word-jumble", "word-aeprs", true);
+        }
+        renderLeaderboard();
+}
+
+function renderLeaderboard() {
+        var body = document.getElementById("leaderboardBody");
+        if (!body) {
+                return;
+        }
+        var entries = loadLeaderboard().slice();
+        entries.sort(function(a, b) {
+                if ((b.count || 0) !== (a.count || 0)) {
+                        return (b.count || 0) - (a.count || 0);
+                }
+                if ((b.updatedAt || "") !== (a.updatedAt || "")) {
+                        return (b.updatedAt || "").localeCompare(a.updatedAt || "");
+                }
+                return a.word.localeCompare(b.word);
+        });
+        var topEntries = entries.slice(0, 10);
+        body.innerHTML = "";
+        if (topEntries.length === 0) {
+                var row = document.createElement("tr");
+                var cell = document.createElement("td");
+                cell.colSpan = 3;
+                cell.className = "leaderboard-empty";
+                cell.textContent = "No anagram streaks logged yet.";
+                row.appendChild(cell);
+                body.appendChild(row);
+                return;
+        }
+        for (var i = 0; i < topEntries.length; i++) {
+                var entry = topEntries[i];
+                var rank = i + 1;
+                var tr = document.createElement("tr");
+                var rankCell = document.createElement("td");
+                rankCell.textContent = rank;
+                var wordCell = document.createElement("td");
+                wordCell.textContent = entry.display || entry.word;
+                var countCell = document.createElement("td");
+                countCell.textContent = entry.count || 0;
+                tr.appendChild(rankCell);
+                tr.appendChild(wordCell);
+                tr.appendChild(countCell);
+                body.appendChild(tr);
+        }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+        renderLeaderboard();
+});
 </script>
 <style>
 body {
@@ -155,6 +272,114 @@ p {
     border-radius: 12px;
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
 }
+.other-list {
+    margin: 0 0 12px 24px;
+}
+.other-list li {
+    margin: 4px 0;
+}
+.power-zone {
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(0, 170, 255, 0.12), rgba(0, 120, 255, 0.05));
+    border: 1px solid rgba(0, 85, 170, 0.2);
+}
+
+.power-heading {
+    margin: 0 0 8px;
+    text-align: center;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    color: #0b4da2;
+}
+
+.power-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 6px;
+}
+
+.power-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 28px;
+    border-radius: 999px;
+    background: rgba(0, 102, 204, 0.08);
+    color: #004080;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.power-item--charged {
+    background: rgba(255, 166, 0, 0.14);
+    color: #b45309;
+    box-shadow: inset 0 0 0 2px rgba(255, 166, 0, 0.2);
+}
+
+.power-item--hyper {
+    background: rgba(220, 38, 38, 0.16);
+    color: #991b1b;
+    box-shadow: inset 0 0 0 2px rgba(220, 38, 38, 0.24);
+}
+
+.over-9000 {
+    margin-top: 10px;
+    text-align: center;
+    font-weight: 700;
+    color: #a3a3a3;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.over-9000--active {
+    color: #ff1a1a;
+    transform: scale(1.08);
+}
+
+.leaderboard {
+    margin-top: 24px;
+    padding: 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 12px 24px rgba(0, 40, 80, 0.12);
+}
+
+.leaderboard h2 {
+    margin-top: 0;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #0b4da2;
+}
+
+.leaderboard table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+.leaderboard th,
+.leaderboard td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid rgba(11, 77, 162, 0.15);
+}
+
+.leaderboard th {
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #0b4da2;
+}
+
+.leaderboard-empty {
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
+}
 </style>
 </head>
 
@@ -168,13 +393,22 @@ p {
 	<p><input type="text" id="userWord" onkeyup="closestWord()" value=""/></p>
 	<p>Unscrambling attempt: </p>
 	<div id="showIt" class="mainOut"></div>
-	<p>Other possibilities: </p>
-        <p><ul>
+        <p>Other possibilities: </p>
+        <ul class="other-list">
                 <li><div id="show1" class="outField"></div></li>
                 <li><div id="show2" class="outField"></div></li>
                 <li><div id="show3" class="outField"></div></li>
                 <li><div id="show4" class="outField"></div></li>
-        </ul></p>
+        </ul>
+
+        <div class="power-zone">
+                <h2 class="power-heading">POWER ANAGRAMS</h2>
+                <ul class="power-list">
+                        <li class="power-item power-item--charged"><div id="show5" class="outField"></div></li>
+                        <li class="power-item power-item--hyper"><div id="show6" class="outField"></div></li>
+                </ul>
+                <p id="over9000" class="over-9000">It's over 9000</p>
+        </div>
 
         <img
             src="assets/letters.png"
@@ -204,13 +438,28 @@ p {
 	 
 	 <p>Various parts of this project required:
 	 
-	 <a href="http://www.w3schools.com/xml/xml_http.asp">Javascript XMLHttpRequest</a> and
-	 <a href="https://msdn.microsoft.com/en-us/library/b0zbh7b6%28v=vs.110%29.aspx">C# comparator overrides</a>.
-	 Also, I discovered that the automatic C# list sorter can alphabetize a 
-	 dictionary in about .2 seconds whereas the brute force approach takes 1 hour.
-	  I knew that sorting can be heavily optimized but I was still surprised by
-	  the magnitude of the difference.
-	 </p>
+         <a href="http://www.w3schools.com/xml/xml_http.asp">Javascript XMLHttpRequest</a> and
+         <a href="https://msdn.microsoft.com/en-us/library/b0zbh7b6%28v=vs.110%29.aspx">C# comparator overrides</a>.
+         Also, I discovered that the automatic C# list sorter can alphabetize a
+         dictionary in about .2 seconds whereas the brute force approach takes 1 hour.
+          I knew that sorting can be heavily optimized but I was still surprised by
+          the magnitude of the difference.
+         </p>
+
+        <section class="leaderboard" aria-labelledby="leaderboardTitle">
+                <h2 id="leaderboardTitle">Anagram Leaderboard</h2>
+                <p>Top 10 words ranked by the number of valid anagrams discovered.</p>
+                <table>
+                        <thead>
+                                <tr>
+                                        <th scope="col">Rank</th>
+                                        <th scope="col">Word</th>
+                                        <th scope="col">Anagrams</th>
+                                </tr>
+                        </thead>
+                        <tbody id="leaderboardBody"></tbody>
+                </table>
+        </section>
 
 </div>
 

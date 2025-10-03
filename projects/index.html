@@ -1,0 +1,161 @@
+---
+layout: default
+permalink: /projects/
+---
+
+<div class="achievements-page">
+  <nav class="achievements-nav" aria-label="Game navigation">
+    <a class="achievements-nav__link" href="{{ '/' | relative_url }}">&larr; Back to home</a>
+    <a class="achievements-nav__link" href="{{ '/projects/minesweeper/' | relative_url }}">Play Minesweeper</a>
+    <a class="achievements-nav__link" href="{{ '/projects/word-jumble/' | relative_url }}">Play Word Jumble</a>
+    <a class="achievements-nav__link" href="{{ '/projects/basketball/' | relative_url }}">Play Rapid Fire Free Throws</a>
+  </nav>
+
+  <header class="achievements-hero">
+    <div class="achievements-hero__art">
+      <img src="{{ '/projects/minesweeper/flag.png' | relative_url }}" alt="Minesweeper flag icon" width="64" height="64" />
+      <img src="{{ '/projects/word-jumble/assets/letters_small.png' | relative_url }}" alt="Word jumble tiles" width="64" height="64" />
+      <img src="{{ '/projects/basketball/assets/player.png' | relative_url }}" alt="Basketball player icon" width="64" height="64" />
+    </div>
+    <div class="achievements-hero__copy">
+      <h1>Alan's Game Zone Achievements</h1>
+      <p>Track your victories, puzzle streaks, and hoops dominance all in one place.</p>
+    </div>
+  </header>
+
+  <section class="achievements-grid" aria-label="Game progress summary">
+    <article class="achievement-card" data-game="minesweeper">
+      <header class="achievement-card__header">
+        <div class="achievement-card__icon">
+          <img src="{{ '/projects/minesweeper/smile.png' | relative_url }}" alt="Cheery minesweeper face" width="72" height="72" />
+        </div>
+        <div>
+          <h2>Minesweeper Triumphs</h2>
+          <p class="achievement-card__lead">Fastest human clear times per difficulty.</p>
+        </div>
+      </header>
+      <table class="achievement-table">
+        <thead>
+          <tr>
+            <th scope="col">Difficulty</th>
+            <th scope="col">Best Time</th>
+            <th scope="col">Wins</th>
+          </tr>
+        </thead>
+        <tbody id="minesweeperSummary"></tbody>
+      </table>
+      <p id="minesweeperEmpty" class="achievement-empty" hidden>You have not logged a win yet. The mines await!</p>
+    </article>
+
+    <article class="achievement-card" data-game="word-jumble">
+      <header class="achievement-card__header">
+        <div class="achievement-card__icon achievement-card__icon--glow">
+          <img src="{{ '/projects/word-jumble/assets/letters.png' | relative_url }}" alt="Exploding power letters" width="72" height="72" />
+        </div>
+        <div>
+          <h2>Word Jumble Power Plays</h2>
+          <p class="achievement-card__lead">Your mightiest anagram hauls.</p>
+        </div>
+      </header>
+      <ol id="wordJumbleHighlights" class="achievement-list"></ol>
+      <p id="wordJumbleEmpty" class="achievement-empty" hidden>Crack a few jumbles to reveal your signature words.</p>
+    </article>
+
+    <article class="achievement-card" data-game="basketball">
+      <header class="achievement-card__header">
+        <div class="achievement-card__icon achievement-card__icon--court">
+          <img src="{{ '/projects/basketball/assets/player.png' | relative_url }}" alt="Rapid fire shooter" width="72" height="72" />
+        </div>
+        <div>
+          <h2>Rapid Fire Records</h2>
+          <p class="achievement-card__lead">Top scores from the free throw cannon.</p>
+        </div>
+      </header>
+      <table class="achievement-table">
+        <thead>
+          <tr>
+            <th scope="col">Level</th>
+            <th scope="col">Best Score</th>
+            <th scope="col">High Score Date</th>
+            <th scope="col">Runs Logged</th>
+          </tr>
+        </thead>
+        <tbody id="basketballSummary"></tbody>
+      </table>
+      <p id="basketballEmpty" class="achievement-empty" hidden>Launch a volley of shots to begin charting history.</p>
+    </article>
+  </section>
+
+  <section class="achievements-trophies" aria-labelledby="trophiesHeading">
+    <div class="achievements-trophies__header">
+      <div>
+        <h2 id="trophiesHeading">Achievements</h2>
+        <p class="achievements-trophies__lead">Goals unlocked across every leaderboard.</p>
+      </div>
+      <p id="achievementProgress" class="achievements-trophies__count" role="status" aria-live="polite"></p>
+    </div>
+    <ul id="achievementList" class="achievements-trophies__list" role="list"></ul>
+  </section>
+
+  <section class="achievements-management" aria-labelledby="managementHeading">
+    <h2 id="managementHeading">Leaderboard Management</h2>
+    <p class="achievements-management__intro">Export backups, import shared records, or clear the slate across every game.</p>
+
+    <div class="management-card" data-manage="all">
+      <h3>All Game Data</h3>
+      <p>Download your complete game history or import a shared save to sync every leaderboard.</p>
+      <div class="management-card__controls">
+        <button id="manageDownloadAll" type="button">Download All Scores</button>
+        <label class="management-import">
+          <span>Import All Scores</span>
+          <input type="file" id="manageImportAll" accept="application/json" />
+        </label>
+      </div>
+      <p id="manageAllMessage" class="management-message" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="management-card" data-manage="minesweeper">
+      <h3>Minesweeper Leaderboards</h3>
+      <div class="management-card__grid">
+        <label>
+          Mode
+          <select id="manageMode">
+            <option value="human">Human</option>
+            <option value="auto">Auto</option>
+          </select>
+        </label>
+        <label>
+          Difficulty
+          <select id="manageDifficulty">
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="expert">Advanced</option>
+          </select>
+        </label>
+        <button id="manageClearSelected" type="button" class="management-clear">Clear Selected</button>
+      </div>
+      <button id="manageClearAll" type="button" class="management-clear management-clear--danger">Clear All Leaderboards</button>
+      <p id="manageMessage" class="management-message" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="management-card" data-manage="word-jumble">
+      <h3>Word Jumble Leaderboard</h3>
+      <p>Reset the POWER ANAGRAMS history if you want to start fresh.</p>
+      <button id="manageWordReset" type="button" class="management-clear">Clear Word Jumble Leaderboard</button>
+      <p id="manageWordMessage" class="management-message" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="management-card" data-manage="basketball">
+      <h3>Rapid Fire Free Throws Runs</h3>
+      <p>Remove stored run history and unlock progress for the basketball sim.</p>
+      <button id="manageBasketballReset" type="button" class="management-clear">Clear Basketball Runs</button>
+      <p id="manageBasketballMessage" class="management-message" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+</div>
+
+<script src="{{ '/projects/shared/achievements.js' | relative_url }}"></script>
+
+<div id="achievementToastContainer" class="achievement-toast-container" aria-live="assertive" aria-atomic="true"></div>
+
+<script type="module" src="{{ '/projects/achievements.js' | relative_url }}"></script>

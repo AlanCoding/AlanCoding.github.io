@@ -56,6 +56,24 @@ const AUTO_STRATEGIES = {
 const DEFAULT_AUTO_STRATEGY = 'solver';
 const AUTO_RESTART_DELAY_MS = 1000;
 
+const DIFFICULTY_ACHIEVEMENTS = {
+  beginner: {
+    win: 'minesweeper-beginner-champion',
+    five: 'minesweeper-beginner-5',
+    ten: 'minesweeper-beginner-10',
+  },
+  intermediate: {
+    win: 'minesweeper-intermediate-champion',
+    five: 'minesweeper-intermediate-5',
+    ten: 'minesweeper-intermediate-10',
+  },
+  expert: {
+    win: 'minesweeper-advanced-champion',
+    five: 'minesweeper-advanced-5',
+    ten: 'minesweeper-advanced-10',
+  },
+};
+
 function imageForValue(value) {
   if (value === MINE) {
     return TILE_IMAGES.mine;
@@ -95,6 +113,9 @@ export class MinesweeperUI {
     this.autoRestartTimer = null;
     this._modalKeydownHandler = null;
     this._previouslyFocusedElement = null;
+    this.achievements = typeof window !== 'undefined' ? window.gameAchievements || null : null;
+    this._wrongFlaggedCells = new Set();
+    this._flagAccuracyInitialized = false;
   }
 
   init() {
@@ -105,6 +126,7 @@ export class MinesweeperUI {
     this._renderScoreboards();
     this._updateAutoUI();
     this._updateAutoRestartUI();
+    this._evaluateAllProgress({ silent: true });
     if (this.controlsModal) {
       this.controlsModal.setAttribute('aria-hidden', 'true');
     }
@@ -166,15 +188,6 @@ export class MinesweeperUI {
         titleEl.textContent = config.label;
         header.appendChild(titleEl);
 
-        const clearBtn = this.document.createElement('button');
-        clearBtn.type = 'button';
-        clearBtn.className = 'clear-leaderboard';
-        clearBtn.dataset.mode = sectionConfig.mode;
-        clearBtn.dataset.difficulty = difficultyKey;
-        clearBtn.dataset.label = config.label;
-        clearBtn.textContent = 'Clear';
-        header.appendChild(clearBtn);
-
         board.appendChild(header);
 
         const statsEl = this.document.createElement('div');
@@ -192,7 +205,6 @@ export class MinesweeperUI {
           titleEl,
           statsEl,
           listEl: list,
-          clearButton: clearBtn,
         });
       });
       this.scoreboardContainer.appendChild(section);
@@ -201,6 +213,14 @@ export class MinesweeperUI {
 
   _bindEvents() {
     this.faceImg.addEventListener('click', () => {
+      if (
+        this.achievements &&
+        this.game &&
+        this.game.revealedCount === 0 &&
+        this.game.status === GameStatus.READY
+      ) {
+        this._unlockAchievement('minesweeper-sun-early');
+      }
       this.mode = 'human';
       this._resetAutoState();
       this._selectDifficulty(this.currentDifficultyKey);
@@ -212,31 +232,14 @@ export class MinesweeperUI {
         this._selectDifficulty(button.dataset.difficulty);
       });
     });
-    this.downloadBtn.addEventListener('click', () => {
-      this._downloadScores();
-    });
-    this.importInput.addEventListener('change', event => {
-      this._importScores(event);
-    });
-    if (this.scoreboardContainer) {
-      this.scoreboardContainer.addEventListener('click', event => {
-        const target = event.target;
-        if (!target || typeof target.closest !== 'function') {
-          return;
-        }
-        const button = target.closest('.clear-leaderboard');
-        if (!button) {
-          return;
-        }
-        const { mode, difficulty, label } = button.dataset;
-        if (!mode || !difficulty) {
-          return;
-        }
-        const difficultyLabel = label ?? this.difficulties[difficulty]?.label ?? difficulty;
-        this.scoreRepository.clearLeaderboard(mode, difficulty, difficultyLabel);
-        this._renderScoreboards();
-        const modeLabel = mode === 'auto' ? 'Auto' : 'User';
-        this._setStatus(`${modeLabel} ${difficultyLabel} leaderboard cleared.`);
+    if (this.downloadBtn) {
+      this.downloadBtn.addEventListener('click', () => {
+        this._downloadScores();
+      });
+    }
+    if (this.importInput) {
+      this.importInput.addEventListener('change', event => {
+        this._importScores(event);
       });
     }
     if (this.autoStrategySelect) {
@@ -299,6 +302,7 @@ export class MinesweeperUI {
       button.classList.toggle('active', button.dataset.difficulty === key);
     });
     this.game = new MinesweeperGame(config.rows, config.cols, config.mines);
+    this._resetAchievementTracking();
     if (!preserveAuto) {
       this._resetAutoState();
       this.gameUsedAuto = false;
@@ -345,8 +349,9 @@ export class MinesweeperUI {
       return;
     }
     const { row, col } = this._eventToCoords(event);
+    const wasRevealed = this.game.revealed[row][col];
     const result = this.game.revealCell(row, col);
-    this._applyRevealResult(result);
+    this._applyRevealResult(result, { chordAttempt: wasRevealed });
   }
 
   _onCellContext(event) {
@@ -357,8 +362,7 @@ export class MinesweeperUI {
     const { row, col } = this._eventToCoords(event);
     const result = this.game.toggleFlag(row, col);
     if (result.changed) {
-      this._setTileState(row, col, result.flagged ? 'flagged' : 'hidden');
-      this._updateCounts();
+      this._handleFlagChange(row, col, result.flagged);
       this._setFace(result.flagged ? 'glasses' : 'smug');
     }
   }
@@ -371,9 +375,12 @@ export class MinesweeperUI {
     };
   }
 
-  _applyRevealResult(result, { fromAuto = false, guessed = false } = {}) {
+  _applyRevealResult(result, { fromAuto = false, guessed = false, chordAttempt = false } = {}) {
     if (!result) {
       return;
+    }
+    if (this.game?.minesPlaced && !this._flagAccuracyInitialized) {
+      this._refreshFlagAccuracy();
     }
     result.revealed.forEach(cell => {
       if (cell.value === MINE) {
@@ -387,7 +394,13 @@ export class MinesweeperUI {
       this._startTimer();
     }
     this._updateTimerDisplay();
+    if (chordAttempt && result.action === 'reveal' && result.revealed.length > 0) {
+      this._unlockAchievement('minesweeper-chordmaster');
+    }
     if (result.action === 'mine') {
+      if (this._wrongFlaggedCells.size > 0) {
+        this._unlockAchievement('minesweeper-flag-oops');
+      }
       this._handleLoss({ fromAuto });
       return;
     }
@@ -403,18 +416,23 @@ export class MinesweeperUI {
     } else {
       this._setFace('smile');
     }
+    this._checkFlagBasedAchievements();
   }
 
   _handleLoss({ fromAuto = false } = {}) {
     this._stopTimer();
     this._setFace('frown');
     this._setStatus('You tripped a mine. The crowd gasps.');
+    if (fromAuto) {
+      this._unlockAchievement('minesweeper-auto-down');
+    }
     const difficultyConfig = this.difficulties[this.currentDifficultyKey];
     const difficultyLabel = difficultyConfig?.label ?? this.currentDifficultyKey;
     const leaderboardMode = this._getLeaderboardMode();
     const playerName = this._getResultName(leaderboardMode);
     this.scoreRepository.recordLoss(leaderboardMode, this.currentDifficultyKey, difficultyLabel, playerName);
     this._renderScoreboards();
+    this._evaluateMinesweeperProgress(this.currentDifficultyKey);
     for (let r = 0; r < this.game.rows; r += 1) {
       for (let c = 0; c < this.game.cols; c += 1) {
         if (this.game.field[r][c] === MINE && !this.game.revealed[r][c]) {
@@ -440,8 +458,140 @@ export class MinesweeperUI {
     const playerName = this._getResultName(leaderboardMode);
     this.scoreRepository.recordWin(leaderboardMode, this.currentDifficultyKey, difficultyLabel, seconds, playerName);
     this._renderScoreboards();
+    this._evaluateMinesweeperProgress(this.currentDifficultyKey);
     const resumeAuto = fromAuto || mode === 'auto' || this.autoRunning;
     this._scheduleAutoRestart({ resumeAuto });
+  }
+
+  _handleFlagChange(row, col, flagged) {
+    this._setTileState(row, col, flagged ? 'flagged' : 'hidden');
+    this._updateCounts();
+    this._trackFlagAchievements(row, col, flagged);
+  }
+
+  _trackFlagAchievements(row, col, flagged) {
+    if (!this.game || !this.achievements) {
+      return;
+    }
+    const key = `${row},${col}`;
+    if (flagged) {
+      if (this.game.revealedCount === 0 && this.game.status === GameStatus.READY) {
+        this._unlockAchievement('minesweeper-preemptive-flag');
+      }
+      if (this.game.minesPlaced) {
+        if (this.game.field[row][col] !== MINE) {
+          this._wrongFlaggedCells.add(key);
+        } else {
+          this._wrongFlaggedCells.delete(key);
+        }
+      }
+    } else {
+      this._wrongFlaggedCells.delete(key);
+    }
+    if (this.game.remainingMines < 0) {
+      this._unlockAchievement('minesweeper-flag-overflow');
+    }
+    this._checkFlagBasedAchievements();
+  }
+
+  _refreshFlagAccuracy() {
+    if (!this.game || !this.game.minesPlaced) {
+      return;
+    }
+    this._flagAccuracyInitialized = true;
+    this._wrongFlaggedCells.clear();
+    for (let r = 0; r < this.game.rows; r += 1) {
+      for (let c = 0; c < this.game.cols; c += 1) {
+        if (this.game.flagged[r][c] && this.game.field[r][c] !== MINE) {
+          this._wrongFlaggedCells.add(`${r},${c}`);
+        }
+      }
+    }
+    this._checkFlagBasedAchievements();
+  }
+
+  _countFlags() {
+    if (!this.game) {
+      return 0;
+    }
+    let count = 0;
+    for (let r = 0; r < this.game.rows; r += 1) {
+      for (let c = 0; c < this.game.cols; c += 1) {
+        if (this.game.flagged[r][c]) {
+          count += 1;
+        }
+      }
+    }
+    return count;
+  }
+
+  _checkFlagBasedAchievements() {
+    if (!this.achievements || !this.game) {
+      return;
+    }
+    const totalCells = this.game.rows * this.game.cols;
+    const flaggedCount = this._countFlags();
+    if (flaggedCount === totalCells && totalCells > 0) {
+      this._unlockAchievement('minesweeper-flag-all');
+    }
+    if (this.game.minesPlaced && this.game.totalMines > 0) {
+      if (flaggedCount === this.game.totalMines && this._wrongFlaggedCells.size === 0) {
+        this._unlockAchievement('minesweeper-land-mapper');
+      }
+      if (this.game.remainingMines < 0) {
+        this._unlockAchievement('minesweeper-flag-overflow');
+      }
+    }
+  }
+
+  _setAchievement(achievementId, unlocked, { silent = false } = {}) {
+    if (!this.achievements) {
+      return;
+    }
+    this.achievements.setStatus('minesweeper', achievementId, unlocked, { silent });
+  }
+
+  _unlockAchievement(achievementId, options = {}) {
+    this._setAchievement(achievementId, true, options);
+  }
+
+  _evaluateMinesweeperProgress(difficultyKey, { silent = false } = {}) {
+    if (!this.achievements) {
+      return;
+    }
+    const ids = DIFFICULTY_ACHIEVEMENTS[difficultyKey];
+    if (!ids) {
+      return;
+    }
+    const config = this.difficulties[difficultyKey];
+    const label = config?.label ?? difficultyKey;
+    const humanBoard = this.scoreRepository.getLeaderboard('human', difficultyKey, label);
+    const autoBoard = this.scoreRepository.getLeaderboard('auto', difficultyKey, label);
+    const wins = Number(humanBoard?.wins || 0) + Number(autoBoard?.wins || 0);
+    const losses = Number(humanBoard?.losses || 0) + Number(autoBoard?.losses || 0);
+    const totalGames = wins + losses;
+    const updateOptions = { silent };
+    this.achievements.setStatus('minesweeper', ids.win, wins > 0, updateOptions);
+    this.achievements.setStatus('minesweeper', ids.five, totalGames >= 5, updateOptions);
+    this.achievements.setStatus('minesweeper', ids.ten, totalGames >= 10, updateOptions);
+    let totalAutoLosses = 0;
+    Object.keys(this.difficulties).forEach(key => {
+      const keyLabel = this.difficulties[key]?.label ?? key;
+      const auto = this.scoreRepository.getLeaderboard('auto', key, keyLabel);
+      totalAutoLosses += Number(auto?.losses || 0);
+    });
+    this.achievements.setStatus('minesweeper', 'minesweeper-auto-down', totalAutoLosses > 0, updateOptions);
+  }
+
+  _evaluateAllProgress({ silent = false } = {}) {
+    Object.keys(this.difficulties).forEach(key => {
+      this._evaluateMinesweeperProgress(key, { silent });
+    });
+  }
+
+  _resetAchievementTracking() {
+    this._wrongFlaggedCells = new Set();
+    this._flagAccuracyInitialized = false;
   }
 
   _setTileState(row, col, state, value = null) {
@@ -538,6 +688,7 @@ export class MinesweeperUI {
       const text = await file.text();
       this.scoreRepository.mergeScores(text);
       this._renderScoreboards();
+      this._evaluateAllProgress({ silent: true });
       this._setStatus('Scores imported and merged. Leaderboard updated.');
     } catch (err) {
       this._setStatus('Import failed. That file gave me bad vibes.');
@@ -558,9 +709,6 @@ export class MinesweeperUI {
         const boardLabel = board.label ?? fallbackLabel;
         if (elements.titleEl) {
           elements.titleEl.textContent = boardLabel;
-        }
-        if (elements.clearButton) {
-          elements.clearButton.dataset.label = boardLabel;
         }
         const totalGames = board.wins + board.losses;
         const winRate = totalGames === 0 ? 0 : board.wins / totalGames;
@@ -868,14 +1016,18 @@ export class MinesweeperUI {
         if (action.type === 'flag') {
           const result = this.game.toggleFlag(action.row, action.col);
           if (result.changed) {
-            this._setTileState(action.row, action.col, result.flagged ? 'flagged' : 'hidden');
-            this._updateCounts();
+            this._handleFlagChange(action.row, action.col, result.flagged);
           }
           return;
         }
         if (action.type === 'reveal') {
+          const wasRevealed = this.game.revealed[action.row][action.col];
           const outcome = this.game.revealCell(action.row, action.col);
-          this._applyRevealResult(outcome, { fromAuto: true, guessed: action.guess });
+          this._applyRevealResult(outcome, {
+            fromAuto: true,
+            guessed: action.guess,
+            chordAttempt: wasRevealed,
+          });
         }
       });
     } catch (error) {
