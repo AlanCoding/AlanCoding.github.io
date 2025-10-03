@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Castle Ledger: Chronicle of Beldane Keep</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: "EB Garamond", "Times New Roman", serif;
+        --bg: #f7f2e8;
+        --fg: #2c2a28;
+        --accent: #5b3227;
+        --accent-soft: #cbb59d;
+        --border: #d0c3b0;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #16120c;
+          --fg: #f5ecdc;
+          --accent: #d9b36f;
+          --accent-soft: #7b5e3d;
+          --border: #4c4030;
+        }
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at top, rgba(200, 187, 154, 0.28), rgba(122, 96, 63, 0.32)), var(--bg);
+        color: var(--fg);
+        display: flex;
+        justify-content: center;
+        padding: clamp(1rem, 2vw, 2rem);
+      }
+
+      main {
+        width: min(100%, 1100px);
+        background: rgba(255, 250, 240, 0.92);
+        border-radius: 20px;
+        padding: clamp(1.5rem, 3vw, 2.75rem);
+        box-shadow: 0 32px 60px rgba(46, 24, 6, 0.2);
+        border: 1px solid var(--border);
+        display: grid;
+        gap: 2rem;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        main {
+          background: rgba(28, 22, 18, 0.85);
+        }
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        color: var(--accent);
+        font-weight: 600;
+        font-family: "Inter", system-ui, sans-serif;
+      }
+
+      .back-link::before {
+        content: "←";
+        font-size: 1.25rem;
+      }
+
+      .back-link:hover,
+      .back-link:focus {
+        text-decoration: underline;
+      }
+
+      header h1 {
+        font-size: clamp(2rem, 3vw + 1rem, 3.2rem);
+        margin: 0;
+        color: var(--accent);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      header p {
+        margin-top: 0.75rem;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        max-width: 60ch;
+      }
+
+      .game-shell {
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      @media (min-width: 980px) {
+        .game-shell {
+          grid-template-columns: 2.1fr 1fr;
+          align-items: start;
+        }
+      }
+
+      .room-card {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: clamp(1.25rem, 2vw, 2rem);
+        box-shadow: 0 16px 30px rgba(46, 24, 6, 0.18);
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .room-card {
+          background: rgba(24, 20, 16, 0.85);
+        }
+      }
+
+      #roomTitle {
+        margin-top: 0;
+        font-size: clamp(1.8rem, 2vw + 1rem, 2.5rem);
+        color: var(--accent);
+      }
+
+      #roomDescription {
+        font-size: 1.08rem;
+        line-height: 1.8;
+        white-space: pre-line;
+      }
+
+      .options {
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .room-log {
+        padding: 1rem;
+        border-radius: 12px;
+        background: rgba(203, 181, 157, 0.16);
+        border: 1px dashed var(--border);
+      }
+
+      .room-log h3 {
+        margin: 0 0 0.4rem 0;
+        font-size: 0.95rem;
+        font-family: "Inter", system-ui, sans-serif;
+        color: rgba(91, 50, 39, 0.85);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .room-log {
+          background: rgba(123, 94, 61, 0.25);
+        }
+
+        .room-log h3 {
+          color: rgba(217, 179, 111, 0.85);
+        }
+      }
+
+      .option-button {
+        padding: 0.85rem 1.1rem;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: linear-gradient(135deg, rgba(203, 181, 157, 0.25), rgba(255, 249, 240, 0.5));
+        font-size: 1.02rem;
+        font-family: "Inter", system-ui, sans-serif;
+        cursor: pointer;
+        text-align: left;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .option-button:hover,
+      .option-button:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 22px rgba(46, 24, 6, 0.18);
+      }
+
+      .option-button[disabled] {
+        opacity: 0.65;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .inventory-card {
+        background: rgba(255, 255, 255, 0.78);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: clamp(1.1rem, 2vw, 1.75rem);
+        box-shadow: 0 16px 28px rgba(46, 24, 6, 0.14);
+        display: grid;
+        gap: 1rem;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .inventory-card {
+          background: rgba(24, 20, 16, 0.78);
+        }
+      }
+
+      .inventory-card h2 {
+        margin: 0;
+        font-size: 1.45rem;
+        color: var(--accent);
+      }
+
+      .inventory-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 0.6rem;
+        font-size: 1.05rem;
+      }
+
+      .inventory-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        border-bottom: 1px dashed var(--border);
+        padding-bottom: 0.35rem;
+      }
+
+      .inventory-item:last-child {
+        border-bottom: none;
+      }
+
+      .inventory-item strong {
+        font-weight: 600;
+      }
+
+      #eventLog {
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.6;
+        padding: 1rem 1.25rem;
+        background: rgba(91, 50, 39, 0.12);
+        border-radius: 16px;
+        border: 1px solid rgba(91, 50, 39, 0.25);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        #eventLog {
+          background: rgba(217, 179, 111, 0.12);
+          border-color: rgba(217, 179, 111, 0.4);
+        }
+      }
+
+      .actions-footer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: space-between;
+        align-items: center;
+        font-family: "Inter", system-ui, sans-serif;
+      }
+
+      .reset-button {
+        border: 1px solid var(--accent);
+        background: transparent;
+        color: var(--accent);
+        padding: 0.6rem 1.2rem;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.15s ease, color 0.15s ease;
+      }
+
+      .reset-button:hover,
+      .reset-button:focus {
+        background: var(--accent);
+        color: var(--bg);
+      }
+
+      .room-meta {
+        font-size: 0.95rem;
+        color: rgba(91, 50, 39, 0.8);
+        font-family: "Inter", system-ui, sans-serif;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .room-meta {
+          color: rgba(217, 179, 111, 0.8);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back-link" href="../">All games</a>
+      <header>
+        <h1>Castle Ledger: Chronicle of Beldane Keep</h1>
+        <p>
+          Record every footstep and every bargain as you circle the walls of Beldane Keep, slip through its gates,
+          and shoulder the duties of a castle clerk. Your ledger is written in the cookies of your browser, so the
+          people you meet will remember your promises, your purchases, and the stray dog you chose to feed.
+        </p>
+      </header>
+
+      <section class="game-shell" aria-live="polite">
+        <article class="room-card" aria-labelledby="roomTitle">
+          <div class="room-meta" id="roomMeta"></div>
+          <h2 id="roomTitle"></h2>
+          <div id="roomDescription"></div>
+          <div class="options" id="options" role="group" aria-label="Available actions"></div>
+          <div class="room-log" aria-live="polite">
+            <h3>Recent notation</h3>
+            <p id="eventLog">Your ledger is open. The parchment still smells of fresh gall ink.</p>
+          </div>
+        </article>
+        <aside class="inventory-card" aria-labelledby="inventoryHeading">
+          <h2 id="inventoryHeading">Ledger &amp; Inventory</h2>
+          <ul class="inventory-list" id="inventoryList"></ul>
+          <div>
+            <h3 class="room-meta" style="margin: 0 0 0.4rem 0;">Quests &amp; obligations</h3>
+            <ul class="inventory-list" id="questList"></ul>
+          </div>
+        </aside>
+      </section>
+
+      <div class="actions-footer">
+        <p class="room-meta" id="progressNote"></p>
+        <button type="button" class="reset-button" id="resetGame">Clear ledger and begin anew</button>
+      </div>
+    </main>
+    <script src="game.js"></script>
+  </body>
+</html>

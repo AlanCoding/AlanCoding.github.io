@@ -11,11 +11,27 @@ const BASKETBALL_LEVELS = [
   { key: 'level1', label: 'Level 1', cookie: 'rapid_fire_runs_level1_v1' },
   { key: 'level2', label: 'Level 2', cookie: 'rapid_fire_runs_level2_v1' },
 ];
+const CASTLE_COOKIE = 'castle_ledger_state_v1';
 const DATA_EXPORT_VERSION = 1;
 const ACHIEVEMENT_GAME_LABELS = {
   'word-jumble': 'Word Jumble',
   basketball: 'Rapid Fire Free Throws',
   minesweeper: 'Land Mine Mapper',
+  'castle-ledger': 'Castle Ledger',
+};
+const ACHIEVEMENT_GROUP_ORDER = Object.keys(ACHIEVEMENT_GAME_LABELS);
+const ACHIEVEMENT_FALLBACK_GROUP = {
+  id: 'special',
+  label: 'Special Achievements',
+};
+const CASTLE_ITEM_LABELS = {
+  silver_pennies: 'Silver pennies',
+  salted_pork: 'Salted pork haunch',
+  hemp_rope: 'Coil of hemp rope',
+  linen_bandage: 'Linen bandage',
+  iron_spike: 'Iron gate spike',
+  wax_tablet: 'Wax tablet & stylus',
+  sealed_dispatch: 'Sealed dispatch',
 };
 
 function renderMinesweeperSummary(repo) {
@@ -196,6 +212,126 @@ function renderBasketballSummary() {
   }
 }
 
+function parseCastleLedgerState() {
+  const cookie = readCookie(CASTLE_COOKIE);
+  if (!cookie) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(cookie);
+    if (!parsed || typeof parsed !== 'object') {
+      return null;
+    }
+    const visited = parsed.visited && typeof parsed.visited === 'object' ? parsed.visited : {};
+    const inventory = parsed.inventory && typeof parsed.inventory === 'object' ? parsed.inventory : {};
+    const flags = parsed.flags && typeof parsed.flags === 'object' ? parsed.flags : {};
+    const location = typeof parsed.location === 'string' ? parsed.location : null;
+    return {
+      location,
+      visitedCount: Object.values(visited).filter(Boolean).length,
+      inventory,
+      flags,
+      logLength: Array.isArray(parsed.log) ? parsed.log.length : 0,
+    };
+  } catch (error) {
+    return null;
+  }
+}
+
+function describeCastleStage(flags = {}) {
+  if (!flags.enteredCastle) {
+    return 'Surveying the villages outside the walls.';
+  }
+  if (!flags.scrollAssigned) {
+    return 'Exploring the bailey while awaiting orders from the guard station.';
+  }
+  if (!flags.injuredGuardTreated) {
+    return 'Carrying aid to the wounded guard at the training yard gate.';
+  }
+  if (!flags.scrollDelivered) {
+    return 'Bearing the coastal dispatch to the master-at-arms.';
+  }
+  if (!flags.rearBridgeSecured) {
+    return 'Gathering iron to lock the rear drawbridge against intrusion.';
+  }
+  if (!flags.reportComplete) {
+    return 'Ready to report the secured rear bridge at the guard station.';
+  }
+  if (!flags.earlRewarded) {
+    return 'Summoned to the great hall to receive the earl’s ruling.';
+  }
+  return 'Commended by the earl and maintaining the keep’s readiness.';
+}
+
+function formatCastleLocation(location) {
+  const labels = {
+    south_road: 'Southern road',
+    south_market_lane: 'Market lane',
+    front_drawbridge: 'Front drawbridge plaza',
+    southeast_shanty: 'Ropewalk shanties',
+    east_mill_stream: 'Mill stream curve',
+    east_postern: 'Eastern postern bridge',
+    northeast_monastery: 'Monastery gardens',
+    north_reed_marsh: 'Northern reed marsh',
+    rear_drawbridge: 'Rear service drawbridge',
+    northwest_hunters: 'Hunters’ stands',
+    west_floodgate: 'West floodgate',
+    west_sally_port: 'West sally port',
+    outer_bailey: 'Outer bailey',
+    guard_station: 'Guard station',
+    training_yard: 'Training yard',
+    great_hall: 'Great hall',
+  };
+  return labels[location] || 'On assignment';
+}
+
+function renderCastleSummary() {
+  const summary = document.getElementById('castleSummary');
+  const emptyState = document.getElementById('castleEmpty');
+  if (!summary) {
+    return;
+  }
+  const state = parseCastleLedgerState();
+  summary.innerHTML = '';
+  if (!state) {
+    if (emptyState) {
+      emptyState.hidden = false;
+    }
+    return;
+  }
+  if (emptyState) {
+    emptyState.hidden = true;
+  }
+
+  const flags = state.flags || {};
+  const stage = describeCastleStage(flags);
+  const location = formatCastleLocation(state.location);
+  const heldItems = Object.keys(CASTLE_ITEM_LABELS)
+    .map(key => ({ key, count: Number(state.inventory?.[key] || 0) }))
+    .filter(item => item.count > 0);
+  const itemsText =
+    heldItems.length > 0
+      ? heldItems.map(item => `${CASTLE_ITEM_LABELS[item.key]} ×${item.count}`).join('; ')
+      : 'None on hand yet';
+
+  function appendFact(term, detail) {
+    const row = document.createElement('tr');
+    const termCell = document.createElement('th');
+    termCell.scope = 'row';
+    termCell.textContent = term;
+    const valueCell = document.createElement('td');
+    valueCell.textContent = detail;
+    row.appendChild(termCell);
+    row.appendChild(valueCell);
+    summary.appendChild(row);
+  }
+
+  appendFact('Current post', location);
+  appendFact('Ledger stage', stage);
+  appendFact('Scenes recorded', `${state.visitedCount || 0} visited • ${state.logLength || 0} log notes`);
+  appendFact('Items on hand', itemsText);
+}
+
 function collectAchievementFacts() {
   const wordEntries = loadWordJumbleEntries();
   const basketball = {};
@@ -231,7 +367,9 @@ function collectAchievementFacts() {
     minesweeper.totalAutoLosses += autoLosses;
   });
 
-  return { wordEntries, basketball, minesweeper };
+  const castle = parseCastleLedgerState();
+
+  return { wordEntries, basketball, minesweeper, castle };
 }
 
 function syncAchievementsFromFacts(facts, options = {}) {
@@ -262,6 +400,13 @@ function syncAchievementsFromFacts(facts, options = {}) {
   const minesweeperDifficulties = minesweeperFacts.difficulties || {};
   const autoLosses = Number(minesweeperFacts.totalAutoLosses || 0);
   achievements.setStatus('minesweeper', 'minesweeper-auto-down', autoLosses > 0, updateOptions);
+
+  const castleFacts = facts.castle || {};
+  const castleFlags = castleFacts.flags || {};
+  achievements.setStatus('castle-ledger', 'castle-gained-entry', Boolean(castleFlags.enteredCastle), updateOptions);
+  achievements.setStatus('castle-ledger', 'castle-fed-mastiff', Boolean(castleFlags.dogFed), updateOptions);
+  achievements.setStatus('castle-ledger', 'castle-secured-bridge', Boolean(castleFlags.rearBridgeSecured), updateOptions);
+  achievements.setStatus('castle-ledger', 'castle-earl-praise', Boolean(castleFlags.earlRewarded), updateOptions);
 
   const difficultyAchievementMap = {
     beginner: {
@@ -318,46 +463,99 @@ function renderAchievementsSection(states) {
     return;
   }
 
-  states.forEach(state => {
-    const item = document.createElement('li');
-    item.className = `achievement-item${state.unlocked ? ' achievement-item--unlocked' : ''}`;
-    if (state.gameId) {
-      item.dataset.game = state.gameId;
+  const groups = new Map();
+  states.forEach((state, index) => {
+    const key = state.gameId || ACHIEVEMENT_FALLBACK_GROUP.id;
+    if (!groups.has(key)) {
+      const label = ACHIEVEMENT_GAME_LABELS[key] || ACHIEVEMENT_FALLBACK_GROUP.label;
+      const groupGameId = key === ACHIEVEMENT_FALLBACK_GROUP.id ? null : key;
+      groups.set(key, { id: key, label, gameId: groupGameId, items: [] });
     }
-
-    const status = document.createElement('span');
-    status.className = 'achievement-item__status';
-    status.textContent = state.unlocked ? '✓' : '✗';
-    status.setAttribute('role', 'img');
-    status.setAttribute('aria-label', state.unlocked ? 'Completed achievement' : 'Locked achievement');
-
-    const body = document.createElement('div');
-    body.className = 'achievement-item__body';
-
-    if (state.gameId) {
-      const meta = document.createElement('p');
-      meta.className = 'achievement-item__game';
-      meta.textContent = ACHIEVEMENT_GAME_LABELS[state.gameId] || 'Game achievement';
-      body.appendChild(meta);
-    }
-
-    const title = document.createElement('h3');
-    title.textContent = state.name;
-    const srStatus = document.createElement('span');
-    srStatus.className = 'u-screen-reader-text';
-    srStatus.textContent = state.unlocked ? ' (achievement completed)' : ' (achievement locked)';
-    title.appendChild(srStatus);
-
-    const description = document.createElement('p');
-    description.textContent = state.description;
-
-    body.appendChild(title);
-    body.appendChild(description);
-
-    item.appendChild(status);
-    item.appendChild(body);
-    list.appendChild(item);
+    groups.get(key).items.push({ state, order: index });
   });
+
+  const groupEntries = Array.from(groups.values());
+  groupEntries.sort((a, b) => {
+    const aIndex = ACHIEVEMENT_GROUP_ORDER.indexOf(a.gameId);
+    const bIndex = ACHIEVEMENT_GROUP_ORDER.indexOf(b.gameId);
+    if (aIndex === -1 && bIndex === -1) {
+      return a.label.localeCompare(b.label);
+    }
+    if (aIndex === -1) {
+      return 1;
+    }
+    if (bIndex === -1) {
+      return -1;
+    }
+    return aIndex - bIndex;
+  });
+
+  groupEntries.forEach(group => {
+    group.items.sort((a, b) => a.order - b.order);
+    const wrapper = document.createElement('li');
+    wrapper.className = 'achievement-group';
+    if (group.gameId) {
+      wrapper.dataset.game = group.gameId;
+    }
+
+    const heading = document.createElement('h3');
+    heading.className = 'achievement-group__title';
+    heading.textContent = group.label;
+    wrapper.appendChild(heading);
+
+    const sublist = document.createElement('ul');
+    sublist.className = 'achievement-group__list';
+
+    group.items.forEach(entry => {
+      const item = createAchievementListItem(entry.state);
+      sublist.appendChild(item);
+    });
+
+    wrapper.appendChild(sublist);
+    list.appendChild(wrapper);
+  });
+}
+
+function createAchievementListItem(state) {
+  const item = document.createElement('li');
+  item.className = `achievement-item${state.unlocked ? ' achievement-item--unlocked' : ''}`;
+  if (state.gameId) {
+    item.dataset.game = state.gameId;
+  }
+
+  const status = document.createElement('span');
+  status.className = 'achievement-item__status';
+  status.textContent = state.unlocked ? '✓' : '✗';
+  status.setAttribute('role', 'img');
+  status.setAttribute('aria-label', state.unlocked ? 'Completed achievement' : 'Locked achievement');
+
+  const body = document.createElement('div');
+  body.className = 'achievement-item__body';
+
+  if (state.gameId) {
+    const meta = document.createElement('p');
+    meta.className = 'achievement-item__game';
+    meta.textContent = ACHIEVEMENT_GAME_LABELS[state.gameId] || 'Game achievement';
+    body.appendChild(meta);
+  }
+
+  const title = document.createElement('h3');
+  title.textContent = state.name;
+  const srStatus = document.createElement('span');
+  srStatus.className = 'u-screen-reader-text';
+  srStatus.textContent = state.unlocked ? ' (achievement completed)' : ' (achievement locked)';
+  title.appendChild(srStatus);
+
+  const description = document.createElement('p');
+  description.textContent = state.description;
+
+  body.appendChild(title);
+  body.appendChild(description);
+
+  item.appendChild(status);
+  item.appendChild(body);
+
+  return item;
 }
 
 function refreshAchievementSection(options = {}) {
@@ -504,6 +702,56 @@ function normalizeBasketballEntries(entries) {
     .slice(0, 10);
 }
 
+function normalizeCastleState(state) {
+  if (!state || typeof state !== 'object') {
+    return null;
+  }
+  const normalized = {
+    location: typeof state.location === 'string' ? state.location : 'south_road',
+    visited: state.visited && typeof state.visited === 'object' ? state.visited : {},
+    inventory: {},
+    flags: {},
+    log: Array.isArray(state.log) ? state.log.slice(-12) : [],
+  };
+  const inventory = state.inventory && typeof state.inventory === 'object' ? state.inventory : {};
+  Object.keys(CASTLE_ITEM_LABELS).forEach(key => {
+    const value = Number.parseInt(inventory[key], 10);
+    normalized.inventory[key] = Number.isFinite(value) && value >= 0 ? value : 0;
+  });
+  const flagKeys = [
+    'butcherMet',
+    'meatPurchased',
+    'ropemakerMet',
+    'ropeSecured',
+    'dogFed',
+    'dogLocation',
+    'shrineBlessing',
+    'scribeQuiz',
+    'bandageEarned',
+    'injuredGuardTreated',
+    'enteredCastle',
+    'courtIndex',
+    'scrollAssigned',
+    'scrollDelivered',
+    'rearBridgeSecured',
+    'millersHelped',
+    'reportComplete',
+    'earlRewarded',
+  ];
+  const flags = state.flags && typeof state.flags === 'object' ? state.flags : {};
+  flagKeys.forEach(key => {
+    if (key === 'dogLocation') {
+      normalized.flags.dogLocation = flags.dogLocation === 'pond' ? 'pond' : 'postern';
+    } else if (key === 'courtIndex') {
+      const value = Number.parseInt(flags.courtIndex, 10);
+      normalized.flags.courtIndex = Number.isFinite(value) ? value : 0;
+    } else {
+      normalized.flags[key] = Boolean(flags[key]);
+    }
+  });
+  return normalized;
+}
+
 function collectAllGameData(repo) {
   const payload = {
     version: DATA_EXPORT_VERSION,
@@ -512,6 +760,7 @@ function collectAllGameData(repo) {
       minesweeper: null,
       wordJumble: [],
       basketball: {},
+      castleLedger: null,
     },
   };
   try {
@@ -523,6 +772,7 @@ function collectAllGameData(repo) {
   BASKETBALL_LEVELS.forEach(level => {
     payload.games.basketball[level.key] = parseBasketballHistory(level.cookie);
   });
+  payload.games.castleLedger = parseCastleLedgerState();
   return payload;
 }
 
@@ -549,9 +799,16 @@ function applyImportedData(repo, data) {
       }
     });
   }
+  if (games.castleLedger && typeof games.castleLedger === 'object') {
+    const normalized = normalizeCastleState(games.castleLedger);
+    if (normalized) {
+      writeCookie(CASTLE_COOKIE, JSON.stringify(normalized));
+    }
+  }
   renderMinesweeperSummary(repo);
   renderWordJumbleSummary();
   renderBasketballSummary();
+  renderCastleSummary();
   refreshAchievementSection({ announce: false });
 }
 
@@ -619,6 +876,7 @@ if (typeof document !== 'undefined') {
     renderMinesweeperSummary(repo);
     renderWordJumbleSummary();
     renderBasketballSummary();
+    renderCastleSummary();
     refreshAchievementSection({ announce: false });
     setupGlobalManagement(repo);
     setupMinesweeperManagement(repo);

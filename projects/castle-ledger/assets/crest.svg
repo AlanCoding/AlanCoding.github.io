@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">Beldane Keep crest</title>
+  <desc id="desc">A shield divided quarterly with a tower, quill, torch, and sheaf.</desc>
+  <defs>
+    <linearGradient id="shield" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3a4a6d" />
+      <stop offset="100%" stop-color="#1f2c46" />
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="28" ry="28" fill="#c6c7d1" />
+  <path d="M24 28h112v72c0 29-24 52-56 64-32-12-56-35-56-64z" fill="url(#shield)" stroke="#10182b" stroke-width="6" stroke-linejoin="round" />
+  <path d="M80 32v104M32 84h96" stroke="#c9a04f" stroke-width="6" stroke-linecap="round" />
+  <path d="M56 54h16v32H56z" fill="#d8dbe6" stroke="#f5f5f7" stroke-width="3" />
+  <path d="M104 50l10 18-10 18-10-18z" fill="#f7d87c" stroke="#c9a04f" stroke-width="4" />
+  <path d="M48 108l12 20 12-20" fill="none" stroke="#f4f1e6" stroke-width="6" stroke-linecap="round" />
+  <path d="M100 108c0-10 8-18 18-18v8c-4 0-7 3-7 7 0 6-5 11-11 11z" fill="#f7f0d0" stroke="#d7c394" stroke-width="4" stroke-linejoin="round" />
+</svg>

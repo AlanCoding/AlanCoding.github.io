@@ -330,6 +330,15 @@
     box-shadow: 0 0 0 1px rgba(30, 40, 80, 0.12);
 }
 
+.home-game-icon--crest {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    line-height: 1;
+    background: rgba(255, 255, 255, 0.9);
+}
+
 .home-game-meta {
     display: flex;
     flex-direction: column;
@@ -536,6 +545,18 @@
     color: $grey-color;
 }
 
+.achievement-card__footnote {
+    margin: 0;
+    font-size: 0.9rem;
+    font-family: "Inter", system-ui, sans-serif;
+    color: rgba(30, 41, 59, 0.75);
+}
+
+.achievement-card__footnote a {
+    color: inherit;
+    text-decoration: underline;
+}
+
 .achievement-card__title-link {
     color: inherit;
     text-decoration: none;
@@ -688,6 +709,31 @@
     margin: $spacing-unit 0 0;
     display: grid;
     gap: $spacing-unit / 1.25;
+}
+
+.achievement-group {
+    padding: 1.25rem 1.5rem;
+    border-radius: 22px;
+    background: linear-gradient(135deg, rgba(30, 64, 175, 0.09), rgba(37, 99, 235, 0.05));
+    box-shadow: 0 16px 32px rgba(30, 64, 175, 0.18);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.achievement-group__title {
+    margin: 0 0 0.85rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #1e3a8a;
+    font-weight: 700;
+}
+
+.achievement-group__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: $spacing-unit / 1.5;
 }
 
 .achievement-item {

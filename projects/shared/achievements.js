@@ -25,6 +25,28 @@
         description: 'Finish a rapid-fire run with a perfect goose egg—celebrate the art of missing every shot.',
       },
     ],
+    'castle-ledger': [
+      {
+        id: 'castle-gained-entry',
+        name: 'Postern Intrigue',
+        description: 'Slip past the mastiff and enter the outer bailey of Beldane Keep.',
+      },
+      {
+        id: 'castle-fed-mastiff',
+        name: 'Hound Whisperer',
+        description: 'Win the kennel mastiff’s trust with a salted haunch.',
+      },
+      {
+        id: 'castle-secured-bridge',
+        name: 'Rear Gate Sentinel',
+        description: 'Wedge the rear drawbridge winch with an iron spike to lock the gate tight.',
+      },
+      {
+        id: 'castle-earl-praise',
+        name: 'Commended by the Earl',
+        description: 'Deliver the coastal dispatch and earn the earl’s public thanks.',
+      },
+    ],
     minesweeper: [
       {
         id: 'minesweeper-land-mapper',
