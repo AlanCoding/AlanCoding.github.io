@@ -19,6 +19,11 @@ const ACHIEVEMENT_GAME_LABELS = {
   minesweeper: 'Land Mine Mapper',
   'castle-ledger': 'Castle Ledger',
 };
+const ACHIEVEMENT_GROUP_ORDER = Object.keys(ACHIEVEMENT_GAME_LABELS);
+const ACHIEVEMENT_FALLBACK_GROUP = {
+  id: 'special',
+  label: 'Special Achievements',
+};
 const CASTLE_ITEM_LABELS = {
   silver_pennies: 'Silver pennies',
   salted_pork: 'Salted pork haunch',
@@ -458,46 +463,99 @@ function renderAchievementsSection(states) {
     return;
   }
 
-  states.forEach(state => {
-    const item = document.createElement('li');
-    item.className = `achievement-item${state.unlocked ? ' achievement-item--unlocked' : ''}`;
-    if (state.gameId) {
-      item.dataset.game = state.gameId;
+  const groups = new Map();
+  states.forEach((state, index) => {
+    const key = state.gameId || ACHIEVEMENT_FALLBACK_GROUP.id;
+    if (!groups.has(key)) {
+      const label = ACHIEVEMENT_GAME_LABELS[key] || ACHIEVEMENT_FALLBACK_GROUP.label;
+      const groupGameId = key === ACHIEVEMENT_FALLBACK_GROUP.id ? null : key;
+      groups.set(key, { id: key, label, gameId: groupGameId, items: [] });
     }
-
-    const status = document.createElement('span');
-    status.className = 'achievement-item__status';
-    status.textContent = state.unlocked ? '✓' : '✗';
-    status.setAttribute('role', 'img');
-    status.setAttribute('aria-label', state.unlocked ? 'Completed achievement' : 'Locked achievement');
-
-    const body = document.createElement('div');
-    body.className = 'achievement-item__body';
-
-    if (state.gameId) {
-      const meta = document.createElement('p');
-      meta.className = 'achievement-item__game';
-      meta.textContent = ACHIEVEMENT_GAME_LABELS[state.gameId] || 'Game achievement';
-      body.appendChild(meta);
-    }
-
-    const title = document.createElement('h3');
-    title.textContent = state.name;
-    const srStatus = document.createElement('span');
-    srStatus.className = 'u-screen-reader-text';
-    srStatus.textContent = state.unlocked ? ' (achievement completed)' : ' (achievement locked)';
-    title.appendChild(srStatus);
-
-    const description = document.createElement('p');
-    description.textContent = state.description;
-
-    body.appendChild(title);
-    body.appendChild(description);
-
-    item.appendChild(status);
-    item.appendChild(body);
-    list.appendChild(item);
+    groups.get(key).items.push({ state, order: index });
   });
+
+  const groupEntries = Array.from(groups.values());
+  groupEntries.sort((a, b) => {
+    const aIndex = ACHIEVEMENT_GROUP_ORDER.indexOf(a.gameId);
+    const bIndex = ACHIEVEMENT_GROUP_ORDER.indexOf(b.gameId);
+    if (aIndex === -1 && bIndex === -1) {
+      return a.label.localeCompare(b.label);
+    }
+    if (aIndex === -1) {
+      return 1;
+    }
+    if (bIndex === -1) {
+      return -1;
+    }
+    return aIndex - bIndex;
+  });
+
+  groupEntries.forEach(group => {
+    group.items.sort((a, b) => a.order - b.order);
+    const wrapper = document.createElement('li');
+    wrapper.className = 'achievement-group';
+    if (group.gameId) {
+      wrapper.dataset.game = group.gameId;
+    }
+
+    const heading = document.createElement('h3');
+    heading.className = 'achievement-group__title';
+    heading.textContent = group.label;
+    wrapper.appendChild(heading);
+
+    const sublist = document.createElement('ul');
+    sublist.className = 'achievement-group__list';
+
+    group.items.forEach(entry => {
+      const item = createAchievementListItem(entry.state);
+      sublist.appendChild(item);
+    });
+
+    wrapper.appendChild(sublist);
+    list.appendChild(wrapper);
+  });
+}
+
+function createAchievementListItem(state) {
+  const item = document.createElement('li');
+  item.className = `achievement-item${state.unlocked ? ' achievement-item--unlocked' : ''}`;
+  if (state.gameId) {
+    item.dataset.game = state.gameId;
+  }
+
+  const status = document.createElement('span');
+  status.className = 'achievement-item__status';
+  status.textContent = state.unlocked ? '✓' : '✗';
+  status.setAttribute('role', 'img');
+  status.setAttribute('aria-label', state.unlocked ? 'Completed achievement' : 'Locked achievement');
+
+  const body = document.createElement('div');
+  body.className = 'achievement-item__body';
+
+  if (state.gameId) {
+    const meta = document.createElement('p');
+    meta.className = 'achievement-item__game';
+    meta.textContent = ACHIEVEMENT_GAME_LABELS[state.gameId] || 'Game achievement';
+    body.appendChild(meta);
+  }
+
+  const title = document.createElement('h3');
+  title.textContent = state.name;
+  const srStatus = document.createElement('span');
+  srStatus.className = 'u-screen-reader-text';
+  srStatus.textContent = state.unlocked ? ' (achievement completed)' : ' (achievement locked)';
+  title.appendChild(srStatus);
+
+  const description = document.createElement('p');
+  description.textContent = state.description;
+
+  body.appendChild(title);
+  body.appendChild(description);
+
+  item.appendChild(status);
+  item.appendChild(body);
+
+  return item;
 }
 
 function refreshAchievementSection(options = {}) {

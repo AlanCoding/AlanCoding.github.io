@@ -711,6 +711,31 @@
     gap: $spacing-unit / 1.25;
 }
 
+.achievement-group {
+    padding: 1.25rem 1.5rem;
+    border-radius: 22px;
+    background: linear-gradient(135deg, rgba(30, 64, 175, 0.09), rgba(37, 99, 235, 0.05));
+    box-shadow: 0 16px 32px rgba(30, 64, 175, 0.18);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+}
+
+.achievement-group__title {
+    margin: 0 0 0.85rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #1e3a8a;
+    font-weight: 700;
+}
+
+.achievement-group__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: $spacing-unit / 1.5;
+}
+
 .achievement-item {
     display: grid;
     grid-template-columns: auto 1fr;
