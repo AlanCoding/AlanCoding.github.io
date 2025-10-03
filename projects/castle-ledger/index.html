@@ -105,6 +105,8 @@
         border-radius: 18px;
         padding: clamp(1.25rem, 2vw, 2rem);
         box-shadow: 0 16px 30px rgba(46, 24, 6, 0.18);
+        display: grid;
+        gap: 1.5rem;
       }
 
       @media (prefers-color-scheme: dark) {
@@ -126,9 +128,32 @@
       }
 
       .options {
-        margin-top: 1.5rem;
         display: grid;
         gap: 0.75rem;
+      }
+
+      .room-log {
+        padding: 1rem;
+        border-radius: 12px;
+        background: rgba(203, 181, 157, 0.16);
+        border: 1px dashed var(--border);
+      }
+
+      .room-log h3 {
+        margin: 0 0 0.4rem 0;
+        font-size: 0.95rem;
+        font-family: "Inter", system-ui, sans-serif;
+        color: rgba(91, 50, 39, 0.85);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .room-log {
+          background: rgba(123, 94, 61, 0.25);
+        }
+
+        .room-log h3 {
+          color: rgba(217, 179, 111, 0.85);
+        }
       }
 
       .option-button {
@@ -276,6 +301,10 @@
           <h2 id="roomTitle"></h2>
           <div id="roomDescription"></div>
           <div class="options" id="options" role="group" aria-label="Available actions"></div>
+          <div class="room-log" aria-live="polite">
+            <h3>Recent notation</h3>
+            <p id="eventLog">Your ledger is open. The parchment still smells of fresh gall ink.</p>
+          </div>
         </article>
         <aside class="inventory-card" aria-labelledby="inventoryHeading">
           <h2 id="inventoryHeading">Ledger &amp; Inventory</h2>
@@ -285,11 +314,6 @@
             <ul class="inventory-list" id="questList"></ul>
           </div>
         </aside>
-      </section>
-
-      <section>
-        <h2 class="room-meta" style="margin-top: 0;">Recent notation</h2>
-        <p id="eventLog">Your ledger is open. The parchment still smells of fresh gall ink.</p>
       </section>
 
       <div class="actions-footer">

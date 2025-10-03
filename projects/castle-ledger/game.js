@@ -749,7 +749,8 @@
           return;
         }
         state.flags.millersHelped = true;
-        appendLog('You cut a short length from your rope coil and fashion a secure splice. The miller’s wife thanks you with a warm oatcake and a promise to put in a good word at the guard station.');
+        adjustItem('silver_pennies', 1);
+        appendLog('You cut a short length from your rope coil and fashion a secure splice. The miller’s wife thanks you with a warm oatcake, slips a silver penny into your palm, and promises to speak well of you at the guard station.');
         saveState();
       });
       addOption(options, 'Return to the mill stream bank', () => setLocation('east_mill_stream', 'You hop back to the damp bank.'));

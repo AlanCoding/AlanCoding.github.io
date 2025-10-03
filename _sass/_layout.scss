@@ -330,6 +330,15 @@
     box-shadow: 0 0 0 1px rgba(30, 40, 80, 0.12);
 }
 
+.home-game-icon--crest {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    line-height: 1;
+    background: rgba(255, 255, 255, 0.9);
+}
+
 .home-game-meta {
     display: flex;
     flex-direction: column;
@@ -534,6 +543,18 @@
 .achievement-card__lead {
     margin: 0;
     color: $grey-color;
+}
+
+.achievement-card__footnote {
+    margin: 0;
+    font-size: 0.9rem;
+    font-family: "Inter", system-ui, sans-serif;
+    color: rgba(30, 41, 59, 0.75);
+}
+
+.achievement-card__footnote a {
+    color: inherit;
+    text-decoration: underline;
 }
 
 .achievement-card__title-link {
