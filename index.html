@@ -4,7 +4,6 @@ layout: default
 
 <div class="home">
   <header class="home-intro">
-    <h1 class="page-heading">AlanCoding (github) homepage</h1>
     <p class="home-lede">
       This is my static-files only web presence (I have shut down a few original hosted services).
       Some content is stuff I made while doing the Iron Yard in 2015, and it's still here.
@@ -18,7 +17,7 @@ layout: default
   <section class="home-section">
     <h2 class="section-heading">Alan's Game Zone</h2>
     <p class="section-description">
-      I hand-wrote the minesweeper and work-jumble originally.
+      I hand-wrote the Land Mine Mapper and word jumble originally.
       Then I started to use AI to supercharge my games here, ever since Codex got good.
       Whenver the AI writes text it's totally cringe, which you can see in some of the "blog" posts below.
     </p>
@@ -30,12 +29,12 @@ layout: default
         <img
           class="home-game-icon"
           src="{{ '/projects/minesweeper/flag.png' | relative_url }}"
-          alt="Minesweeper flag icon"
+          alt="Land Mine Mapper flag icon"
           width="48"
           height="48"
         />
         <div class="home-game-meta">
-          <a href="{{ '/projects/minesweeper/' | relative_url }}">Minesweeper</a>
+          <a href="{{ '/projects/minesweeper/' | relative_url }}">Land Mine Mapper</a>
           <p class="home-game-description">Classic mine-clearing puzzle with custom board sizes.</p>
         </div>
       </li>
@@ -74,21 +73,11 @@ layout: default
 
   <section class="home-section">
     <h2 class="section-heading">Profiles</h2>
-    <ul class="home-links">
-      <li><a href="https://www.linkedin.com/in/alan-rominger-40236518">LinkedIn</a></li>
-      <li><a href="https://github.com/AlanCoding">GitHub</a></li>
-      <li><a href="http://physics.stackexchange.com/users/1255/alan-rominger">Physics Stack Exchange</a></li>
-      <li><a href="https://www.inaturalist.org/people/8281527">INaturalist</a></li>
-    </ul>
-  </section>
-
-  <section class="home-section">
-    <h2 class="section-heading">More Links Coming Soon</h2>
-    <ul class="home-links home-placeholders">
-      <li>
-        <img class="under-construction-icon" src="{{ '/assets/img/under-construction-missing.gif' | relative_url }}" alt="Under construction icon placeholder">
-        <span>Future project slot &mdash; pardon the digital dust.</span>
-      </li>
+    <ul class="home-links home-links--profiles">
+      <li><a class="home-profile-link" href="https://www.linkedin.com/in/alan-rominger-40236518">LinkedIn</a></li>
+      <li><a class="home-profile-link" href="https://github.com/AlanCoding">GitHub</a></li>
+      <li><a class="home-profile-link" href="http://physics.stackexchange.com/users/1255/alan-rominger">Physics Stack Exchange</a></li>
+      <li><a class="home-profile-link" href="https://www.inaturalist.org/people/8281527">INaturalist</a></li>
     </ul>
   </section>
 

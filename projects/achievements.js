@@ -1,6 +1,6 @@
 import { ScoreRepository, formatSeconds } from './minesweeper/scripts/scoreboard.js';
 
-const MINESWEEPER_DIFFICULTIES = [
+const LAND_MINE_MAPPER_DIFFICULTIES = [
   { key: 'beginner', label: 'Beginner' },
   { key: 'intermediate', label: 'Intermediate' },
   { key: 'expert', label: 'Advanced' },
@@ -15,7 +15,7 @@ const DATA_EXPORT_VERSION = 1;
 const ACHIEVEMENT_GAME_LABELS = {
   'word-jumble': 'Word Jumble',
   basketball: 'Rapid Fire Free Throws',
-  minesweeper: 'Minesweeper',
+  minesweeper: 'Land Mine Mapper',
 };
 
 function renderMinesweeperSummary(repo) {
@@ -26,7 +26,7 @@ function renderMinesweeperSummary(repo) {
   }
   tbody.innerHTML = '';
   let hasWin = false;
-  MINESWEEPER_DIFFICULTIES.forEach(difficulty => {
+  LAND_MINE_MAPPER_DIFFICULTIES.forEach(difficulty => {
     const board = repo.getLeaderboard('human', difficulty.key, difficulty.label);
     const bestEntry = Array.isArray(board.entries) && board.entries.length > 0 ? board.entries[0] : null;
     if (bestEntry) {
@@ -216,7 +216,7 @@ function collectAchievementFacts() {
     difficulties: {},
     totalAutoLosses: 0,
   };
-  MINESWEEPER_DIFFICULTIES.forEach(difficulty => {
+  LAND_MINE_MAPPER_DIFFICULTIES.forEach(difficulty => {
     const humanBoard = leaderboards.human?.[difficulty.key] ?? { wins: 0, losses: 0 };
     const autoBoard = leaderboards.auto?.[difficulty.key] ?? { wins: 0, losses: 0 };
     const wins = Number(humanBoard.wins || 0) + Number(autoBoard.wins || 0);
@@ -386,7 +386,8 @@ function setupMinesweeperManagement(repo) {
     clearSelectedBtn.addEventListener('click', () => {
       const mode = modeSelect.value || 'human';
       const difficultyKey = difficultySelect.value || 'beginner';
-      const difficulty = MINESWEEPER_DIFFICULTIES.find(item => item.key === difficultyKey) || MINESWEEPER_DIFFICULTIES[0];
+    const difficulty =
+      LAND_MINE_MAPPER_DIFFICULTIES.find(item => item.key === difficultyKey) || LAND_MINE_MAPPER_DIFFICULTIES[0];
       repo.clearLeaderboard(mode, difficulty.key, difficulty.label);
       renderMinesweeperSummary(repo);
       if (window.gameAchievements) {
@@ -406,7 +407,7 @@ function setupMinesweeperManagement(repo) {
         window.gameAchievements.resetGame('minesweeper');
       }
       refreshAchievementSection({ announce: false });
-      setMessage('All minesweeper leaderboards cleared.', 'warning');
+      setMessage('All Land Mine Mapper leaderboards cleared.', 'warning');
     });
   }
 }
@@ -612,14 +613,35 @@ function writeCookie(name, value, days = 365) {
   document.cookie = `${name}=${encodeURIComponent(value)};max-age=${maxAge};path=/;SameSite=Lax`;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const repo = new ScoreRepository();
-  renderMinesweeperSummary(repo);
-  renderWordJumbleSummary();
-  renderBasketballSummary();
-  refreshAchievementSection({ announce: false });
-  setupGlobalManagement(repo);
-  setupMinesweeperManagement(repo);
-  setupWordJumbleManagement();
-  setupBasketballManagement();
-});
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    const repo = new ScoreRepository();
+    renderMinesweeperSummary(repo);
+    renderWordJumbleSummary();
+    renderBasketballSummary();
+    refreshAchievementSection({ announce: false });
+    setupGlobalManagement(repo);
+    setupMinesweeperManagement(repo);
+    setupWordJumbleManagement();
+    setupBasketballManagement();
+  });
+}
+
+export {
+  LAND_MINE_MAPPER_DIFFICULTIES,
+  renderMinesweeperSummary,
+  renderWordJumbleSummary,
+  renderBasketballSummary,
+  normalizeWordJumbleEntries,
+  normalizeBasketballEntries,
+  normalizeBasketballEntry,
+  collectAllGameData,
+  applyImportedData,
+  setupGlobalManagement,
+  setupMinesweeperManagement,
+  setupWordJumbleManagement,
+  setupBasketballManagement,
+  refreshAchievementSection,
+  readCookie,
+  writeCookie,
+};

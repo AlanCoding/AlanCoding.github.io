@@ -6,14 +6,11 @@ permalink: /projects/
 <div class="achievements-page">
   <nav class="achievements-nav" aria-label="Game navigation">
     <a class="achievements-nav__link" href="{{ '/' | relative_url }}">&larr; Back to home</a>
-    <a class="achievements-nav__link" href="{{ '/projects/minesweeper/' | relative_url }}">Play Minesweeper</a>
-    <a class="achievements-nav__link" href="{{ '/projects/word-jumble/' | relative_url }}">Play Word Jumble</a>
-    <a class="achievements-nav__link" href="{{ '/projects/basketball/' | relative_url }}">Play Rapid Fire Free Throws</a>
   </nav>
 
   <header class="achievements-hero">
     <div class="achievements-hero__art">
-      <img src="{{ '/projects/minesweeper/flag.png' | relative_url }}" alt="Minesweeper flag icon" width="64" height="64" />
+      <img src="{{ '/projects/minesweeper/flag.png' | relative_url }}" alt="Land Mine Mapper flag icon" width="64" height="64" />
       <img src="{{ '/projects/word-jumble/assets/letters_small.png' | relative_url }}" alt="Word jumble tiles" width="64" height="64" />
       <img src="{{ '/projects/basketball/assets/player.png' | relative_url }}" alt="Basketball player icon" width="64" height="64" />
     </div>
@@ -27,10 +24,12 @@ permalink: /projects/
     <article class="achievement-card" data-game="minesweeper">
       <header class="achievement-card__header">
         <div class="achievement-card__icon">
-          <img src="{{ '/projects/minesweeper/smile.png' | relative_url }}" alt="Cheery minesweeper face" width="72" height="72" />
+          <img src="{{ '/projects/minesweeper/smile.png' | relative_url }}" alt="Cheery Land Mine Mapper face" width="72" height="72" />
         </div>
         <div>
-          <h2>Minesweeper Triumphs</h2>
+          <h2>
+            <a class="achievement-card__title-link" href="{{ '/projects/minesweeper/' | relative_url }}">Land Mine Mapper Triumphs</a>
+          </h2>
           <p class="achievement-card__lead">Fastest human clear times per difficulty.</p>
         </div>
       </header>
@@ -53,7 +52,9 @@ permalink: /projects/
           <img src="{{ '/projects/word-jumble/assets/letters.png' | relative_url }}" alt="Exploding power letters" width="72" height="72" />
         </div>
         <div>
-          <h2>Word Jumble Power Plays</h2>
+          <h2>
+            <a class="achievement-card__title-link" href="{{ '/projects/word-jumble/' | relative_url }}">Word Jumble Power Plays</a>
+          </h2>
           <p class="achievement-card__lead">Your mightiest anagram hauls.</p>
         </div>
       </header>
@@ -67,7 +68,9 @@ permalink: /projects/
           <img src="{{ '/projects/basketball/assets/player.png' | relative_url }}" alt="Rapid fire shooter" width="72" height="72" />
         </div>
         <div>
-          <h2>Rapid Fire Records</h2>
+          <h2>
+            <a class="achievement-card__title-link" href="{{ '/projects/basketball/' | relative_url }}">Rapid Fire Records</a>
+          </h2>
           <p class="achievement-card__lead">Top scores from the free throw cannon.</p>
         </div>
       </header>
@@ -115,7 +118,7 @@ permalink: /projects/
     </div>
 
     <div class="management-card" data-manage="minesweeper">
-      <h3>Minesweeper Leaderboards</h3>
+      <h3>Land Mine Mapper Leaderboards</h3>
       <div class="management-card__grid">
         <label>
           Mode
