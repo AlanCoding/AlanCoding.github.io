@@ -24,6 +24,26 @@
         name: 'Goose Egg Gala!',
         description: 'Finish a rapid-fire run with a perfect goose egg—celebrate the art of missing every shot.',
       },
+      {
+        id: 'basketball-black-hole-100',
+        name: 'Singularity Snacker',
+        description: 'Feed 100 balls to the Level 2 black hole in a single run.',
+      },
+      {
+        id: 'basketball-black-hole-150',
+        name: 'Gravity Gourmet',
+        description: 'Sacrifice 150 balls to the Event Horizon during one attempt.',
+      },
+      {
+        id: 'basketball-black-hole-180',
+        name: 'Abyss Appetizer',
+        description: 'Let 180 shots slip past the event horizon in the same round.',
+      },
+      {
+        id: 'basketball-black-hole-195',
+        name: 'Event Horizon Epicure',
+        description: 'Deliver 195 balls into the black hole buffet before time expires.',
+      },
     ],
     'castle-ledger': [
       {

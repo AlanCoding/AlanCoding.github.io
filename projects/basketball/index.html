@@ -314,7 +314,7 @@
         Level 3
       </a>
       <span id="level2-lock-text" class="level-lock-text">Score 70+ on Level 1 to unlock Level 2.</span>
-      <span id="level3-lock-text" class="level-lock-text">Score 55+ on Level 2 to unlock Level 3.</span>
+      <span id="level3-lock-text" class="level-lock-text">Score 40+ on Level 2 to unlock Level 3.</span>
     </nav>
     <div id="hud">
       <span id="score">Score: 0</span>
@@ -379,8 +379,8 @@
         {
           linkId: 'level3-link',
           lockTextId: 'level3-lock-text',
-          unlockThreshold: 55,
-          lockedText: 'Score 55+ on Level 2 to unlock Level 3.',
+          unlockThreshold: 40,
+          lockedText: 'Score 40+ on Level 2 to unlock Level 3.',
           unlockedText: 'Level 3 unlocked! Time to master the moving board.',
           storageKey: 'rapid_fire_free_throws_level3_unlocked',
           getUnlockScore: helpers => helpers.getBestScoreFromCookie('rapid_fire_runs_level2_v2')

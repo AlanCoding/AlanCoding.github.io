@@ -381,7 +381,7 @@
         Level 3
       </a>
       <span id="level2-lock-text" class="level-lock-text">Reach 70 on Level 1 to unlock this level.</span>
-      <span id="level3-lock-text" class="level-lock-text">Score 55+ on Level 2 to unlock Level 3.</span>
+      <span id="level3-lock-text" class="level-lock-text">Score 40+ on Level 2 to unlock Level 3.</span>
     </nav>
     <p id="level2-locked-message" class="level-lock-banner" hidden>
       Score 70 or more on Level 1 to breach the singularity. Once unlocked you'll see your best cosmic runs right here.
@@ -415,7 +415,7 @@
       <div id="score-flash" role="status" aria-live="polite"></div>
     </div>
     <p id="win-progress" class="win-progress">
-      Score 160 or more on Level 2 to unlock the celebration.
+      Score 40 or more on Level 2 to unlock the celebration.
     </p>
     <a
       id="win-link"
@@ -474,11 +474,11 @@
         horizonColor: [0.98, 0.62, 0.28, 0.95]
       },
       win: {
-        threshold: 160,
+        threshold: 40,
         linkId: 'win-link',
         messageId: 'win-progress',
         storageKey: 'rapid_fire_free_throws_level2_victory_unlocked',
-        lockedText: 'Score 160 or more on Level 2 to unlock the celebration.',
+        lockedText: 'Score 40 or more on Level 2 to unlock the celebration.',
         unlockedText: 'Victory unlocked! Tap the button below to celebrate your run.'
       },
       getUnlockScore: helpers => helpers.getBestScoreFromCookie('rapid_fire_runs_level1_v1'),
@@ -486,8 +486,8 @@
         {
           linkId: 'level3-link',
           lockTextId: 'level3-lock-text',
-          unlockThreshold: 55,
-          lockedText: 'Score 55+ on Level 2 to unlock Level 3.',
+          unlockThreshold: 40,
+          lockedText: 'Score 40+ on Level 2 to unlock Level 3.',
           unlockedText: 'Level 3 unlocked! Deploy the roaming backboard.',
           storageKey: 'rapid_fire_free_throws_level3_unlocked',
           getUnlockScore: helpers => helpers.getBestScoreFromCookie('rapid_fire_runs_level2_v2')

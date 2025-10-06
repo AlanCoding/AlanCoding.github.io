@@ -241,6 +241,10 @@
         }
       };
 
+      if (blackHole) {
+        currentRun.blackHoleConsumed = 0;
+      }
+
       if (shootButton) shootButton.disabled = true;
       if (stopButton) stopButton.disabled = false;
       hideScoreFlash();
@@ -338,6 +342,10 @@
       }
 
       const completedScore = outcome === 'completed' ? score : null;
+      const consumedByBlackHole = blackHole && currentRun && Number.isFinite(currentRun.blackHoleConsumed)
+        ? currentRun.blackHoleConsumed
+        : 0;
+
       const record = {
         timestamp: new Date().toISOString(),
         angleBoost: currentRun.params.angleBoost,
@@ -345,7 +353,8 @@
         spawnRate: currentRun.params.spawnRate,
         duration: currentRun.params.duration,
         score: completedScore,
-        status: outcome
+        status: outcome,
+        blackHoleConsumed: consumedByBlackHole
       };
 
       addRunRecord(record);
@@ -361,6 +370,19 @@
         }
         if (Number.isFinite(completedScore) && completedScore === 0) {
           achievements.setStatus('basketball', 'basketball-zero-hero', true);
+        }
+        if (blackHole && consumedByBlackHole > 0) {
+          const milestones = [
+            { value: 100, id: 'basketball-black-hole-100' },
+            { value: 150, id: 'basketball-black-hole-150' },
+            { value: 180, id: 'basketball-black-hole-180' },
+            { value: 195, id: 'basketball-black-hole-195' }
+          ];
+          milestones.forEach(milestone => {
+            if (consumedByBlackHole >= milestone.value) {
+              achievements.setStatus('basketball', milestone.id, true);
+            }
+          });
         }
       }
 
@@ -954,6 +976,9 @@
         ball.vx = 0;
         ball.vy = 0;
         ball.radius *= blackHole.consumeShrink;
+        if (currentRun) {
+          currentRun.blackHoleConsumed = (currentRun.blackHoleConsumed || 0) + 1;
+        }
         return true;
       }
       return false;
