@@ -114,9 +114,25 @@
       box-shadow: none;
     }
 
+    .level-link--win.win-link--available {
+      background: linear-gradient(135deg, #44d1ab, #4c85ff);
+      color: #071226;
+      box-shadow: 0 20px 34px rgba(70, 150, 255, 0.38);
+    }
+
     .level-lock-text {
       font-size: 0.95rem;
       color: rgba(178, 191, 255, 0.75);
+    }
+
+    .level-requirement {
+      margin: 0 0 1.4rem;
+      padding: 1rem 1.3rem;
+      border-radius: 16px;
+      background: rgba(74, 90, 160, 0.28);
+      color: rgba(220, 228, 255, 0.92);
+      font-weight: 600;
+      text-align: center;
     }
 
     .level-lock-banner {
@@ -252,51 +268,14 @@
     }
 
     #win-progress {
-      margin: 1.6rem auto 1rem;
-      padding: 1.1rem 1.25rem;
       max-width: 640px;
-      text-align: center;
-      border-radius: 14px;
-      background: rgba(58, 78, 150, 0.28);
-      color: rgba(214, 222, 255, 0.92);
-      font-weight: 600;
+      margin: 0 auto 1.4rem;
       box-shadow: 0 20px 36px rgba(3, 5, 10, 0.55);
     }
 
     .win-progress--unlocked {
       background: rgba(255, 198, 124, 0.25);
       color: #1a0f05;
-    }
-
-    .win-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-      margin: 0 auto 2rem;
-      padding: 1rem 2.8rem;
-      border-radius: 999px;
-      font-size: 1.05rem;
-      font-weight: 700;
-      text-decoration: none;
-      color: #0b0f1e;
-      background: linear-gradient(135deg, #ffd28f, #ff8a5c);
-      box-shadow: 0 22px 38px rgba(255, 162, 98, 0.4);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .win-link--available {
-      box-shadow: 0 24px 42px rgba(255, 162, 98, 0.48);
-    }
-
-    .win-link:hover,
-    .win-link:focus {
-      transform: translateY(-2px);
-      box-shadow: 0 28px 46px rgba(255, 162, 98, 0.5);
-    }
-
-    .win-link[hidden] {
-      display: none;
     }
 
     #run-history {
@@ -380,9 +359,21 @@
       >
         Level 3
       </a>
+      <a
+        id="win-link"
+        class="level-link level-link--locked level-link--win"
+        href="./win.html"
+        aria-disabled="true"
+        tabindex="-1"
+      >
+        Win!
+      </a>
       <span id="level2-lock-text" class="level-lock-text">Reach 70 on Level 1 to unlock this level.</span>
       <span id="level3-lock-text" class="level-lock-text">Score 40+ on Level 2 to unlock Level 3.</span>
     </nav>
+    <p id="win-progress" class="level-requirement win-progress">
+      Score 40 or more on Level 2 to unlock Level 3 and Win! above.
+    </p>
     <p id="level2-locked-message" class="level-lock-banner" hidden>
       Score 70 or more on Level 1 to breach the singularity. Once unlocked you'll see your best cosmic runs right here.
     </p>
@@ -414,19 +405,6 @@
       <canvas id="court" width="960" height="540"></canvas>
       <div id="score-flash" role="status" aria-live="polite"></div>
     </div>
-    <p id="win-progress" class="win-progress">
-      Score 40 or more on Level 2 to unlock the celebration.
-    </p>
-    <a
-      id="win-link"
-      class="win-link"
-      href="win.html"
-      hidden
-      aria-hidden="true"
-      tabindex="-1"
-    >
-      🎉 Visit the victory celebration
-    </a>
     <section id="run-history">
       <h2>Top 10 Runs</h2>
       <table>
@@ -478,8 +456,8 @@
         linkId: 'win-link',
         messageId: 'win-progress',
         storageKey: 'rapid_fire_free_throws_level2_victory_unlocked',
-        lockedText: 'Score 40 or more on Level 2 to unlock the celebration.',
-        unlockedText: 'Victory unlocked! Tap the button below to celebrate your run.'
+        lockedText: 'Score 40 or more on Level 2 to unlock Level 3 and Win! above.',
+        unlockedText: 'Victory unlocked! Tap Win! above to celebrate your run.'
       },
       getUnlockScore: helpers => helpers.getBestScoreFromCookie('rapid_fire_runs_level1_v1'),
       additionalLocks: [

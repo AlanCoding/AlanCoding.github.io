@@ -898,17 +898,19 @@
       }
 
       if (winLink) {
+        winLink.hidden = false;
+        winLink.removeAttribute('hidden');
+        winLink.removeAttribute('aria-hidden');
+
         if (unlocked) {
-          winLink.hidden = false;
-          winLink.removeAttribute('hidden');
           winLink.classList.add('win-link--available');
-          winLink.setAttribute('aria-hidden', 'false');
+          winLink.classList.remove('level-link--locked');
+          winLink.removeAttribute('aria-disabled');
           winLink.removeAttribute('tabindex');
         } else {
-          winLink.hidden = true;
-          winLink.setAttribute('hidden', '');
           winLink.classList.remove('win-link--available');
-          winLink.setAttribute('aria-hidden', 'true');
+          winLink.classList.add('level-link--locked');
+          winLink.setAttribute('aria-disabled', 'true');
           winLink.setAttribute('tabindex', '-1');
         }
       }

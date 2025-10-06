@@ -97,6 +97,22 @@
       font-weight: 700;
     }
 
+    .level-requirement {
+      margin: 0 0 1.5rem;
+      padding: 0.85rem 1.1rem;
+      border-radius: 14px;
+      background: rgba(47, 61, 134, 0.12);
+      color: #1f2b5c;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .level-link--win.win-link--available {
+      background: linear-gradient(135deg, rgba(64, 199, 157, 0.95), rgba(76, 133, 255, 0.95));
+      color: #fff;
+      box-shadow: 0 14px 24px rgba(64, 133, 214, 0.32);
+    }
+
     h1 {
       font-size: clamp(2.2rem, 3vw + 1rem, 3.2rem);
       text-align: center;
@@ -313,9 +329,19 @@
       >
         Level 3
       </a>
+      <a
+        id="win-link"
+        class="level-link level-link--locked level-link--win"
+        href="./win.html"
+        aria-disabled="true"
+        tabindex="-1"
+      >
+        Win!
+      </a>
       <span id="level2-lock-text" class="level-lock-text">Score 70+ on Level 1 to unlock Level 2.</span>
       <span id="level3-lock-text" class="level-lock-text">Score 40+ on Level 2 to unlock Level 3.</span>
     </nav>
+    <p class="level-requirement">Score 70 or more on Level 1 to unlock Level 2.</p>
     <div id="hud">
       <span id="score">Score: 0</span>
       <span id="balls">Balls in play: 0</span>
@@ -375,6 +401,11 @@
       level2LinkId: 'level2-link',
       level2LockTextId: 'level2-lock-text',
       scoreFlashId: 'score-flash',
+      win: {
+        threshold: 175,
+        linkId: 'win-link',
+        storageKey: 'rapid_fire_free_throws_level3_victory_unlocked'
+      },
       additionalLocks: [
         {
           linkId: 'level3-link',
