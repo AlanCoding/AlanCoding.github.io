@@ -794,11 +794,17 @@
       }
 
       if (level2LockText) {
-        const lockedText = config.unlockLockedText || `Score ${unlockThreshold}+ on Level 1 to unlock.`;
-        const unlockedText = config.unlockUnlockedText || 'Level 2 unlocked!';
-        level2LockText.textContent = unlocked
+        const defaultLockedText = `Score ${unlockThreshold}+ on Level 1 to unlock.`;
+        const lockedTemplate =
+          typeof config.unlockLockedText === 'string' ? config.unlockLockedText : defaultLockedText;
+        const unlockedText =
+          typeof config.unlockUnlockedText === 'string' ? config.unlockUnlockedText : 'Level 2 unlocked!';
+        const message = unlocked
           ? unlockedText
-          : lockedText.replace('{threshold}', String(unlockThreshold)).replace('${threshold}', String(unlockThreshold));
+          : formatTemplate(lockedTemplate, { threshold: unlockThreshold });
+
+        level2LockText.textContent = message;
+        level2LockText.hidden = !message || !message.trim().length;
       }
 
       updateRequirementMessage(unlocked, bestScore);
@@ -849,10 +855,19 @@
         bestScore: bestScoreDisplay
       };
 
-      const template = unlocked
-        ? requirementUnlockedText || config.unlockUnlockedText || 'Next challenge unlocked! Best score: {bestScore}.'
-        : requirementLockedText ||
-          'Score {threshold}+ to unlock the next challenge. Your best score: {bestScore}.';
+      const unlockedTemplate =
+        requirementUnlockedText !== null
+          ? requirementUnlockedText
+          : (typeof config.unlockUnlockedText === 'string' && config.unlockUnlockedText.trim().length > 0
+              ? config.unlockUnlockedText
+              : 'Next challenge unlocked! Best score: {bestScore}.');
+
+      const lockedTemplate =
+        requirementLockedText !== null
+          ? requirementLockedText
+          : 'Score {threshold}+ to unlock the next challenge. Your best score: {bestScore}.';
+
+      const template = unlocked ? unlockedTemplate : lockedTemplate;
 
       levelRequirement.textContent = formatTemplate(template, values);
     }
@@ -899,12 +914,16 @@
         }
 
         if (lock.lockText) {
-          const lockedText = lock.lockedText || `Score ${lock.threshold}+ to unlock.`;
-          const unlockedText = lock.unlockedText || 'Unlocked!';
+          const defaultLockedText = `Score ${lock.threshold}+ to unlock.`;
+          const lockedTemplate =
+            typeof lock.lockedText === 'string' ? lock.lockedText : defaultLockedText;
+          const unlockedText = typeof lock.unlockedText === 'string' ? lock.unlockedText : 'Unlocked!';
           const message = unlocked
             ? unlockedText
-            : lockedText.replace('{threshold}', String(lock.threshold)).replace('${threshold}', String(lock.threshold));
+            : formatTemplate(lockedTemplate, { threshold: lock.threshold });
+
           lock.lockText.textContent = message;
+          lock.lockText.hidden = !message || !message.trim().length;
         }
 
         if (typeof lock.onUnlockStateChange === 'function') {
