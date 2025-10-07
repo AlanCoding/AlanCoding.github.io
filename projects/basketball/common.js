@@ -32,6 +32,11 @@
     const scoreFlash = config.scoreFlashId ? doc.getElementById(config.scoreFlashId) : doc.getElementById('score-flash');
     const level2Link = config.level2LinkId ? doc.getElementById(config.level2LinkId) : null;
     const level2LockText = config.level2LockTextId ? doc.getElementById(config.level2LockTextId) : null;
+    const levelRequirement = config.levelRequirementId ? doc.getElementById(config.levelRequirementId) : null;
+    const requirementLockedText =
+      typeof config.requirementLockedText === 'string' ? config.requirementLockedText : null;
+    const requirementUnlockedText =
+      typeof config.requirementUnlockedText === 'string' ? config.requirementUnlockedText : null;
     const lockBanner = config.lockBannerId ? doc.getElementById(config.lockBannerId) : null;
     const winConfig = config.win || null;
     const winLink = winConfig && winConfig.linkId ? doc.getElementById(winConfig.linkId) : null;
@@ -796,6 +801,8 @@
           : lockedText.replace('{threshold}', String(unlockThreshold)).replace('${threshold}', String(unlockThreshold));
       }
 
+      updateRequirementMessage(unlocked, bestScore);
+
       if (lockBanner) {
         lockBanner.hidden = unlocked;
       }
@@ -828,6 +835,26 @@
       }
 
       return unlocked;
+    }
+
+    function updateRequirementMessage(unlocked, bestScore) {
+      if (!levelRequirement) {
+        return;
+      }
+
+      const hasBestScore = Number.isFinite(bestScore) && bestScore > -Infinity;
+      const bestScoreDisplay = hasBestScore ? Math.round(bestScore) : '—';
+      const values = {
+        threshold: unlockThreshold,
+        bestScore: bestScoreDisplay
+      };
+
+      const template = unlocked
+        ? requirementUnlockedText || config.unlockUnlockedText || 'Next challenge unlocked! Best score: {bestScore}.'
+        : requirementLockedText ||
+          'Score {threshold}+ to unlock the next challenge. Your best score: {bestScore}.';
+
+      levelRequirement.textContent = formatTemplate(template, values);
     }
 
     function updateAdditionalLocks(latestScore = null) {
@@ -961,6 +988,20 @@
       }
 
       return unlocked;
+    }
+
+    function formatTemplate(template, replacements) {
+      if (typeof template !== 'string' || !template) {
+        return '';
+      }
+
+      return template.replace(/\{(\w+)\}|\$\{(\w+)\}/g, (match, key1, key2) => {
+        const key = key1 || key2;
+        if (Object.prototype.hasOwnProperty.call(replacements, key)) {
+          return String(replacements[key]);
+        }
+        return match;
+      });
     }
 
     function applyBlackHoleForce(ball, dt) {
