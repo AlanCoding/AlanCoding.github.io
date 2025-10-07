@@ -100,6 +100,40 @@
         }
       : null;
 
+    const blackHoleConfig = config.blackHole || null;
+    const blackHole = blackHoleConfig
+      ? {
+          x: typeof blackHoleConfig.x === 'number' ? blackHoleConfig.x : worldWidth * 0.55,
+          y: typeof blackHoleConfig.y === 'number' ? blackHoleConfig.y : worldHeight * 0.55,
+          radius: typeof blackHoleConfig.radius === 'number' ? blackHoleConfig.radius : 2.6,
+          eventHorizonRadius:
+            typeof blackHoleConfig.eventHorizonRadius === 'number'
+              ? blackHoleConfig.eventHorizonRadius
+              : 1.45,
+          influenceRadius:
+            typeof blackHoleConfig.influenceRadius === 'number' ? blackHoleConfig.influenceRadius : 6.5,
+          pullStrength: typeof blackHoleConfig.pullStrength === 'number' ? blackHoleConfig.pullStrength : 260,
+          spinStrength: typeof blackHoleConfig.spinStrength === 'number' ? blackHoleConfig.spinStrength : 0,
+          minDistance: typeof blackHoleConfig.minDistance === 'number' ? blackHoleConfig.minDistance : 1.0,
+          consumeShrink:
+            typeof blackHoleConfig.consumeShrink === 'number'
+              ? Math.min(Math.max(blackHoleConfig.consumeShrink, 0.1), 0.95)
+              : 0.65,
+          color: Array.isArray(blackHoleConfig.color) ? blackHoleConfig.color : [0.1, 0.1, 0.16, 0.96],
+          horizonColor: Array.isArray(blackHoleConfig.horizonColor)
+            ? blackHoleConfig.horizonColor
+            : [0.94, 0.52, 0.18, 0.92],
+          glowColor: Array.isArray(blackHoleConfig.glowColor) ? blackHoleConfig.glowColor : [0.46, 0.6, 0.95, 0.32]
+        }
+      : null;
+
+    const additionalLocks = Array.isArray(config.additionalLocks)
+      ? config.additionalLocks
+          .map(setupAdditionalLock)
+          .filter(Boolean)
+      : [];
+    const additionalLockStates = new WeakMap();
+
     const balls = [];
     let score = 0;
     let shootStart = 0;
@@ -138,6 +172,7 @@
     updateControls();
     renderHistory();
     levelUnlocked = updateLevelUnlockState();
+    updateAdditionalLocks();
     updateWinState();
     renderScene();
     updateHud(performance.now());
@@ -206,6 +241,10 @@
           duration: simulationDurationMs / 1000
         }
       };
+
+      if (blackHole) {
+        currentRun.blackHoleConsumed = 0;
+      }
 
       if (shootButton) shootButton.disabled = true;
       if (stopButton) stopButton.disabled = false;
@@ -304,6 +343,10 @@
       }
 
       const completedScore = outcome === 'completed' ? score : null;
+      const consumedByBlackHole = blackHole && currentRun && Number.isFinite(currentRun.blackHoleConsumed)
+        ? currentRun.blackHoleConsumed
+        : 0;
+
       const record = {
         timestamp: new Date().toISOString(),
         angleBoost: currentRun.params.angleBoost,
@@ -311,13 +354,16 @@
         spawnRate: currentRun.params.spawnRate,
         duration: currentRun.params.duration,
         score: completedScore,
-        status: outcome
+        status: outcome,
+        blackHoleConsumed: consumedByBlackHole
       };
 
       addRunRecord(record);
       saveHistory(runHistory);
       renderHistory();
-      levelUnlocked = updateLevelUnlockState();
+      const previousLevelUnlockState = levelUnlocked;
+      levelUnlocked = updateLevelUnlockState(completedScore, previousLevelUnlockState);
+      updateAdditionalLocks(completedScore);
       updateWinState(completedScore);
 
       if (achievements && outcome === 'completed') {
@@ -326,6 +372,19 @@
         }
         if (Number.isFinite(completedScore) && completedScore === 0) {
           achievements.setStatus('basketball', 'basketball-zero-hero', true);
+        }
+        if (blackHole && consumedByBlackHole > 0) {
+          const milestones = [
+            { value: 100, id: 'basketball-black-hole-100' },
+            { value: 150, id: 'basketball-black-hole-150' },
+            { value: 180, id: 'basketball-black-hole-180' },
+            { value: 195, id: 'basketball-black-hole-195' }
+          ];
+          milestones.forEach(milestone => {
+            if (consumedByBlackHole >= milestone.value) {
+              achievements.setStatus('basketball', milestone.id, true);
+            }
+          });
         }
       }
 
@@ -354,16 +413,28 @@
     }
 
     function updatePhysics(dt, now) {
-      const activeBalls = balls.filter(b => b.active);
-
       if (board) {
         updateBoardFromKeys(dt);
       }
 
-      for (const ball of activeBalls) {
+      const activeBalls = [];
+
+      for (const ball of balls) {
+        if (!ball.active) {
+          continue;
+        }
+
+        if (blackHole) {
+          applyBlackHoleForce(ball, dt);
+        }
+
         ball.vy += gravity * dt;
         ball.x += ball.vx * dt;
         ball.y += ball.vy * dt;
+
+        if (blackHole && consumeBallInBlackHole(ball)) {
+          continue;
+        }
 
         if (ball.y - ball.radius < floorY) {
           ball.y = floorY + ball.radius;
@@ -387,6 +458,9 @@
 
         if (board) {
           handleBoardCollision(ball);
+          if (!ball.active) {
+            continue;
+          }
         }
 
         const dx = ball.x - hoop.x;
@@ -395,13 +469,17 @@
         if (distSq < (hoop.radius - ball.radius * 0.35) * (hoop.radius - ball.radius * 0.35)) {
           ball.active = false;
           score += 1;
+          continue;
         }
+
+        activeBalls.push(ball);
       }
 
       for (let i = 0; i < activeBalls.length; i++) {
         const a = activeBalls[i];
         for (let j = i + 1; j < activeBalls.length; j++) {
           const b = activeBalls[j];
+          if (!a.active || !b.active) continue;
           const dx = b.x - a.x;
           const dy = b.y - a.y;
           const distSq = dx * dx + dy * dy;
@@ -432,6 +510,7 @@
       }
 
       for (const ball of activeBalls) {
+        if (!ball.active) continue;
         ball.vx *= 0.999;
         ball.vy *= 0.999;
       }
@@ -458,6 +537,12 @@
         drawRect(22.8, 7.8, 0.16, 4.2, [0.7, 0.7, 0.76, 1]);
         drawRect(22.96, 10.3, 0.7, 2.2, [0.96, 0.96, 0.98, 1]);
         drawRect(23.1, 10.55, 0.42, 1.7, [0.88, 0.9, 0.96, 1]);
+      }
+
+      if (blackHole) {
+        drawCircle(blackHole.x, blackHole.y, blackHole.radius * 1.65, -1, blackHole.glowColor);
+        drawCircle(blackHole.x, blackHole.y, blackHole.radius, 0.42, blackHole.color);
+        drawCircle(blackHole.x, blackHole.y, blackHole.eventHorizonRadius, -1, blackHole.horizonColor);
       }
 
       drawCircle(hoop.x, hoop.y, hoop.radius, hoop.innerRatio, hoop.color);
@@ -677,11 +762,15 @@
       }
     }
 
-    function updateLevelUnlockState() {
+    function updateLevelUnlockState(latestScore = null, previousState = levelUnlocked) {
       const bestScore = computeUnlockScore();
       const unlockedFromScore = Number.isFinite(bestScore) && bestScore >= unlockThreshold;
       const unlockedFromStorage = getStoredUnlockFlag();
       const unlocked = unlockedFromScore || unlockedFromStorage;
+      const previouslyUnlocked = Boolean(previousState);
+      const justUnlocked = !previouslyUnlocked && unlocked;
+      const unlockedFromLatestScore =
+        justUnlocked && unlockedFromScore && Number.isFinite(latestScore) && latestScore >= unlockThreshold;
 
       if (unlockedFromScore && !unlockedFromStorage) {
         setStoredUnlockFlag(true);
@@ -729,11 +818,81 @@
         config.onUnlockStateChange(unlocked, {
           bestScore,
           unlockedFromScore,
-          unlockedFromStorage
+          unlockedFromStorage,
+          latestScore,
+          threshold: unlockThreshold,
+          previouslyUnlocked,
+          justUnlocked,
+          unlockedFromLatestScore
         });
       }
 
       return unlocked;
+    }
+
+    function updateAdditionalLocks(latestScore = null) {
+      if (!additionalLocks.length) {
+        return;
+      }
+
+      const helpers = {
+        currentHistory: runHistory.slice(),
+        getBestScoreCurrent: getBestScore,
+        getBestScoreFromCookie: name => getBestScore(loadHistoryFromCookie(name))
+      };
+
+      for (const lock of additionalLocks) {
+        const score = typeof lock.getUnlockScore === 'function'
+          ? lock.getUnlockScore(helpers)
+          : helpers.getBestScoreCurrent(helpers.currentHistory);
+        const unlockedFromScore = Number.isFinite(score) && score >= lock.threshold;
+        const unlockedFromStorage = lock.storageKey ? getStoredFlag(lock.storageKey) : false;
+        const unlocked = unlockedFromScore || unlockedFromStorage;
+        const previouslyUnlocked = Boolean(additionalLockStates.get(lock));
+        const justUnlocked = !previouslyUnlocked && unlocked;
+        const unlockedFromLatestScore =
+          justUnlocked && unlockedFromScore && Number.isFinite(latestScore) && latestScore >= lock.threshold;
+
+        if (unlockedFromScore && lock.storageKey && !unlockedFromStorage) {
+          setStoredFlag(lock.storageKey, true);
+        }
+
+        additionalLockStates.set(lock, unlocked);
+
+        if (lock.link) {
+          if (unlocked) {
+            lock.link.classList.remove('level-link--locked');
+            lock.link.removeAttribute('aria-disabled');
+            lock.link.removeAttribute('tabindex');
+          } else {
+            lock.link.classList.add('level-link--locked');
+            lock.link.setAttribute('aria-disabled', 'true');
+            lock.link.setAttribute('tabindex', '-1');
+          }
+        }
+
+        if (lock.lockText) {
+          const lockedText = lock.lockedText || `Score ${lock.threshold}+ to unlock.`;
+          const unlockedText = lock.unlockedText || 'Unlocked!';
+          const message = unlocked
+            ? unlockedText
+            : lockedText.replace('{threshold}', String(lock.threshold)).replace('${threshold}', String(lock.threshold));
+          lock.lockText.textContent = message;
+        }
+
+        if (typeof lock.onUnlockStateChange === 'function') {
+          lock.onUnlockStateChange(unlocked, {
+            bestScore: score,
+            unlockedFromScore,
+            unlockedFromStorage,
+            latestScore,
+            threshold: lock.threshold,
+            previouslyUnlocked,
+            justUnlocked,
+            unlockedFromLatestScore
+          });
+        }
+      }
     }
 
     function updateWinState(latestScore = null) {
@@ -761,17 +920,19 @@
       }
 
       if (winLink) {
+        winLink.hidden = false;
+        winLink.removeAttribute('hidden');
+        winLink.removeAttribute('aria-hidden');
+
         if (unlocked) {
-          winLink.hidden = false;
-          winLink.removeAttribute('hidden');
           winLink.classList.add('win-link--available');
-          winLink.setAttribute('aria-hidden', 'false');
+          winLink.classList.remove('level-link--locked');
+          winLink.removeAttribute('aria-disabled');
           winLink.removeAttribute('tabindex');
         } else {
-          winLink.hidden = true;
-          winLink.setAttribute('hidden', '');
           winLink.classList.remove('win-link--available');
-          winLink.setAttribute('aria-hidden', 'true');
+          winLink.classList.add('level-link--locked');
+          winLink.setAttribute('aria-disabled', 'true');
           winLink.setAttribute('tabindex', '-1');
         }
       }
@@ -780,11 +941,14 @@
         const lockedText = winConfig.lockedText
           ? String(winConfig.lockedText)
           : `Score ${winThreshold}+ on Level 2 to unlock the celebration.`;
-        const unlockedText = winConfig.unlockedText
+        const baseUnlockedText = winConfig.unlockedText
           ? String(winConfig.unlockedText)
           : 'Victory unlocked! Celebrate your win below!';
+        const unlockedCelebrationText = Number.isFinite(latestScore) && latestScore >= winThreshold
+          ? `You scored ${Math.round(latestScore)}! ${baseUnlockedText}`
+          : baseUnlockedText;
         winMessage.hidden = false;
-        winMessage.textContent = unlocked ? unlockedText : lockedText;
+        winMessage.textContent = unlocked ? unlockedCelebrationText : lockedText;
         winMessage.classList.toggle('win-progress--unlocked', unlocked);
       }
 
@@ -797,6 +961,54 @@
       }
 
       return unlocked;
+    }
+
+    function applyBlackHoleForce(ball, dt) {
+      if (!blackHole) return;
+
+      const dx = blackHole.x - ball.x;
+      const dy = blackHole.y - ball.y;
+      const distSq = dx * dx + dy * dy;
+      const influenceSq = blackHole.influenceRadius * blackHole.influenceRadius;
+      if (distSq > influenceSq) {
+        return;
+      }
+
+      const distance = Math.sqrt(distSq) || blackHole.minDistance;
+      const clampedDistance = Math.max(distance, blackHole.minDistance);
+      const pull = blackHole.pullStrength / (clampedDistance * clampedDistance);
+      const nx = dx / clampedDistance;
+      const ny = dy / clampedDistance;
+      ball.vx += nx * pull * dt;
+      ball.vy += ny * pull * dt;
+
+      if (blackHole.spinStrength) {
+        const tx = -ny;
+        const ty = nx;
+        const spin = blackHole.spinStrength / Math.max(clampedDistance, 1);
+        ball.vx += tx * spin * dt;
+        ball.vy += ty * spin * dt;
+      }
+    }
+
+    function consumeBallInBlackHole(ball) {
+      if (!blackHole) return false;
+
+      const dx = ball.x - blackHole.x;
+      const dy = ball.y - blackHole.y;
+      const distanceSq = dx * dx + dy * dy;
+      const horizon = Math.max(0.1, blackHole.eventHorizonRadius - ball.radius * 0.25);
+      if (distanceSq < horizon * horizon) {
+        ball.active = false;
+        ball.vx = 0;
+        ball.vy = 0;
+        ball.radius *= blackHole.consumeShrink;
+        if (currentRun) {
+          currentRun.blackHoleConsumed = (currentRun.blackHoleConsumed || 0) + 1;
+        }
+        return true;
+      }
+      return false;
     }
 
     function computeUnlockScore() {
@@ -817,6 +1029,25 @@
         }
         return best;
       }, -Infinity);
+    }
+
+    function setupAdditionalLock(lockConfig) {
+      if (!lockConfig || typeof lockConfig !== 'object') {
+        return null;
+      }
+
+      const thresholdValue = Number(lockConfig.unlockThreshold);
+      return {
+        link: lockConfig.linkId ? doc.getElementById(lockConfig.linkId) : null,
+        lockText: lockConfig.lockTextId ? doc.getElementById(lockConfig.lockTextId) : null,
+        threshold: Number.isFinite(thresholdValue) ? thresholdValue : 0,
+        lockedText: typeof lockConfig.lockedText === 'string' ? lockConfig.lockedText : null,
+        unlockedText: typeof lockConfig.unlockedText === 'string' ? lockConfig.unlockedText : null,
+        storageKey: typeof lockConfig.storageKey === 'string' ? lockConfig.storageKey : null,
+        getUnlockScore: typeof lockConfig.getUnlockScore === 'function' ? lockConfig.getUnlockScore : null,
+        onUnlockStateChange:
+          typeof lockConfig.onUnlockStateChange === 'function' ? lockConfig.onUnlockStateChange : null
+      };
     }
 
     function loadHistoryFromCookie(name) {

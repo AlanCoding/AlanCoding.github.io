@@ -7,127 +7,173 @@
   <style>
     :root {
       color-scheme: light dark;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
     }
 
     body {
       margin: 0;
-      background: radial-gradient(circle at top, #f2f6ff, #d7e1ff 55%, #a4b5ff);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: radial-gradient(circle at top, #0b1533 0%, #060913 55%, #030508 100%);
+      color: #e8edff;
       padding: 2rem 1rem 3rem;
     }
 
     main {
-      max-width: 960px;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(6px);
-      border-radius: 18px;
-      box-shadow: 0 24px 40px rgba(40, 52, 120, 0.25);
-      padding: 2rem clamp(1rem, 3vw, 2.5rem) 3rem;
+      width: min(1024px, 100%);
+      background: rgba(8, 12, 28, 0.75);
+      border-radius: 20px;
+      box-shadow: 0 32px 48px rgba(2, 4, 12, 0.7);
+      padding: clamp(1.5rem, 4vw, 2.8rem);
+      position: relative;
+      overflow: hidden;
+    }
+
+    main::before {
+      content: "";
+      position: absolute;
+      inset: -80% -40% auto;
+      height: 180%;
+      background: radial-gradient(circle at top left, rgba(118, 78, 255, 0.32), rgba(9, 15, 30, 0));
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    main > * {
+      position: relative;
+      z-index: 1;
     }
 
     .back-link {
       display: inline-flex;
       align-items: center;
-      gap: 0.45rem;
+      gap: 0.5rem;
+      color: #8fa4ff;
+      text-decoration: none;
       font-weight: 600;
       margin-bottom: 1.5rem;
-      color: #2f3d86;
-      text-decoration: none;
-      transition: transform 0.15s ease, color 0.15s ease;
+      letter-spacing: 0.02em;
+      transition: color 0.2s ease, transform 0.2s ease;
     }
 
     .back-link:hover,
     .back-link:focus {
-      color: #ff6c3c;
-      transform: translateX(-3px);
+      color: #ffd28f;
+      transform: translateX(-2px);
+    }
+
+    h1 {
+      margin: 0 0 1.25rem;
+      font-size: clamp(2.4rem, 3.2vw + 1rem, 3.4rem);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #f8fbff;
+      text-shadow: 0 18px 36px rgba(2, 6, 20, 0.8);
     }
 
     .level-nav {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.75rem 1.2rem;
-      margin-bottom: 1.5rem;
+      gap: 0.65rem 1rem;
+      margin-bottom: 1.25rem;
       font-weight: 600;
-      color: #1f2b5c;
+      color: rgba(199, 209, 255, 0.88);
     }
 
     .level-link {
-      position: relative;
-      padding: 0.4rem 1.2rem;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.45rem 1.4rem;
       border-radius: 999px;
-      background: rgba(63, 79, 155, 0.16);
+      background: rgba(102, 122, 255, 0.14);
       color: inherit;
       text-decoration: none;
-      transition: transform 0.15s ease, background 0.15s ease;
+      transition: transform 0.2s ease, background 0.2s ease;
     }
 
     .level-link:hover,
     .level-link:focus {
-      transform: translateY(-2px);
-      background: rgba(255, 108, 60, 0.18);
-      outline: none;
+      transform: translateY(-1px);
+      background: rgba(255, 210, 143, 0.22);
     }
 
     .level-link--current {
-      background: linear-gradient(135deg, rgba(255, 120, 44, 0.9), rgba(255, 78, 78, 0.9));
+      background: linear-gradient(135deg, #814bff, #3f82ff);
       color: #fff;
-      box-shadow: 0 14px 24px rgba(240, 80, 40, 0.28);
+      box-shadow: 0 20px 36px rgba(63, 130, 255, 0.35);
     }
 
     .level-link--locked {
       opacity: 0.45;
       pointer-events: none;
-      background: rgba(102, 112, 166, 0.22);
-      color: rgba(32, 42, 92, 0.7);
+      background: rgba(82, 96, 150, 0.22);
+      color: rgba(179, 193, 252, 0.75);
       box-shadow: none;
+    }
+
+    .level-link--win.win-link--available {
+      background: linear-gradient(135deg, #44d1ab, #4c85ff);
+      color: #071226;
+      box-shadow: 0 20px 34px rgba(70, 150, 255, 0.38);
     }
 
     .level-lock-text {
       font-size: 0.95rem;
-      color: rgba(41, 58, 122, 0.9);
+      color: rgba(178, 191, 255, 0.75);
     }
 
-    .level-lock-text strong {
-      font-weight: 700;
+    .level-requirement {
+      margin: 0 0 1.4rem;
+      padding: 1rem 1.3rem;
+      border-radius: 16px;
+      background: rgba(74, 90, 160, 0.28);
+      color: rgba(220, 228, 255, 0.92);
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .level-up-toast {
+      margin: 0 0 1.3rem;
+      padding: 0.95rem 1.25rem;
+      border-radius: 16px;
+      background: rgba(104, 226, 196, 0.22);
+      color: rgba(16, 30, 58, 0.9);
+      font-weight: 650;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .level-up-toast--visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .level-lock-banner {
-      margin: 0 0 1rem;
-      padding: 0.85rem 1rem;
-      border-radius: 12px;
-      background: rgba(63, 79, 155, 0.12);
-      color: #1f2b5c;
+      margin: 0 0 1.4rem;
+      padding: 1rem 1.25rem;
+      border-radius: 14px;
+      background: rgba(74, 90, 160, 0.26);
+      color: rgba(220, 228, 255, 0.92);
       font-weight: 600;
-    }
-
-    h1 {
-      font-size: clamp(2.2rem, 3vw + 1rem, 3.2rem);
-      text-align: center;
-      margin-top: 0;
-      letter-spacing: 0.04em;
-      color: #293a7a;
-      text-shadow: 0 6px 16px rgba(25, 40, 92, 0.35);
     }
 
     #hud {
       display: flex;
       flex-wrap: wrap;
+      gap: 1rem 1.4rem;
       align-items: center;
       justify-content: center;
-      gap: 1rem 2rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.4rem;
       font-weight: 600;
-      color: #1f2b5c;
     }
 
     #hud span {
-      min-width: 140px;
+      min-width: 150px;
       text-align: center;
       font-size: 1.05rem;
     }
@@ -135,124 +181,89 @@
     #hud button {
       appearance: none;
       border: none;
-      padding: 0.85rem 2.4rem;
       border-radius: 999px;
-      font-size: 1.1rem;
+      padding: 0.9rem 2.75rem;
       font-weight: 700;
-      color: #fff;
+      font-size: 1.05rem;
+      letter-spacing: 0.03em;
+      color: #0c1224;
       cursor: pointer;
-      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
     }
 
     #hud button:disabled {
       cursor: not-allowed;
-      filter: grayscale(40%);
+      filter: brightness(0.75);
       box-shadow: none;
     }
 
     #shoot {
-      background: linear-gradient(135deg, #ff782c, #ff4e4e);
-      box-shadow: 0 18px 24px rgba(240, 80, 40, 0.3);
-    }
-
-    #shoot:disabled {
-      background: #ffb48d;
-      color: rgba(255, 255, 255, 0.8);
+      background: linear-gradient(135deg, #ffd28f, #ff8a5c);
+      box-shadow: 0 18px 32px rgba(255, 162, 98, 0.35);
     }
 
     #shoot:not(:disabled):hover {
       transform: translateY(-2px);
-      box-shadow: 0 20px 28px rgba(240, 80, 40, 0.35);
+      box-shadow: 0 22px 36px rgba(255, 162, 98, 0.4);
     }
 
     #stop {
-      background: linear-gradient(135deg, #4f67ff, #3849d7);
-      box-shadow: 0 18px 24px rgba(60, 82, 220, 0.3);
-    }
-
-    #stop:disabled {
-      background: #9ba5ff;
-      color: rgba(255, 255, 255, 0.85);
+      background: linear-gradient(135deg, #6c7bff, #3f4bff);
+      color: #f5f7ff;
+      box-shadow: 0 18px 32px rgba(96, 112, 255, 0.32);
     }
 
     #stop:not(:disabled):hover {
       transform: translateY(-2px);
-      box-shadow: 0 20px 28px rgba(60, 82, 220, 0.35);
+      box-shadow: 0 22px 38px rgba(96, 112, 255, 0.38);
     }
 
-    canvas {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 12px;
-      border: 2px solid rgba(25, 40, 92, 0.15);
-      background: linear-gradient(#9acbff, #87b7ff);
+    .level-intro {
+      margin: 0 0 1.6rem;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: rgba(214, 222, 255, 0.9);
     }
 
-    canvas.board-enabled {
-      cursor: grab;
+    #controls {
+      display: grid;
+      gap: 0.9rem 1.2rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-bottom: 1.6rem;
     }
 
-    canvas.board-enabled.board-dragging {
-      cursor: grabbing;
+    #controls label {
+      display: grid;
+      gap: 0.4rem;
+      padding: 1rem 1.15rem;
+      border-radius: 14px;
+      background: rgba(40, 54, 112, 0.32);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      color: rgba(223, 229, 255, 0.88);
+      font-size: 0.95rem;
     }
 
-    .win-progress {
-      margin: 1.5rem auto 0.75rem;
-      padding: 0.85rem 1.25rem;
-      max-width: 640px;
-      text-align: center;
-      border-radius: 12px;
-      background: rgba(63, 79, 155, 0.14);
-      color: #263474;
-      font-weight: 600;
-      box-shadow: 0 10px 18px rgba(40, 52, 120, 0.18);
+    #controls input[type="range"] {
+      accent-color: #ffad66;
     }
 
-    .win-progress--unlocked {
-      background: rgba(255, 120, 44, 0.18);
-      color: #8c3515;
-      box-shadow: 0 12px 22px rgba(214, 102, 49, 0.24);
-    }
-
-    .win-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-      margin: 0 auto 2rem;
-      padding: 0.95rem 2.6rem;
-      border-radius: 999px;
-      font-size: 1.1rem;
-      font-weight: 700;
-      text-decoration: none;
-      color: #fff;
-      background: linear-gradient(135deg, #ff782c, #ff4e9c);
-      box-shadow: 0 18px 30px rgba(240, 80, 120, 0.3);
-      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-    }
-
-    .win-link--available {
-      box-shadow: 0 20px 34px rgba(240, 80, 120, 0.32);
-    }
-
-    .win-link:hover,
-    .win-link:focus {
-      transform: translateY(-2px);
-      box-shadow: 0 22px 34px rgba(240, 80, 120, 0.35);
-      outline: none;
-    }
-
-    .win-link:focus-visible {
-      box-shadow: 0 0 0 3px rgba(255, 120, 44, 0.35), 0 22px 34px rgba(240, 80, 120, 0.35);
-    }
-
-    .win-link[hidden] {
-      display: none;
+    #controls span {
+      font-size: 0.9rem;
+      color: rgba(255, 210, 143, 0.85);
     }
 
     .court-wrapper {
       position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 32px 48px rgba(6, 9, 18, 0.75);
+    }
+
+    canvas {
+      width: 100%;
+      display: block;
+      height: auto;
+      background: radial-gradient(circle at 20% 30%, rgba(32, 53, 105, 0.85), rgba(6, 10, 22, 0.92));
     }
 
     #score-flash {
@@ -261,11 +272,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-size: clamp(2.4rem, 5vw, 3.4rem);
       font-weight: 800;
-      color: rgba(255, 255, 255, 0.96);
-      text-shadow: 0 10px 22px rgba(25, 30, 60, 0.45);
-      background: radial-gradient(circle, rgba(22, 32, 78, 0.35), rgba(22, 32, 78, 0));
+      color: rgba(255, 222, 190, 0.94);
+      text-shadow: 0 14px 28px rgba(12, 8, 0, 0.6);
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s ease;
@@ -275,153 +285,138 @@
       opacity: 1;
     }
 
-    #controls {
-      display: grid;
-      gap: 0.8rem 1.2rem;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      margin-bottom: 1.4rem;
-      color: #1f2b5c;
-      font-weight: 600;
-    }
-
-    #controls label {
-      display: grid;
-      gap: 0.35rem;
-      font-size: 0.95rem;
-      padding: 0.9rem 1rem;
-      border-radius: 12px;
-      background: rgba(71, 92, 156, 0.08);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    }
-
-    #controls input[type="range"] {
-      width: 100%;
-      accent-color: #ff6c3c;
-    }
-
-    #controls span {
-      font-size: 0.9rem;
-      color: #293a7a;
-    }
-
-    p {
-      margin-top: 1.75rem;
-      line-height: 1.6;
-      color: #2b3570;
-      text-align: center;
-    }
-
-    .level-intro {
-      margin: 0 0 1.3rem;
-      text-align: left;
-      font-size: 1.05rem;
-      color: #1f2b5c;
-    }
-
     #run-history {
       margin-top: 2.6rem;
-    }
-
-    #run-history h2 {
-      font-size: clamp(1.4rem, 2vw + 1rem, 1.9rem);
-      color: #24316d;
-      text-align: center;
-      margin-bottom: 1.1rem;
     }
 
     #run-history table {
       width: 100%;
       border-collapse: collapse;
-      background: rgba(255, 255, 255, 0.86);
-      border-radius: 12px;
+      background: rgba(12, 18, 42, 0.7);
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 12px 22px rgba(32, 44, 98, 0.14);
     }
 
     #run-history th,
     #run-history td {
-      padding: 0.75rem 0.9rem;
-      font-size: 0.95rem;
+      padding: 0.85rem 1rem;
       text-align: left;
-      color: #1f2b5c;
+      font-size: 0.95rem;
     }
 
     #run-history thead {
-      background: linear-gradient(135deg, rgba(76, 99, 196, 0.95), rgba(56, 73, 175, 0.95));
-      color: #fff;
+      background: rgba(36, 49, 96, 0.9);
+      color: rgba(226, 232, 255, 0.92);
     }
 
     #run-history tbody tr:nth-child(even) {
-      background: rgba(132, 148, 220, 0.08);
+      background: rgba(20, 28, 58, 0.7);
     }
 
-    #run-history tbody tr:hover {
-      background: rgba(255, 193, 126, 0.25);
+    #run-history tbody tr:nth-child(odd) {
+      background: rgba(15, 23, 48, 0.7);
     }
 
-    #run-history td:last-child {
-      font-weight: 700;
+    @media (max-width: 680px) {
+      main {
+        padding: 1.6rem 1.2rem 2.4rem;
+      }
+
+      #hud {
+        flex-direction: column;
+      }
+
+      #hud span {
+        width: 100%;
+      }
+
+      .level-nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .level-link {
+        width: 100%;
+        justify-content: center;
+      }
+
+      #controls {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
   <main>
-    <a class="back-link" href="/index.html" aria-label="Back to projects">
+    <a class="back-link" href="./" aria-label="Back to Level 1">
       <span aria-hidden="true">⟵</span>
-      Back to projects
+      Back to Level 1
     </a>
-    <h1>Rapid Fire Free Throws</h1>
+    <h1>Level 2 · Event Horizon</h1>
     <nav class="level-nav" aria-label="Basketball levels">
       <span>Levels:</span>
       <a class="level-link" href="./">Level 1</a>
-      <a id="level2-link" class="level-link level-link--current" href="./level2.html">Level 2</a>
+      <span class="level-link level-link--current">Level 2</span>
+      <a
+        id="level3-link"
+        class="level-link level-link--locked"
+        href="./level3.html"
+        aria-disabled="true"
+        tabindex="-1"
+      >
+        Level 3
+      </a>
+      <a
+        id="win-link"
+        class="level-link level-link--locked level-link--win"
+        href="./win.html"
+        aria-disabled="true"
+        tabindex="-1"
+      >
+        Win!
+      </a>
       <span id="level2-lock-text" class="level-lock-text">Reach 70 on Level 1 to unlock this level.</span>
+      <span id="level3-lock-text" class="level-lock-text">Score 40+ on Level 2 to unlock Level 3.</span>
     </nav>
+    <p class="level-requirement">Score 40 or more on Level 2 to unlock Level 3 above.</p>
+    <div
+      id="level3-unlock-toast"
+      class="level-up-toast"
+      role="status"
+      aria-live="polite"
+      hidden
+    ></div>
     <p id="level2-locked-message" class="level-lock-banner" hidden>
-      Score 70 or more on Level 1 to unlock this advanced drill. Your best runs will appear here once unlocked.
+      Score 70 or more on Level 1 to breach the singularity. Once unlocked you'll see your best cosmic runs right here.
     </p>
     <div id="hud">
       <span id="score">Score: 0</span>
       <span id="balls">Balls in play: 0</span>
       <span id="timer">Timer: 0.0s</span>
-      <button id="shoot">Start Shooting</button>
-      <button id="stop" disabled>Stop</button>
+      <button id="shoot">Start Gravity Well</button>
+      <button id="stop" disabled>Abort Run</button>
     </div>
     <p class="level-intro">
-      Level 2: the practice court added a roaming backboard. Drag it with your pointer or nudge it with WASD/arrow keys
-      to send ricocheting shots into the hoop. Keep your rhythm—balls still launch for ten frantic seconds, and the clock
-      gives rebounds a couple extra beats to settle before tallying your score.
+      A rogue practice facility opened a miniature black hole at mid-court. Its gravity bends every shot—get too close and the
+      ball vanishes beyond the event horizon. Thread the needle by curving throws into the hoop while steering clear of the
+      singularity's hungry core.
     </p>
     <div id="controls">
       <label for="angle-control">
         Angle boost
-        <input type="range" id="angle-control" min="-0.25" max="0.83" step="0.01" value="0.18" />
-        <span id="angle-display">+10.3°</span>
+        <input type="range" id="angle-control" min="-0.25" max="0.83" step="0.01" value="0.16" />
+        <span id="angle-display">+9.2°</span>
       </label>
       <label for="power-control">
         Launch power
-        <input type="range" id="power-control" min="14" max="39" step="0.1" value="19.5" />
-        <span id="power-display">19.5 u/s</span>
+        <input type="range" id="power-control" min="14" max="39" step="0.1" value="20.5" />
+        <span id="power-display">20.5 u/s</span>
       </label>
     </div>
     <div class="court-wrapper">
       <canvas id="court" width="960" height="540"></canvas>
       <div id="score-flash" role="status" aria-live="polite"></div>
     </div>
-    <p id="win-progress" class="win-progress">
-      Score 170 or more on Level 2 to unlock the victory celebration.
-    </p>
-    <a
-      id="win-link"
-      class="win-link"
-      href="win.html"
-      hidden
-      aria-hidden="true"
-      tabindex="-1"
-    >
-      🎉 Visit the victory celebration
-    </a>
-    <p>Unleash a cascade of free throws! Hit the button to fire 20 balls a second for ten straight seconds. Shots ricochet off the floor, the wall, and even each other. Sink them through the hoop before time runs out.</p>
     <section id="run-history">
       <h2>Top 10 Runs</h2>
       <table>
@@ -444,40 +439,67 @@
   <script src="../shared/achievements.js"></script>
   <script src="common.js"></script>
   <script>
+    const level3UnlockToast = document.getElementById('level3-unlock-toast');
+
     window.RapidFireFreeThrows.initGame({
-      historyCookie: 'rapid_fire_runs_level2_v1',
+      historyCookie: 'rapid_fire_runs_level2_v2',
       levelKey: 'level2',
       unlockThreshold: 70,
-      unlockLockedText: 'Reach 70+ on Level 1 to unlock this level.',
-      unlockUnlockedText: 'Level 2 unlocked! Guide the board to redirect shots.',
+      unlockLockedText: 'Reach 70+ on Level 1 to unlock the Event Horizon.',
+      unlockUnlockedText: 'Level 2 unlocked! Ride the gravity well.',
       level2LockTextId: 'level2-lock-text',
       lockBannerId: 'level2-locked-message',
       scoreFlashId: 'score-flash',
-      simulationDurationMs: 12000,
+      simulationDurationMs: 11500,
       disableUntilUnlocked: true,
-      board: {
-        width: 11.5,
-        aspect: 264 / 8000,
-        x: 19.2,
-        y: 8.4,
-        speed: 13,
-        restitution: 0.92,
-        padding: 0.6,
-        verticalPadding: 0.6,
-        textureUrl: 'assets/board.png'
+      blackHole: {
+        x: 16.4,
+        y: 8.2,
+        radius: 2.45,
+        eventHorizonRadius: 1.35,
+        influenceRadius: 7.4,
+        pullStrength: 265,
+        spinStrength: 34,
+        minDistance: 1.05,
+        color: [0.12, 0.13, 0.24, 0.92],
+        glowColor: [0.36, 0.46, 0.94, 0.32],
+        horizonColor: [0.98, 0.62, 0.28, 0.95]
       },
       win: {
-        threshold: 170,
+        threshold: 175,
         linkId: 'win-link',
-        messageId: 'win-progress',
-        storageKey: 'rapid_fire_free_throws_victory_unlocked',
-        lockedText: 'Score 170 or more on Level 2 to unlock the celebration.',
-        unlockedText: 'Victory unlocked! Tap the button below to celebrate your win.'
+        storageKey: 'rapid_fire_free_throws_level3_victory_unlocked'
       },
-      getUnlockScore: helpers => helpers.getBestScoreFromCookie('rapid_fire_runs_level1_v1')
+      getUnlockScore: helpers => helpers.getBestScoreFromCookie('rapid_fire_runs_level1_v1'),
+      additionalLocks: [
+        {
+          linkId: 'level3-link',
+          lockTextId: 'level3-lock-text',
+          unlockThreshold: 40,
+          lockedText: 'Score 40+ on Level 2 to unlock Level 3.',
+          unlockedText: 'Level 3 unlocked! Deploy the roaming backboard.',
+          storageKey: 'rapid_fire_free_throws_level3_unlocked',
+          getUnlockScore: helpers => helpers.getBestScoreFromCookie('rapid_fire_runs_level2_v2'),
+          onUnlockStateChange(unlocked, details) {
+            if (!level3UnlockToast) {
+              return;
+            }
+            if (unlocked && details && details.unlockedFromLatestScore) {
+              const scoreValue = Number.isFinite(details.latestScore)
+                ? Math.round(details.latestScore)
+                : details.threshold;
+              level3UnlockToast.textContent = `You scored ${scoreValue}! Level 3 is unlocked—advance above to challenge the moving board.`;
+              level3UnlockToast.hidden = false;
+              level3UnlockToast.classList.add('level-up-toast--visible');
+            } else if (!unlocked) {
+              level3UnlockToast.hidden = true;
+              level3UnlockToast.classList.remove('level-up-toast--visible');
+              level3UnlockToast.textContent = '';
+            }
+          }
+        }
+      ]
     });
   </script>
-
-
 </body>
 </html>
