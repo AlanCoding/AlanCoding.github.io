@@ -18,6 +18,8 @@ const BASKETBALL_UNLOCK_STORAGE_KEYS = [
   'rapid_fire_free_throws_level2_victory_unlocked',
   'rapid_fire_free_throws_level3_victory_unlocked',
 ];
+const BASKETBALL_COOKIE_PREFIXES = ['rapid_fire_runs_level', 'rapid_fire_free_throws_level'];
+const BASKETBALL_STORAGE_PREFIXES = ['rapid_fire_free_throws_level'];
 const CASTLE_COOKIE = 'castle_ledger_state_v1';
 const DATA_EXPORT_VERSION = 1;
 const ACHIEVEMENT_GAME_LABELS = {
@@ -647,18 +649,8 @@ function setupBasketballManagement() {
     return;
   }
   resetBtn.addEventListener('click', () => {
-    BASKETBALL_LEVELS.forEach(level => {
-      writeCookie(level.cookie, '', -1);
-    });
-    try {
-      if (window.localStorage) {
-        BASKETBALL_UNLOCK_STORAGE_KEYS.forEach(key => {
-          window.localStorage.removeItem(key);
-        });
-      }
-    } catch (error) {
-      // ignore storage removal failures
-    }
+    clearBasketballCookies();
+    clearBasketballStorage();
     renderBasketballSummary();
     if (window.gameAchievements) {
       window.gameAchievements.resetGame('basketball');
@@ -668,6 +660,66 @@ function setupBasketballManagement() {
       messageEl.textContent = 'Rapid Fire run history cleared.';
     }
   });
+}
+
+function clearBasketballCookies() {
+  if (typeof document === 'undefined') {
+    return;
+  }
+  const cookiesToClear = new Set(BASKETBALL_LEVELS.map(level => level.cookie));
+  if (typeof document.cookie === 'string' && document.cookie) {
+    document.cookie
+      .split(';')
+      .map(part => part.trim())
+      .filter(Boolean)
+      .forEach(part => {
+        const eqIndex = part.indexOf('=');
+        const rawName = eqIndex === -1 ? part : part.slice(0, eqIndex);
+        const name = rawName.trim();
+        if (!name) {
+          return;
+        }
+        if (
+          cookiesToClear.has(name) ||
+          BASKETBALL_COOKIE_PREFIXES.some(prefix => name.startsWith(prefix))
+        ) {
+          cookiesToClear.add(name);
+        }
+      });
+  }
+  cookiesToClear.forEach(name => {
+    writeCookie(name, '', -1);
+  });
+}
+
+function clearBasketballStorage() {
+  const keysToClear = new Set(BASKETBALL_UNLOCK_STORAGE_KEYS);
+  try {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const storage = window.localStorage;
+    if (!storage) {
+      return;
+    }
+    for (let index = 0; index < storage.length; index += 1) {
+      const key = storage.key(index);
+      if (!key) {
+        continue;
+      }
+      if (
+        keysToClear.has(key) ||
+        BASKETBALL_STORAGE_PREFIXES.some(prefix => key.startsWith(prefix))
+      ) {
+        keysToClear.add(key);
+      }
+    }
+    keysToClear.forEach(key => {
+      storage.removeItem(key);
+    });
+  } catch (error) {
+    // ignore storage removal failures
+  }
 }
 
 function normalizeWordJumbleEntries(entries) {
