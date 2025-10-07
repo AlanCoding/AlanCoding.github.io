@@ -135,6 +135,24 @@
       text-align: center;
     }
 
+    .level-up-toast {
+      margin: 0 0 1.3rem;
+      padding: 0.95rem 1.25rem;
+      border-radius: 16px;
+      background: rgba(104, 226, 196, 0.22);
+      color: rgba(16, 30, 58, 0.9);
+      font-weight: 650;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .level-up-toast--visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     .level-lock-banner {
       margin: 0 0 1.4rem;
       padding: 1rem 1.25rem;
@@ -267,17 +285,6 @@
       opacity: 1;
     }
 
-    #win-progress {
-      max-width: 640px;
-      margin: 0 auto 1.4rem;
-      box-shadow: 0 20px 36px rgba(3, 5, 10, 0.55);
-    }
-
-    .win-progress--unlocked {
-      background: rgba(255, 198, 124, 0.25);
-      color: #1a0f05;
-    }
-
     #run-history {
       margin-top: 2.6rem;
     }
@@ -371,9 +378,14 @@
       <span id="level2-lock-text" class="level-lock-text">Reach 70 on Level 1 to unlock this level.</span>
       <span id="level3-lock-text" class="level-lock-text">Score 40+ on Level 2 to unlock Level 3.</span>
     </nav>
-    <p id="win-progress" class="level-requirement win-progress">
-      Score 40 or more on Level 2 to unlock Level 3 and Win! above.
-    </p>
+    <p class="level-requirement">Score 40 or more on Level 2 to unlock Level 3 above.</p>
+    <div
+      id="level3-unlock-toast"
+      class="level-up-toast"
+      role="status"
+      aria-live="polite"
+      hidden
+    ></div>
     <p id="level2-locked-message" class="level-lock-banner" hidden>
       Score 70 or more on Level 1 to breach the singularity. Once unlocked you'll see your best cosmic runs right here.
     </p>
@@ -427,6 +439,8 @@
   <script src="../shared/achievements.js"></script>
   <script src="common.js"></script>
   <script>
+    const level3UnlockToast = document.getElementById('level3-unlock-toast');
+
     window.RapidFireFreeThrows.initGame({
       historyCookie: 'rapid_fire_runs_level2_v2',
       levelKey: 'level2',
@@ -452,12 +466,9 @@
         horizonColor: [0.98, 0.62, 0.28, 0.95]
       },
       win: {
-        threshold: 40,
+        threshold: 175,
         linkId: 'win-link',
-        messageId: 'win-progress',
-        storageKey: 'rapid_fire_free_throws_level2_victory_unlocked',
-        lockedText: 'Score 40 or more on Level 2 to unlock Level 3 and Win! above.',
-        unlockedText: 'Victory unlocked! Tap Win! above to celebrate your run.'
+        storageKey: 'rapid_fire_free_throws_level3_victory_unlocked'
       },
       getUnlockScore: helpers => helpers.getBestScoreFromCookie('rapid_fire_runs_level1_v1'),
       additionalLocks: [
@@ -468,7 +479,24 @@
           lockedText: 'Score 40+ on Level 2 to unlock Level 3.',
           unlockedText: 'Level 3 unlocked! Deploy the roaming backboard.',
           storageKey: 'rapid_fire_free_throws_level3_unlocked',
-          getUnlockScore: helpers => helpers.getBestScoreFromCookie('rapid_fire_runs_level2_v2')
+          getUnlockScore: helpers => helpers.getBestScoreFromCookie('rapid_fire_runs_level2_v2'),
+          onUnlockStateChange(unlocked, details) {
+            if (!level3UnlockToast) {
+              return;
+            }
+            if (unlocked && details && details.unlockedFromLatestScore) {
+              const scoreValue = Number.isFinite(details.latestScore)
+                ? Math.round(details.latestScore)
+                : details.threshold;
+              level3UnlockToast.textContent = `You scored ${scoreValue}! Level 3 is unlocked—advance above to challenge the moving board.`;
+              level3UnlockToast.hidden = false;
+              level3UnlockToast.classList.add('level-up-toast--visible');
+            } else if (!unlocked) {
+              level3UnlockToast.hidden = true;
+              level3UnlockToast.classList.remove('level-up-toast--visible');
+              level3UnlockToast.textContent = '';
+            }
+          }
         }
       ]
     });

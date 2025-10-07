@@ -132,6 +132,7 @@
           .map(setupAdditionalLock)
           .filter(Boolean)
       : [];
+    const additionalLockStates = new WeakMap();
 
     const balls = [];
     let score = 0;
@@ -360,8 +361,9 @@
       addRunRecord(record);
       saveHistory(runHistory);
       renderHistory();
-      levelUnlocked = updateLevelUnlockState();
-      updateAdditionalLocks();
+      const previousLevelUnlockState = levelUnlocked;
+      levelUnlocked = updateLevelUnlockState(completedScore, previousLevelUnlockState);
+      updateAdditionalLocks(completedScore);
       updateWinState(completedScore);
 
       if (achievements && outcome === 'completed') {
@@ -760,11 +762,15 @@
       }
     }
 
-    function updateLevelUnlockState() {
+    function updateLevelUnlockState(latestScore = null, previousState = levelUnlocked) {
       const bestScore = computeUnlockScore();
       const unlockedFromScore = Number.isFinite(bestScore) && bestScore >= unlockThreshold;
       const unlockedFromStorage = getStoredUnlockFlag();
       const unlocked = unlockedFromScore || unlockedFromStorage;
+      const previouslyUnlocked = Boolean(previousState);
+      const justUnlocked = !previouslyUnlocked && unlocked;
+      const unlockedFromLatestScore =
+        justUnlocked && unlockedFromScore && Number.isFinite(latestScore) && latestScore >= unlockThreshold;
 
       if (unlockedFromScore && !unlockedFromStorage) {
         setStoredUnlockFlag(true);
@@ -812,14 +818,19 @@
         config.onUnlockStateChange(unlocked, {
           bestScore,
           unlockedFromScore,
-          unlockedFromStorage
+          unlockedFromStorage,
+          latestScore,
+          threshold: unlockThreshold,
+          previouslyUnlocked,
+          justUnlocked,
+          unlockedFromLatestScore
         });
       }
 
       return unlocked;
     }
 
-    function updateAdditionalLocks() {
+    function updateAdditionalLocks(latestScore = null) {
       if (!additionalLocks.length) {
         return;
       }
@@ -837,10 +848,16 @@
         const unlockedFromScore = Number.isFinite(score) && score >= lock.threshold;
         const unlockedFromStorage = lock.storageKey ? getStoredFlag(lock.storageKey) : false;
         const unlocked = unlockedFromScore || unlockedFromStorage;
+        const previouslyUnlocked = Boolean(additionalLockStates.get(lock));
+        const justUnlocked = !previouslyUnlocked && unlocked;
+        const unlockedFromLatestScore =
+          justUnlocked && unlockedFromScore && Number.isFinite(latestScore) && latestScore >= lock.threshold;
 
         if (unlockedFromScore && lock.storageKey && !unlockedFromStorage) {
           setStoredFlag(lock.storageKey, true);
         }
+
+        additionalLockStates.set(lock, unlocked);
 
         if (lock.link) {
           if (unlocked) {
@@ -867,7 +884,12 @@
           lock.onUnlockStateChange(unlocked, {
             bestScore: score,
             unlockedFromScore,
-            unlockedFromStorage
+            unlockedFromStorage,
+            latestScore,
+            threshold: lock.threshold,
+            previouslyUnlocked,
+            justUnlocked,
+            unlockedFromLatestScore
           });
         }
       }
@@ -919,11 +941,14 @@
         const lockedText = winConfig.lockedText
           ? String(winConfig.lockedText)
           : `Score ${winThreshold}+ on Level 2 to unlock the celebration.`;
-        const unlockedText = winConfig.unlockedText
+        const baseUnlockedText = winConfig.unlockedText
           ? String(winConfig.unlockedText)
           : 'Victory unlocked! Celebrate your win below!';
+        const unlockedCelebrationText = Number.isFinite(latestScore) && latestScore >= winThreshold
+          ? `You scored ${Math.round(latestScore)}! ${baseUnlockedText}`
+          : baseUnlockedText;
         winMessage.hidden = false;
-        winMessage.textContent = unlocked ? unlockedText : lockedText;
+        winMessage.textContent = unlocked ? unlockedCelebrationText : lockedText;
         winMessage.classList.toggle('win-progress--unlocked', unlocked);
       }
 

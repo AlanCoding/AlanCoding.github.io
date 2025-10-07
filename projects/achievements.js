@@ -9,7 +9,14 @@ const LAND_MINE_MAPPER_DIFFICULTIES = [
 const WORD_JUMBLE_STORAGE_KEY = 'word_jumble_power_stats_v1';
 const BASKETBALL_LEVELS = [
   { key: 'level1', label: 'Level 1', cookie: 'rapid_fire_runs_level1_v1' },
-  { key: 'level2', label: 'Level 2', cookie: 'rapid_fire_runs_level2_v1' },
+  { key: 'level2', label: 'Level 2', cookie: 'rapid_fire_runs_level2_v2' },
+  { key: 'level3', label: 'Level 3', cookie: 'rapid_fire_runs_level3_v1' },
+];
+const BASKETBALL_UNLOCK_STORAGE_KEYS = [
+  'rapid_fire_free_throws_level2_unlocked',
+  'rapid_fire_free_throws_level3_unlocked',
+  'rapid_fire_free_throws_level2_victory_unlocked',
+  'rapid_fire_free_throws_level3_victory_unlocked',
 ];
 const CASTLE_COOKIE = 'castle_ledger_state_v1';
 const DATA_EXPORT_VERSION = 1;
@@ -643,6 +650,15 @@ function setupBasketballManagement() {
     BASKETBALL_LEVELS.forEach(level => {
       writeCookie(level.cookie, '', -1);
     });
+    try {
+      if (window.localStorage) {
+        BASKETBALL_UNLOCK_STORAGE_KEYS.forEach(key => {
+          window.localStorage.removeItem(key);
+        });
+      }
+    } catch (error) {
+      // ignore storage removal failures
+    }
     renderBasketballSummary();
     if (window.gameAchievements) {
       window.gameAchievements.resetGame('basketball');

@@ -107,6 +107,24 @@
       text-align: center;
     }
 
+    .level-up-toast {
+      margin: 0 0 1.5rem;
+      padding: 0.85rem 1.1rem;
+      border-radius: 14px;
+      background: rgba(64, 199, 157, 0.18);
+      color: #0f1f4b;
+      font-weight: 600;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .level-up-toast--visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     .level-link--win.win-link--available {
       background: linear-gradient(135deg, rgba(64, 199, 157, 0.95), rgba(76, 133, 255, 0.95));
       color: #fff;
@@ -342,6 +360,13 @@
       <span id="level3-lock-text" class="level-lock-text">Score 40+ on Level 2 to unlock Level 3.</span>
     </nav>
     <p class="level-requirement">Score 70 or more on Level 1 to unlock Level 2.</p>
+    <div
+      id="level2-unlock-toast"
+      class="level-up-toast"
+      role="status"
+      aria-live="polite"
+      hidden
+    ></div>
     <div id="hud">
       <span id="score">Score: 0</span>
       <span id="balls">Balls in play: 0</span>
@@ -392,6 +417,8 @@
   <script src="../shared/achievements.js"></script>
   <script src="common.js"></script>
   <script>
+    const level2UnlockToast = document.getElementById('level2-unlock-toast');
+
     window.RapidFireFreeThrows.initGame({
       historyCookie: 'rapid_fire_runs_level1_v1',
       levelKey: 'level1',
@@ -405,6 +432,23 @@
         threshold: 175,
         linkId: 'win-link',
         storageKey: 'rapid_fire_free_throws_level3_victory_unlocked'
+      },
+      onUnlockStateChange(unlocked, details) {
+        if (!level2UnlockToast) {
+          return;
+        }
+        if (unlocked && details && details.unlockedFromLatestScore) {
+          const scoreValue = Number.isFinite(details.latestScore)
+            ? Math.round(details.latestScore)
+            : details.threshold;
+          level2UnlockToast.textContent = `You scored ${scoreValue}! Level 2 is unlocked—enter the Event Horizon next.`;
+          level2UnlockToast.hidden = false;
+          level2UnlockToast.classList.add('level-up-toast--visible');
+        } else if (!unlocked) {
+          level2UnlockToast.hidden = true;
+          level2UnlockToast.classList.remove('level-up-toast--visible');
+          level2UnlockToast.textContent = '';
+        }
       },
       additionalLocks: [
         {
