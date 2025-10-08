@@ -32,6 +32,11 @@
     const scoreFlash = config.scoreFlashId ? doc.getElementById(config.scoreFlashId) : doc.getElementById('score-flash');
     const level2Link = config.level2LinkId ? doc.getElementById(config.level2LinkId) : null;
     const level2LockText = config.level2LockTextId ? doc.getElementById(config.level2LockTextId) : null;
+    const levelRequirement = config.levelRequirementId ? doc.getElementById(config.levelRequirementId) : null;
+    const requirementLockedText =
+      typeof config.requirementLockedText === 'string' ? config.requirementLockedText : null;
+    const requirementUnlockedText =
+      typeof config.requirementUnlockedText === 'string' ? config.requirementUnlockedText : null;
     const lockBanner = config.lockBannerId ? doc.getElementById(config.lockBannerId) : null;
     const winConfig = config.win || null;
     const winLink = winConfig && winConfig.linkId ? doc.getElementById(winConfig.linkId) : null;
@@ -789,12 +794,20 @@
       }
 
       if (level2LockText) {
-        const lockedText = config.unlockLockedText || `Score ${unlockThreshold}+ on Level 1 to unlock.`;
-        const unlockedText = config.unlockUnlockedText || 'Level 2 unlocked!';
-        level2LockText.textContent = unlocked
+        const defaultLockedText = `Score ${unlockThreshold}+ on Level 1 to unlock.`;
+        const lockedTemplate =
+          typeof config.unlockLockedText === 'string' ? config.unlockLockedText : defaultLockedText;
+        const unlockedText =
+          typeof config.unlockUnlockedText === 'string' ? config.unlockUnlockedText : 'Level 2 unlocked!';
+        const message = unlocked
           ? unlockedText
-          : lockedText.replace('{threshold}', String(unlockThreshold)).replace('${threshold}', String(unlockThreshold));
+          : formatTemplate(lockedTemplate, { threshold: unlockThreshold });
+
+        level2LockText.textContent = message;
+        level2LockText.hidden = !message || !message.trim().length;
       }
+
+      updateRequirementMessage(unlocked, bestScore);
 
       if (lockBanner) {
         lockBanner.hidden = unlocked;
@@ -828,6 +841,35 @@
       }
 
       return unlocked;
+    }
+
+    function updateRequirementMessage(unlocked, bestScore) {
+      if (!levelRequirement) {
+        return;
+      }
+
+      const hasBestScore = Number.isFinite(bestScore) && bestScore > -Infinity;
+      const bestScoreDisplay = hasBestScore ? Math.round(bestScore) : '—';
+      const values = {
+        threshold: unlockThreshold,
+        bestScore: bestScoreDisplay
+      };
+
+      const unlockedTemplate =
+        requirementUnlockedText !== null
+          ? requirementUnlockedText
+          : (typeof config.unlockUnlockedText === 'string' && config.unlockUnlockedText.trim().length > 0
+              ? config.unlockUnlockedText
+              : 'Next challenge unlocked! Best score: {bestScore}.');
+
+      const lockedTemplate =
+        requirementLockedText !== null
+          ? requirementLockedText
+          : 'Score {threshold}+ to unlock the next challenge. Your best score: {bestScore}.';
+
+      const template = unlocked ? unlockedTemplate : lockedTemplate;
+
+      levelRequirement.textContent = formatTemplate(template, values);
     }
 
     function updateAdditionalLocks(latestScore = null) {
@@ -872,12 +914,16 @@
         }
 
         if (lock.lockText) {
-          const lockedText = lock.lockedText || `Score ${lock.threshold}+ to unlock.`;
-          const unlockedText = lock.unlockedText || 'Unlocked!';
+          const defaultLockedText = `Score ${lock.threshold}+ to unlock.`;
+          const lockedTemplate =
+            typeof lock.lockedText === 'string' ? lock.lockedText : defaultLockedText;
+          const unlockedText = typeof lock.unlockedText === 'string' ? lock.unlockedText : 'Unlocked!';
           const message = unlocked
             ? unlockedText
-            : lockedText.replace('{threshold}', String(lock.threshold)).replace('${threshold}', String(lock.threshold));
+            : formatTemplate(lockedTemplate, { threshold: lock.threshold });
+
           lock.lockText.textContent = message;
+          lock.lockText.hidden = !message || !message.trim().length;
         }
 
         if (typeof lock.onUnlockStateChange === 'function') {
@@ -961,6 +1007,20 @@
       }
 
       return unlocked;
+    }
+
+    function formatTemplate(template, replacements) {
+      if (typeof template !== 'string' || !template) {
+        return '';
+      }
+
+      return template.replace(/\{(\w+)\}|\$\{(\w+)\}/g, (match, key1, key2) => {
+        const key = key1 || key2;
+        if (Object.prototype.hasOwnProperty.call(replacements, key)) {
+          return String(replacements[key]);
+        }
+        return match;
+      });
     }
 
     function applyBlackHoleForce(ball, dt) {

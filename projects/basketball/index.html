@@ -356,10 +356,11 @@
       >
         Win!
       </a>
-      <span id="level2-lock-text" class="level-lock-text">Score 70+ on Level 1 to unlock Level 2.</span>
-      <span id="level3-lock-text" class="level-lock-text">Score 40+ on Level 2 to unlock Level 3.</span>
+      <span id="level2-lock-text" class="level-lock-text">Level 2 locked — score 70+ on Level 1 to unlock it.</span>
     </nav>
-    <p class="level-requirement">Score 70 or more on Level 1 to unlock Level 2.</p>
+    <p id="level2-requirement" class="level-requirement">
+      Score 70 or more on Level 1 to unlock Level 2. Your best score: —.
+    </p>
     <div
       id="level2-unlock-toast"
       class="level-up-toast"
@@ -423,10 +424,14 @@
       historyCookie: 'rapid_fire_runs_level1_v1',
       levelKey: 'level1',
       unlockThreshold: 70,
-      unlockLockedText: 'Score 70+ on Level 1 to unlock Level 2.',
+      unlockLockedText: 'Level 2 locked — score {threshold}+ on Level 1 to unlock it.',
       unlockUnlockedText: 'Level 2 unlocked! Enter the singularity.',
       level2LinkId: 'level2-link',
       level2LockTextId: 'level2-lock-text',
+      levelRequirementId: 'level2-requirement',
+      requirementLockedText:
+        'Score {threshold} or more on Level 1 to unlock Level 2. Your best score: {bestScore}.',
+      requirementUnlockedText: 'Level 2 unlocked! Your best Level 1 score: {bestScore}.',
       scoreFlashId: 'score-flash',
       win: {
         threshold: 175,
