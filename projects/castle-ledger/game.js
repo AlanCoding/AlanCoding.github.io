@@ -52,6 +52,9 @@
   const SELECTORS = {
     roomMeta: document.getElementById('roomMeta'),
     roomTitle: document.getElementById('roomTitle'),
+    roomIllustration: document.getElementById('roomIllustration'),
+    roomIllustrationImage: document.getElementById('roomIllustrationImage'),
+    roomIllustrationCaption: document.getElementById('roomIllustrationCaption'),
     roomDescription: document.getElementById('roomDescription'),
     options: document.getElementById('options'),
     inventoryList: document.getElementById('inventoryList'),
@@ -192,6 +195,24 @@
     const snapshot = room(state);
     SELECTORS.roomMeta.textContent = snapshot.meta || '';
     SELECTORS.roomTitle.textContent = snapshot.title;
+    if (snapshot.illustration) {
+      SELECTORS.roomIllustration.hidden = false;
+      SELECTORS.roomIllustrationImage.src = snapshot.illustration;
+      SELECTORS.roomIllustrationImage.alt = snapshot.illustrationAlt || snapshot.title;
+      if (snapshot.illustrationCaption) {
+        SELECTORS.roomIllustrationCaption.hidden = false;
+        SELECTORS.roomIllustrationCaption.textContent = snapshot.illustrationCaption;
+      } else {
+        SELECTORS.roomIllustrationCaption.textContent = '';
+        SELECTORS.roomIllustrationCaption.hidden = true;
+      }
+    } else {
+      SELECTORS.roomIllustration.hidden = true;
+      SELECTORS.roomIllustrationImage.removeAttribute('src');
+      SELECTORS.roomIllustrationImage.alt = '';
+      SELECTORS.roomIllustrationCaption.textContent = '';
+      SELECTORS.roomIllustrationCaption.hidden = true;
+    }
     if (typeof snapshot.description === 'string') {
       SELECTORS.roomDescription.innerHTML = `<p>${snapshot.description.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
     } else if (Array.isArray(snapshot.description)) {
@@ -335,6 +356,9 @@
       return {
         title: 'Southern Road to Beldane Keep',
         meta: 'Outer ring — South road approach',
+        illustration: 'assets/illustrations/south_road.png',
+        illustrationAlt: 'Castle clerk approaching Beldane Keep along a muddy southern road lined with carts and villagers.',
+        illustrationCaption: 'Southern road at daybreak — early errands toward Beldane Keep.',
         description,
         options,
       };

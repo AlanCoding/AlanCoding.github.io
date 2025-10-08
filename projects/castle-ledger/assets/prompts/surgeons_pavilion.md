@@ -5,7 +5,7 @@
 Use the following structure for every generated image:
 
 **Base Prompt**  
-Create a richly detailed, roughly square digital illustration sized to sit beside narrative text on desktop or mobile screens. Depict a grounded late-medieval world centered on Beldane Keep. Emphasize tactile materials—weathered stone, damp timber, wool, steel, parchment—and atmospheric light with gentle bloom. Compose the scene as if painted in gouache with subtle ink outlines, blending illuminated-manuscript ornamentation with contemporary fantasy concept art clarity. Keep color palettes earthy with selective heraldic accents in crimson, deep blue, and gold.
+Create a richly detailed, roughly square digital painting sized to sit beside narrative text on desktop or mobile screens. Depict a grounded late-medieval world centered on Beldane Keep with historically accurate architecture, clothing, and equipment drawn from 13th-14th century Europe. Emphasize tactile materials—weathered stone, damp timber, wool, steel, parchment—and naturalistic light with gentle bloom. Compose the scene with measured perspective and painterly realism reminiscent of manuscript illuminations and early Renaissance panel art, avoiding exaggerated proportions or stylization. Keep the palette earthy with selective heraldic accents in crimson, deep blue, and gold.
 
 **Rendering Guidance**  
 - Framing: focus on the named location or character grouping, filling most of the frame while leaving breathable space above and below so the artwork can stack with text.  
