@@ -115,6 +115,39 @@
         }
       }
 
+      .room-illustration {
+        margin: 0;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: rgba(203, 181, 157, 0.18);
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .room-illustration img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .room-illustration figcaption {
+        font-family: "Inter", system-ui, sans-serif;
+        font-size: 0.9rem;
+        color: rgba(91, 50, 39, 0.8);
+        padding: 0 1rem 1rem;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .room-illustration {
+          background: rgba(123, 94, 61, 0.25);
+        }
+
+        .room-illustration figcaption {
+          color: rgba(217, 179, 111, 0.8);
+        }
+      }
+
       #roomTitle {
         margin-top: 0;
         font-size: clamp(1.8rem, 2vw + 1rem, 2.5rem);
@@ -299,6 +332,10 @@
         <article class="room-card" aria-labelledby="roomTitle">
           <div class="room-meta" id="roomMeta"></div>
           <h2 id="roomTitle"></h2>
+          <figure class="room-illustration" id="roomIllustration" hidden>
+            <img id="roomIllustrationImage" alt="" loading="lazy" decoding="async" />
+            <figcaption id="roomIllustrationCaption"></figcaption>
+          </figure>
           <div id="roomDescription"></div>
           <div class="options" id="options" role="group" aria-label="Available actions"></div>
           <div class="room-log" aria-live="polite">
