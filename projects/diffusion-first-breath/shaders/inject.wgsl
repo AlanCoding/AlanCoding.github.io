@@ -1,10 +1,10 @@
 struct InjectParams {
-  sourcePos: vec2<f32>;
-  sinkPos: vec2<f32>;
-  radius: f32;
-  emitRate: f32;
-  sinkRate: f32;
-  _pad0: f32;
+  sourcePos : vec2<f32>;
+  sinkPos : vec2<f32>;
+  radius : f32;
+  emitRate : f32;
+  sinkRate : f32;
+  _pad0 : f32;
 };
 
 @group(0) @binding(0) var stateTex: texture_storage_2d<rgba8unorm, read_write>;

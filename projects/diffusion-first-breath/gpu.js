@@ -38,6 +38,7 @@ export async function initGPU(canvas) {
   context.configure({
     device,
     format,
+    usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST,
     alphaMode: 'premultiplied'
   });
 
