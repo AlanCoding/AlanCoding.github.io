@@ -1,12 +1,12 @@
 struct VertexOut {
-  @builtin(position) position : vec4<f32>;
-  @location(0) uv : vec2<f32>;
-};
+  @builtin(position) position: vec4<f32>,
+  @location(0) uv: vec2<f32>
+}
 
 struct RenderParams {
-  useMono : u32;
-  _pad0 : vec3<u32>;
-};
+  useMono: u32,
+  _pad0: vec3<u32>
+}
 
 @group(0) @binding(0) var fieldTex: texture_2d<f32>;
 @group(0) @binding(1) var linearSampler: sampler;
