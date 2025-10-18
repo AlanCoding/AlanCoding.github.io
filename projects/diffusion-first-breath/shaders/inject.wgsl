@@ -7,7 +7,7 @@ struct InjectParams {
   _pad0: f32;
 };
 
-@group(0) @binding(0) var stateTex: texture_storage_2d<rgba32float, read_write>;
+@group(0) @binding(0) var stateTex: texture_storage_2d<rgba8unorm, read_write>;
 @group(0) @binding(1) var<uniform> params: InjectParams;
 
 @compute @workgroup_size(16, 16)

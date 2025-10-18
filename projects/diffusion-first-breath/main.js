@@ -259,7 +259,7 @@ async function prepareSimulation(gpu) {
 function createStateTexture(device, resolution, usage) {
   return device.createTexture({
     size: [resolution, resolution, 1],
-    format: 'rgba32float',
+    format: 'rgba8unorm',
     usage
   });
 }

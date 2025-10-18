@@ -1,12 +1,12 @@
 struct SimParams {
-  alpha: f32,
-  _pad0: f32,
-  _pad1: f32,
-  _pad2: f32,
+  alpha: f32;
+  _pad0: f32;
+  _pad1: f32;
+  _pad2: f32;
 };
 
 @group(0) @binding(0) var srcTex: texture_2d<f32>;
-@group(0) @binding(1) var dstTex: texture_storage_2d<rgba32float, write>;
+@group(0) @binding(1) var dstTex: texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(2) var<uniform> sim: SimParams;
 
 @compute @workgroup_size(16, 16)
