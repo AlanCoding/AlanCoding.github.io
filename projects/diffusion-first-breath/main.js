@@ -207,6 +207,7 @@ async function prepareSimulation(gpu) {
       colorAttachments: [
         {
           view: currentTexture.createView(),
+          clearValue: { r: 0, g: 0, b: 0, a: 1 },
           loadOp: 'clear',
           storeOp: 'store'
         }

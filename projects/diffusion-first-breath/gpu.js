@@ -21,6 +21,10 @@ export async function initGPU(canvas) {
 
   const device = await adapter.requestDevice();
   const context = canvas.getContext('webgpu');
+  if (!context) {
+    return { supported: false, reason: 'no-context' };
+  }
+
   const format = navigator.gpu.getPreferredCanvasFormat();
 
   const maxDimension = device.limits.maxTextureDimension2D;
@@ -35,12 +39,27 @@ export async function initGPU(canvas) {
   canvas.width = simResolution;
   canvas.height = simResolution;
 
-  context.configure({
-    device,
-    format,
-    usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST,
-    alphaMode: 'premultiplied'
-  });
+  const presentationUsage =
+    GPUTextureUsage.RENDER_ATTACHMENT |
+    GPUTextureUsage.COPY_SRC |
+    GPUTextureUsage.COPY_DST;
+
+  try {
+    context.configure({
+      device,
+      format,
+      usage: presentationUsage,
+      alphaMode: 'premultiplied'
+    });
+  } catch (error) {
+    console.warn('[diffusion] Canvas configure failed, retrying with minimal usage.', error);
+    context.configure({
+      device,
+      format,
+      usage: GPUTextureUsage.RENDER_ATTACHMENT,
+      alphaMode: 'premultiplied'
+    });
+  }
 
   return {
     supported: true,
