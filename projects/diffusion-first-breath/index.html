@@ -1,0 +1,47 @@
+---
+layout: default
+title: First Breath (GPU Diffusion)
+permalink: /projects/diffusion-first-breath/
+---
+
+<section class="diffusion-hero">
+  <nav class="diffusion-hero__nav" aria-label="Project navigation">
+    <a class="diffusion-hero__back" href="{{ '/projects/' | relative_url }}">&larr; Back to projects</a>
+  </nav>
+  <h1>First Breath</h1>
+  <p class="diffusion-hero__lead">
+    <strong>First Breath</strong>: A GPU diffusion experiment. Click <strong>Start</strong> to emit a plume that diffuses across the field and is absorbed by a sink. All simulation steps run entirely on your GPU via <strong>WebGPU</strong>.
+  </p>
+</section>
+
+<section class="diffusion-stage" id="diffusionApp" data-app>
+  <canvas id="diffusionCanvas" width="1024" height="1024" aria-label="Diffusion field"></canvas>
+  <div class="diffusion-overlay" aria-live="polite">
+    <button type="button" class="diffusion-button" data-action="start">Start</button>
+    <button type="button" class="diffusion-button diffusion-button--secondary" data-action="toggle" hidden>Pause</button>
+    <dl class="diffusion-stats">
+      <div>
+        <dt>FPS</dt>
+        <dd data-stat="fps">0</dd>
+      </div>
+      <div>
+        <dt>Alpha</dt>
+        <dd data-stat="alpha">0.20</dd>
+      </div>
+      <div>
+        <dt>Resolution</dt>
+        <dd data-stat="resolution">1024×1024</dd>
+      </div>
+    </dl>
+  </div>
+  <p class="diffusion-fallback" data-fallback hidden>
+    This GPU demo requires WebGPU (Chrome/Edge current). Please try on a compatible browser. A CPU/WebGL fallback is planned.
+  </p>
+</section>
+
+<footer class="diffusion-footer">
+  <p>This is <em>Page 1</em> in a multi-page story. Future pages add painting, walls, and flow/advection.</p>
+</footer>
+
+<link rel="stylesheet" href="{{ '/projects/diffusion-first-breath/styles.css' | relative_url }}">
+<script type="module" src="{{ '/projects/diffusion-first-breath/main.js' | relative_url }}"></script>
