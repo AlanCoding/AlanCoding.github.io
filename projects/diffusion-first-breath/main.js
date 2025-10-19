@@ -77,7 +77,7 @@ reducedMotionQuery.addEventListener('change', (event) => {
 })();
 
 async function prepareSimulation(gpu) {
-  const { device, context, format, resolution, adapter } = gpu;
+  const { device, context, format, resolution, adapter, configureContext } = gpu;
   const pipelines = await createPipelines(device, format);
   const lut = await loadLutTexture(device);
   const sampler = device.createSampler({ magFilter: 'linear', minFilter: 'linear' });
@@ -180,6 +180,9 @@ async function prepareSimulation(gpu) {
     }
   }, 2000);
 
+  const supportsErrorScopes = typeof device.pushErrorScope === 'function' && typeof device.popErrorScope === 'function';
+  let pendingReconfigure = false;
+
   function renderFrame() {
     const commandEncoder = device.createCommandEncoder();
     const substeps = state.substeps;
@@ -202,7 +205,20 @@ async function prepareSimulation(gpu) {
       activeIndex = targetIndex;
     }
 
-    const currentTexture = context.getCurrentTexture();
+    let currentTexture;
+    try {
+      currentTexture = context.getCurrentTexture();
+    } catch (error) {
+      console.error('[diffusion] Failed to acquire swap-chain texture.', error);
+      if (configureContext && !pendingReconfigure) {
+        pendingReconfigure = true;
+        queueMicrotask(() => {
+          configureContext();
+          pendingReconfigure = false;
+        });
+      }
+      return;
+    }
     const renderPass = commandEncoder.beginRenderPass({
       colorAttachments: [
         {
@@ -218,7 +234,28 @@ async function prepareSimulation(gpu) {
     renderPass.draw(3, 1, 0, 0);
     renderPass.end();
 
-    device.queue.submit([commandEncoder.finish()]);
+    const commandBuffer = commandEncoder.finish();
+    if (supportsErrorScopes) {
+      device.pushErrorScope('validation');
+    }
+    device.queue.submit([commandBuffer]);
+    if (supportsErrorScopes) {
+      device.popErrorScope().then((error) => {
+        if (!error) {
+          return;
+        }
+        if (error.message?.includes('CopyDst') && configureContext && !pendingReconfigure) {
+          pendingReconfigure = true;
+          console.warn('[diffusion] Reconfiguring canvas after validation error.', error.message);
+          queueMicrotask(() => {
+            configureContext();
+            pendingReconfigure = false;
+          });
+        } else {
+          console.error('[diffusion] GPU validation error', error);
+        }
+      });
+    }
   }
 
   let rafId;

@@ -43,23 +43,39 @@ export async function initGPU(canvas) {
     GPUTextureUsage.RENDER_ATTACHMENT |
     GPUTextureUsage.COPY_SRC |
     GPUTextureUsage.COPY_DST;
+  const fallbackUsage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST;
+
+  const configure = (usage) => {
+    context.configure({
+      device,
+      format,
+      usage,
+      alphaMode: 'premultiplied'
+    });
+  };
+
+  let activeUsage = presentationUsage;
 
   try {
-    context.configure({
-      device,
-      format,
-      usage: presentationUsage,
-      alphaMode: 'premultiplied'
-    });
+    configure(activeUsage);
   } catch (error) {
-    console.warn('[diffusion] Canvas configure failed, retrying with minimal usage.', error);
-    context.configure({
-      device,
-      format,
-      usage: GPUTextureUsage.RENDER_ATTACHMENT,
-      alphaMode: 'premultiplied'
-    });
+    console.warn('[diffusion] Canvas configure failed, retrying with fallback usage.', error);
+    activeUsage = fallbackUsage;
+    try {
+      configure(activeUsage);
+    } catch (fallbackError) {
+      console.error('[diffusion] Canvas configure failed with fallback usage.', fallbackError);
+      return { supported: false, reason: 'configure-failed' };
+    }
   }
+
+  const reconfigure = () => {
+    try {
+      configure(activeUsage);
+    } catch (error) {
+      console.error('[diffusion] Canvas reconfigure failed.', error);
+    }
+  };
 
   return {
     supported: true,
@@ -67,6 +83,7 @@ export async function initGPU(canvas) {
     device,
     context,
     format,
-    resolution: simResolution
+    resolution: simResolution,
+    configureContext: reconfigure
   };
 }
