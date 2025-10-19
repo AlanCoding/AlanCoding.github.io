@@ -82,7 +82,7 @@ async function prepareSimulation(gpu) {
   const lut = await loadLutTexture(device);
   const sampler = device.createSampler({ magFilter: 'linear', minFilter: 'linear' });
 
-  const renderUniformBuffer = device.createBuffer({ size: 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+  const renderUniformBuffer = device.createBuffer({ size: 32, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
   const useMono = state.monoForced || !lut;
   device.queue.writeBuffer(renderUniformBuffer, 0, new Uint32Array([useMono ? 1 : 0]));
 
@@ -115,7 +115,8 @@ async function prepareSimulation(gpu) {
     createStateTexture(device, resolution, textureUsage),
     createStateTexture(device, resolution, textureUsage)
   ];
-  const stateViews = stateTextures.map((texture) => texture.createView());
+  const sampleViews = stateTextures.map((texture) => texture.createView());
+  const storageViews = stateTextures.map((texture) => texture.createView());
 
   const renderLayout = pipelines.renderPipeline.getBindGroupLayout(0);
   const diffuseLayout = pipelines.diffusePipeline.getBindGroupLayout(0);
@@ -124,7 +125,7 @@ async function prepareSimulation(gpu) {
   const lutResource = lut ?? createMonoLut(device);
   const lutView = lutResource.view;
 
-  const renderBindGroups = stateViews.map((view) =>
+  const renderBindGroups = sampleViews.map((view) =>
     device.createBindGroup({
       layout: renderLayout,
       entries: [
@@ -140,27 +141,28 @@ async function prepareSimulation(gpu) {
     device.createBindGroup({
       layout: diffuseLayout,
       entries: [
-        { binding: 0, resource: stateViews[0] },
-        { binding: 1, resource: stateViews[1] },
+        { binding: 0, resource: sampleViews[0] },
+        { binding: 1, resource: storageViews[1] },
         { binding: 2, resource: { buffer: alphaBuffer } }
       ]
     }),
     device.createBindGroup({
       layout: diffuseLayout,
       entries: [
-        { binding: 0, resource: stateViews[1] },
-        { binding: 1, resource: stateViews[0] },
+        { binding: 0, resource: sampleViews[1] },
+        { binding: 1, resource: storageViews[0] },
         { binding: 2, resource: { buffer: alphaBuffer } }
       ]
     })
   ];
 
-  const injectBindGroups = stateViews.map((view) =>
+  const injectBindGroups = sampleViews.map((view, index) =>
     device.createBindGroup({
       layout: injectLayout,
       entries: [
         { binding: 0, resource: view },
-        { binding: 1, resource: { buffer: injectBuffer } }
+        { binding: 1, resource: storageViews[index] },
+        { binding: 2, resource: { buffer: injectBuffer } }
       ]
     })
   );
@@ -183,20 +185,21 @@ async function prepareSimulation(gpu) {
     const substeps = state.substeps;
 
     for (let step = 0; step < substeps; step += 1) {
-      const injectPass = commandEncoder.beginComputePass();
-      injectPass.setPipeline(pipelines.injectPipeline);
-      injectPass.setBindGroup(0, injectBindGroups[activeIndex]);
-      injectPass.dispatchWorkgroups(workgroupCount, workgroupCount);
-      injectPass.end();
+      const targetIndex = 1 - activeIndex;
 
       const diffusePass = commandEncoder.beginComputePass();
       diffusePass.setPipeline(pipelines.diffusePipeline);
-      const diffuseBindGroup = activeIndex === 0 ? diffuseBindGroups[0] : diffuseBindGroups[1];
-      diffusePass.setBindGroup(0, diffuseBindGroup);
+      diffusePass.setBindGroup(0, diffuseBindGroups[activeIndex]);
       diffusePass.dispatchWorkgroups(workgroupCount, workgroupCount);
       diffusePass.end();
 
-      activeIndex = 1 - activeIndex;
+      const injectPass = commandEncoder.beginComputePass();
+      injectPass.setPipeline(pipelines.injectPipeline);
+      injectPass.setBindGroup(0, injectBindGroups[targetIndex]);
+      injectPass.dispatchWorkgroups(workgroupCount, workgroupCount);
+      injectPass.end();
+
+      activeIndex = targetIndex;
     }
 
     const currentTexture = context.getCurrentTexture();
