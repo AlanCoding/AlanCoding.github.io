@@ -22,9 +22,9 @@ test('First Breath page copy introduces the GPU diffusion experiment', async () 
 
 test('Projects index links to the First Breath experience', async () => {
   const html = await readProjectFile('projects/index.html');
-  assert.match(html, /First Breath \(GPU Diffusion\)/);
-  assert.match(html, /diffusion-first-breath/);
-  assert.match(html, /GPU • WebGPU/);
+  assert.doesNotMatch(html, /First Breath \(GPU Diffusion\)/);
+  assert.doesNotMatch(html, /diffusion-first-breath/);
+  assert.doesNotMatch(html, /GPU • WebGPU/);
 });
 
 test('Shader pipelines are configured for compute diffusion', async () => {

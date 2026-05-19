@@ -387,6 +387,113 @@
     font-weight: 600;
 }
 
+.concept-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: $spacing-unit / 2;
+}
+
+.concept-card {
+    padding: ($spacing-unit / 2);
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(236, 242, 255, 0.88));
+    border: 1px solid rgba(59, 130, 246, 0.16);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.concept-card__title {
+    display: inline-block;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.concept-card__scale {
+    margin: 0.35rem 0 0;
+    font-weight: 600;
+    color: #1d4ed8;
+}
+
+.concept-card__description {
+    margin: 0.35rem 0 0;
+    color: $text-color;
+    opacity: 0.88;
+}
+
+.concept-page {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-unit;
+}
+
+.concept-page__header h1 {
+    margin-bottom: 0.35rem;
+    font-size: 2rem;
+}
+
+.concept-page__scale {
+    margin: 0;
+    font-weight: 700;
+    color: #1d4ed8;
+}
+
+.concept-page__lede,
+.concept-page__section p {
+    color: $grey-color-dark;
+}
+
+.concept-page__section {
+    padding: ($spacing-unit / 1.5);
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.92));
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+}
+
+.concept-page__section h2 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.concept-page__links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.concept-page__links li + li {
+    margin-top: 0.45rem;
+}
+
+.concept-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: $spacing-unit / 2;
+    margin-top: $spacing-unit / 2;
+}
+
+.concept-gallery figure {
+    margin: 0;
+    padding: 0.75rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.2);
+}
+
+.concept-gallery img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.concept-gallery figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.92rem;
+    color: $grey-color-dark;
+}
+
 .home-divider {
     margin: ($spacing-unit * 1.5) 0;
     border: 0;
@@ -413,6 +520,14 @@
         flex-direction: column;
         align-items: flex-start;
         gap: $spacing-unit / 4;
+    }
+
+    .concept-card {
+        padding: $spacing-unit / 3;
+    }
+
+    .concept-page__section {
+        padding: $spacing-unit / 2;
     }
 
     .home-placeholders > li {
