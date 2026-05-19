@@ -1,0 +1,17 @@
+Create an image of "Monastery Gardens by the Priory" for Castle Ledger: Chronicle of Beldane Keep.
+
+Create a richly detailed, roughly square digital painting sized to sit beside narrative text on desktop or mobile screens. Depict a grounded late-medieval world centered on Beldane Keep with historically accurate architecture, clothing, and equipment drawn from 13th-14th century Europe. Emphasize tactile materials—weathered stone, damp timber, wool, steel, parchment—and naturalistic light with gentle bloom. Compose the scene with measured perspective and painterly realism reminiscent of manuscript illuminations and early Renaissance panel art, avoiding exaggerated proportions or stylization. Keep the palette earthy with selective heraldic accents in crimson, deep blue, and gold. Rendering guidance: Framing: focus on the named location or character grouping, filling most of the frame while leaving breathable space above and below so the artwork can stack with text. Aspect & scale: aim for a square canvas that could crop cleanly; no cinematic black bars. Lighting: natural ambient light with localized highlights (torches, braziers, sun shafts) to guide the eye. Mood: adventurous but grounded, conveying the tension of impending siege preparations paired with everyday duty. Avoid: modern objects, anachronistic clothing, extreme caricature; no visible UI or text overlays. After this shared template, append location-specific details that describe the composition, key props, characters, and atmosphere for that particular room.
+
+Setting: Outer ring — Northeastern cloister.
+
+Composition: Present a walled herb garden with neat beds of sage, feverfew, and rue leading toward the limewashed priory and its arched doorway.
+
+Key elements: Show monks tending herbs, Brother Aldwin pausing with a wax tablet, and a dovecote alive with fluttering messenger pigeons. Include labeled wooden markers and hanging herb bundles.
+
+Atmosphere: Soft morning light filtered through clouds, carrying a sense of contemplative calm with distant bells implied.
+
+Scene context from the game: Beyond the moat stands a modest priory with stone walls washed in lime. Monks bend over herb plots, tending sage, feverfew, and rue. A parchment-lined dovecote clatters as messenger birds flutter within. Brother Aldwin raises a brow, asking whether you can recall the statutes that govern the earl’s tolls. He clutches a wax tablet, clearly mislaid by a courier.
+
+Gameplay-facing visual hints: Show readable spatial hints about adjacent routes and exits so a player could intuit where paths lead next, visually suggesting these routes without any text signage or UI: "Continue north along the reed marsh toward the rear bridge"; "Return south to the postern tower"; "Step through the priory gate toward the scriptorium". Keep these gameplay hints subtle but legible at a glance, so the image helps the player anticipate navigation choices and useful interactions.
+
+Output a single finished image only, with no text, watermark, border, UI, or split-panel layout.

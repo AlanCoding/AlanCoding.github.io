@@ -64,6 +64,84 @@
     progressNote: document.getElementById('progressNote'),
   };
 
+  const ROOM_ILLUSTRATIONS = {
+    south_road: {
+      illustration: 'assets/illustrations/southern_road.jpeg',
+      illustrationAlt: 'Southern road leading toward Beldane Keep with carts, villagers, and the castle ahead.',
+      illustrationCaption: 'Southern road at daybreak on the approach to Beldane Keep.',
+    },
+    front_drawbridge: {
+      illustration: 'assets/illustrations/front_drawbridge.jpg',
+      illustrationAlt: 'The raised front drawbridge of Beldane Keep above the moat and waiting carts.',
+      illustrationCaption: 'The main drawbridge plaza beneath the gatehouse.',
+    },
+    southeast_shanty: {
+      illustration: 'assets/illustrations/shanties_ropewalkers.jpeg',
+      illustrationAlt: 'Ropewalkers’ shanties and workyards pressed close to the moat.',
+      illustrationCaption: 'The ropewalkers’ quarter of patched roofs, tar, and hemp.',
+    },
+    east_postern: {
+      illustration: 'assets/illustrations/eastern_postern.jpeg',
+      illustrationAlt: 'A narrow eastern postern bridge and side gate set into the castle wall.',
+      illustrationCaption: 'The guarded eastern postern above the waterline.',
+    },
+    northeast_monastery: {
+      illustration: 'assets/illustrations/monastery.jpeg',
+      illustrationAlt: 'Priory gardens and monastery buildings near the northeastern edge of the keep.',
+      illustrationCaption: 'Herb plots and cloister walls beside the priory.',
+    },
+    fishers_huts: {
+      illustration: 'assets/illustrations/fishers_marsh_hut.jpeg',
+      illustrationAlt: 'Marsh huts on stilts with nets, traps, and smoke rising from peat fires.',
+      illustrationCaption: 'Fishers’ huts raised above the northern marsh.',
+    },
+    rear_drawbridge: {
+      illustration: 'assets/illustrations/rear_service_drawbridge.jpeg',
+      illustrationAlt: 'The rear service drawbridge with carts, winches, and the northern service gate.',
+      illustrationCaption: 'The rear service bridge where the winch gear must be secured.',
+    },
+    northwest_hunters: {
+      illustration: 'assets/illustrations/hunters_stand.jpeg',
+      illustrationAlt: 'Hunters’ stands and archery butts with game racks along the moat path.',
+      illustrationCaption: 'The northwestern hunting grounds and practice butts.',
+    },
+    surgeons_pavilion: {
+      illustration: 'assets/illustrations/surgeons_pavilion.jpeg',
+      illustrationAlt: 'A field surgeon’s pavilion with instruments, herbs, and wounded men under treatment.',
+      illustrationCaption: 'The leech’s pavilion beside the archery grounds.',
+    },
+    outer_bailey: {
+      illustration: 'assets/illustrations/outer_bailey.jpeg',
+      illustrationAlt: 'The outer bailey alive with pages, grooms, and movement beneath the keep.',
+      illustrationCaption: 'The busy outer bailey inside Beldane Keep.',
+    },
+    blacksmith_forge: {
+      illustration: 'assets/illustrations/blacksmith.jpg',
+      illustrationAlt: 'A blacksmith’s forge with sparks, bellows, and ironwork in progress.',
+      illustrationCaption: 'Hrodgar’s forge in the inner ward.',
+    },
+    training_yard: {
+      illustration: 'assets/illustrations/training_yard.jpeg',
+      illustrationAlt: 'The training yard with squires drilling, pells, and the master-at-arms overseeing practice.',
+      illustrationCaption: 'The castle training yard under Sir Merrick’s watch.',
+    },
+    kitchens: {
+      illustration: 'assets/illustrations/kitchen.jpeg',
+      illustrationAlt: 'A bustling castle kitchen crowded with spits, tables, and steaming cauldrons.',
+      illustrationCaption: 'The kitchens at full labor beneath the hall.',
+    },
+    great_hall: {
+      illustration: 'assets/illustrations/great_hall.jpeg',
+      illustrationAlt: 'The great hall with banners, stained light, and the earl’s dais at the far end.',
+      illustrationCaption: 'The great hall prepared for petitions and judgment.',
+    },
+    chapel: {
+      illustration: 'assets/illustrations/chapel.jpeg',
+      illustrationAlt: 'The castle chapel lit by candles with altar, incense, and kneeling figures.',
+      illustrationCaption: 'The keep’s candlelit chapel.',
+    },
+  };
+
   function cloneState(value) {
     if (typeof structuredClone === 'function') {
       return structuredClone(value);
@@ -125,6 +203,9 @@
             next.flags[flag] = Number.isFinite(value) ? value : next.flags[flag];
           }
         });
+        if (next.flags.dogFed && raw.flags.dogLocation !== 'postern' && raw.flags.dogLocation !== 'pond') {
+          next.flags.dogLocation = 'pond';
+        }
       }
       if (Array.isArray(raw.log)) {
         next.log = raw.log.slice(-12).map(entry => String(entry));
@@ -193,6 +274,9 @@
       return;
     }
     const snapshot = room(state);
+    if (!snapshot.illustration && ROOM_ILLUSTRATIONS[state.location]) {
+      Object.assign(snapshot, ROOM_ILLUSTRATIONS[state.location]);
+    }
     SELECTORS.roomMeta.textContent = snapshot.meta || '';
     SELECTORS.roomTitle.textContent = snapshot.title;
     if (snapshot.illustration) {
@@ -338,6 +422,11 @@
     }
     return 'The kennel mastiff looks at you expectantly, clearly remembering your previous kindness.';
   }
+
+  function isPosternSafeToDescend() {
+    return state.flags.ropeSecured && state.flags.dogLocation !== 'postern';
+  }
+
   const ROOMS = {
     south_road: state => {
       const description = [
@@ -356,9 +445,6 @@
       return {
         title: 'Southern Road to Beldane Keep',
         meta: 'Outer ring — South road approach',
-        illustration: 'assets/illustrations/south_road.png',
-        illustrationAlt: 'Castle clerk approaching Beldane Keep along a muddy southern road lined with carts and villagers.',
-        illustrationCaption: 'Southern road at daybreak — early errands toward Beldane Keep.',
         description,
         options,
       };
@@ -483,14 +569,14 @@
         saveState();
       }, { disabled: state.flags.ropeSecured });
       addOption(options, 'Descend the rope to the service ladder inside the wall', () => {
-        if (!state.flags.ropeSecured || (!state.flags.dogFed && state.flags.dogLocation === 'postern')) {
+        if (!isPosternSafeToDescend()) {
           appendLog('The mastiff growls menacingly and the rope swings uselessly above the cold water. It is not yet safe to descend.');
           return;
         }
         state.flags.enteredCastle = true;
         appendLog('Hand over hand, you lower yourself to the hidden ladder and slip through the postern into the outer bailey.');
         setLocation('outer_bailey', 'You emerge inside the walls where the keep’s bustle thrums.');
-      }, { disabled: !state.flags.ropeSecured });
+      }, { disabled: !state.flags.ropeSecured || state.flags.dogLocation === 'postern' });
       return {
         title: 'Eastern Postern Bridge',
         meta: 'Outer ring — Eastern postern',

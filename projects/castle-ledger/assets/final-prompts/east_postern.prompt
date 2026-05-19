@@ -1,0 +1,17 @@
+Create an image of "Eastern Postern Bridge" for Castle Ledger: Chronicle of Beldane Keep.
+
+Create a richly detailed, roughly square digital painting sized to sit beside narrative text on desktop or mobile screens. Depict a grounded late-medieval world centered on Beldane Keep with historically accurate architecture, clothing, and equipment drawn from 13th-14th century Europe. Emphasize tactile materials—weathered stone, damp timber, wool, steel, parchment—and naturalistic light with gentle bloom. Compose the scene with measured perspective and painterly realism reminiscent of manuscript illuminations and early Renaissance panel art, avoiding exaggerated proportions or stylization. Keep the palette earthy with selective heraldic accents in crimson, deep blue, and gold. Rendering guidance: Framing: focus on the named location or character grouping, filling most of the frame while leaving breathable space above and below so the artwork can stack with text. Aspect & scale: aim for a square canvas that could crop cleanly; no cinematic black bars. Lighting: natural ambient light with localized highlights (torches, braziers, sun shafts) to guide the eye. Mood: adventurous but grounded, conveying the tension of impending siege preparations paired with everyday duty. Avoid: modern objects, anachronistic clothing, extreme caricature; no visible UI or text overlays. After this shared template, append location-specific details that describe the composition, key props, characters, and atmosphere for that particular room.
+
+Setting: Outer ring — Eastern postern.
+
+Composition: Focus on the narrow side bridge over the moat with the barred postern tower looming above, capturing the precarious descent path.
+
+Key elements: Include the watchful mastiff on the bridge, a coiled rope tied to an iron ring, slick stonework with arrow slits, and the concealed service ladder disappearing into the shadows below.
+
+Atmosphere: Cool dusk lighting with mist rising from the moat and a subtle glow from within the tower to contrast the murky exterior.
+
+Scene context from the game: A narrow postern bridge spans the moat to a side gate barred with iron. The stone tower above bears crossbow slits. A brindled mastiff, muscles like twisted rope, watches you from beside the postern with hackles raised. His handler is nowhere in sight.
+
+Gameplay-facing visual hints: Show readable spatial hints about adjacent routes and exits so a player could intuit where paths lead next, visually suggesting these routes without any text signage or UI: "Return along the mill stream toward the weir"; "Continue north along the moat path toward the monastery gardens". Stage props, body language, or active vignettes that hint at the room's interactable actions and opportunities, visually suggesting these possible actions without literal text: "Secure your rope to the iron ring beneath the parapet"; "Descend the rope to the service ladder inside the wall". Keep these gameplay hints subtle but legible at a glance, so the image helps the player anticipate navigation choices and useful interactions.
+
+Output a single finished image only, with no text, watermark, border, UI, or split-panel layout.

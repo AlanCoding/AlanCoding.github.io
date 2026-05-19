@@ -1,0 +1,31 @@
+---
+layout: default
+permalink: /posts/
+---
+
+<div class="concept-page">
+  <nav class="achievements-nav" aria-label="Posts navigation">
+    <a class="achievements-nav__link" href="{{ '/' | relative_url }}">&larr; Back to home</a>
+  </nav>
+
+  <header class="concept-page__header">
+    <h1>Posts</h1>
+    <p class="concept-page__lede">
+      Full archive of posts from this site.
+    </p>
+  </header>
+
+  <section class="concept-page__section">
+    <ul class="post-list">
+      {% for post in site.posts %}
+        <li>
+          <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+          <h2>
+            <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+          </h2>
+          <span class="post-meta">{{ post.excerpt }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>

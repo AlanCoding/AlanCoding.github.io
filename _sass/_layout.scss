@@ -262,6 +262,17 @@
     margin-bottom: $spacing-unit / 3;
 }
 
+.section-heading__link,
+.section-heading__link:visited {
+    color: inherit;
+    text-decoration: none;
+}
+
+.section-heading__link:hover,
+.section-heading__link:focus {
+    text-decoration: underline;
+}
+
 .section-description {
     margin-bottom: $spacing-unit / 2;
     color: $grey-color;
@@ -393,6 +404,20 @@
     padding: 0;
     display: grid;
     gap: $spacing-unit / 2;
+}
+
+.concept-list--compact {
+    list-style: disc;
+    margin-left: 1.5rem;
+    display: block;
+}
+
+.concept-list--compact li + li {
+    margin-top: 0.35rem;
+}
+
+.concept-list--compact a {
+    font-weight: 600;
 }
 
 .concept-card {

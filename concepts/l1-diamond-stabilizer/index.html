@@ -5,6 +5,7 @@ permalink: /concepts/l1-diamond-stabilizer/
 
 <div class="concept-page">
   <nav class="achievements-nav" aria-label="Concept navigation">
+    <a class="achievements-nav__link" href="{{ '/concepts/' | relative_url }}">&larr; Back to concepts</a>
     <a class="achievements-nav__link" href="{{ '/' | relative_url }}">&larr; Back to home</a>
   </nav>
 
@@ -17,15 +18,50 @@ permalink: /concepts/l1-diamond-stabilizer/
   </header>
 
   <section class="concept-page__section">
-    <h2>Notes</h2>
+    <h2>Motivation</h2>
     <p>
       The diamond stabilizer is a specific form of a concept I dreamed about for years, without being able to put into a form. AI did somewhat help me with this, but it cannot actually advance it on its own.
     </p>
     <p>
-      The broader idea, which I asked about on Physics Stack Exchange long ago, is that you use a pole like a tightrope walker. If you go off balance, you move the pole to restore your position. This solves a real problem of keeping you centered around an unstable orbit.
+      The broader idea, which I <a href="https://space.stackexchange.com/questions/1926/are-there-propellant-less-ways-to-balance-at-an-unstable-orbital-point">asked about on Physics Stack Exchange long ago</a>, is that you use a pole like a tightrope walker. If you go off balance, you move the pole to restore your position. This solves a real problem of keeping you centered around an unstable orbit.
+    </p>
+    <p>
+      I am personally very inspired by <a href="https://hopsblog-hop.blogspot.com/">Hop's blog</a>. It is the best blog on space tethers that I know of. It did actual novel concept development and doubled down on ideas in ways that pushed understanding of the physical possibilities forward, including things like Jacob's ladders.
+    </p>
+    <p>
+      However, I am not directly a fan of space elevators. Even a lunar space elevator feels like it is stretching the envelope of believability if we are talking about what might actually get built. It is too long. Hop is great, but space elevators in the simple sense are too fanciful and too long-term for me.
+    </p>
+    <p>
+      The idea of using tethers for orbital stability squares the circle. Instead of measuring tens of thousands of kilometers, we are talking about hundreds. That is not a small difference, and the operational consequences are much greater than 100x. Building something 100 times as long is not necessarily 100 times as hard, and it is probably harder by a greater factor. And anyway, if we do ever build space elevators, we need to cut our teeth on something smaller.
+    </p>
+    <p>
+      The diamond stabilizer can effectively act as a momentum source. That means it can have, for example, a mass driver. If launches impart some momentum to the station, who cares? It will stabilize itself, and this does not use consumables. This is the kind of benefit you would have wanted from a space elevator, except you do not need the space-elevator part.
     </p>
     <p>
       I still have a lot of improvements to make in the simulation to give a better intuitive feel. The numerical models I have are kind of ugly to follow and do not help develop intuition the way they are run.
+    </p>
+  </section>
+
+  <section class="concept-page__section">
+    <h2>Why a diamond?</h2>
+    <p>
+      The reason for the diamond shape is that you can squish it to elongate in one direction or the other, in a way where the moment of inertia of the total structure does not change. That means it keeps rotating at the same angular velocity before and after the squish, namely the angular velocity of the Earth-Moon system.
+    </p>
+    <p>
+      This isolates torsional effects and lets you produce a pure shape change in the rotating frame of reference. You are not first paying a penalty to spin the whole thing up or slow it down just to get the geometry you want.
+    </p>
+    <p>
+      Those shape changes then lead to a very, very tiny acceleration because Earth and Moon have different gravitational-field shapes, mostly because they are different sizes. Exploiting those small accelerations can offset drift from the orbital instability and let you generally move yourself around, within some limits.
+    </p>
+  </section>
+
+  <section class="concept-page__section">
+    <h2>What I don't know</h2>
+    <p>
+      What I do not know is how, or if, you would correct for perturbations in and out of the plane. The diamond could extend in 3 dimensions into a rectangular octahedron. You can draw that shape, but I do not know what the control law for it would look like.
+    </p>
+    <p>
+      Another thing I do not know is the contingency-case story. The L1 location is super useful because it can reach so many other orbits with small initial-condition changes, but that is a double-edged sword because people will worry about it hitting Earth. I do not know generally if I have this correct, and the problem needs a lot more specific color on it.
     </p>
   </section>
 
