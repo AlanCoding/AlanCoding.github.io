@@ -87,7 +87,6 @@ As blockers emerge, open branches such as:
 - `oarmaker_yard`
 - `victualler_row`
 - `crows_nest`
-- `brig`
 
 `crows_nest` is required for visual diversity and because it sounds fun.
 
@@ -100,7 +99,6 @@ Benchmark note:
   - `mudflat_skiff_landing`
   - `crows_nest`
   - `pilots_tavern`
-  - `brig`
 - `harbor_ledger_office`, `victualler_row`, and `storm_breakwater` remain available but feel less central at the moment
 
 Recommended harbor-side additions for texture and offshoot variety:
@@ -145,7 +143,6 @@ The offshoots should not all hang directly from the same point. A better tree sh
 - `launch_quay`
   - to `mudflat_skiff_landing`
   - to `pilots_tavern`
-  - to `brig`
 
 This keeps the map readable while still letting each new blocker open a small new sub-tree.
 
@@ -154,27 +151,52 @@ Status note:
 - this is a recommended topology sketch, not yet a final map lock
 - it should be treated as a benchmark for the current direction
 
-## Dual-State Illustration Rule
+## Core Progression Rule
 
-At least three harbor locations should have two visual states so the art visibly reflects progress.
+This DLC should stay focused on items, unlocks, and expanding option sets.
 
-Recommended dual-state locations:
+The intended feel is:
 
-- `launch_quay`
-  - initial form: ship ready in principle, but still idle at berth
-  - changed form: launch preparations visibly active after major blockers are cleared
-- `brig`
-  - initial form: empty confinement space
-  - changed form: the final antagonist locked inside
-- `signal_beacon_tower`
-  - initial form: cluttered, contradictory, or improperly set signaling gear
-  - changed form: corrected launch signal state after the relevant blocker is resolved
+- on a first pass, the harbor seems simple and almost too linear
+- the player walks the obvious spine quickly
+- one blocker stops launch
+- an item gathered elsewhere makes an old dead-end useful
+- returning to familiar locations reveals new options because the player now has the right item
+- some actions require multiple items to be present at a location, where they combine into a more specific item
+- that new item then unlocks some distant location on the other side of the harbor or ship
 
-Possible fourth candidate if needed:
+This means the map should grow over time.
 
-- `crows_nest`
-  - initial form: rigging view before launch readiness changes
-  - changed form: harbor and ship visibly committed to departure
+Design rule:
+
+- do not mutate location art in response to progress
+- do not rely on scene-state image swaps
+- use inventory, unlocks, and newly revealed options instead
+- notation should frequently point the player to another far-off location
+- back-and-forth traversal is part of the joke and should be intentionally emphasized
+
+The structure should feel like a tree that keeps sprouting new branches from previously boring nodes.
+
+## Initial Player Experience
+
+The first run through the harbor should be intentionally easy to read.
+
+Target feeling:
+
+- there are only a few obvious options
+- one or two side paths exist mostly for sightseeing or texture
+- the player reaches the launch point quickly
+- the first real blocker produces the first hard dead end
+
+After that:
+
+- item pickups begin reopening old places
+- the town side gains new branches
+- the ship side gains new branches
+- places that were previously inert become combinational work sites
+- the navigation burden increases in an intentional and mildly irritating way
+
+This should make the DLC feel as if it keeps getting bigger the longer the player spends trying to solve one "simple" launch.
 
 ## Launch-Blocker Rhythm
 
@@ -201,6 +223,14 @@ The feeling should be:
 - each step seems like the last one
 - it never is
 
+The public line must remain absurdly constant throughout:
+
+- the ship is fully ready
+- launch is imminent
+- there are no real blockers
+- any current issue is tiny
+- any current issue is definitely somebody else’s responsibility
+
 Current benchmark direction:
 
 - the strongest version of the joke is that readiness is always conditional on one omitted detail
@@ -226,6 +256,39 @@ Good blocker types:
 - a procedural insistence that a cable, spar, or ballast correction must be witnessed again in the proper maritime manner
 
 Each blocker should sound like something that absolutely should not stop a war launch, yet somehow does.
+
+## Town And Ship Growth Direction
+
+The map should expand on both sides of the harbor divide.
+
+Town-side growth should favor:
+
+- `reckoning_house`
+- `victualler_row`
+- `harbor_ledger_office`
+- `pilots_tavern`
+- `oarmaker_yard`
+- `caulking_shed`
+
+Ship-and-quay-side growth should favor:
+
+- `launch_quay`
+- `rope_crane_pier`
+- `capstan_walk`
+- `boatyard_slip`
+- `lamp_room`
+- `signal_beacon_tower`
+- `mudflat_skiff_landing`
+- `crows_nest`
+
+This supports the core rhythm:
+
+- an obscure ship problem sends you into town
+- a town-side fix sends you back to the ship
+- the fix reveals a new ship-side option
+- that ship-side option points you back into town again
+
+The player should feel repeatedly dispatched to the far side of everything.
 
 ## Current Benchmark Blocker Thread
 

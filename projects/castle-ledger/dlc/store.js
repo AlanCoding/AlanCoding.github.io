@@ -9,7 +9,7 @@ import {
   loadSharedState,
   saveSharedState,
   syncInstallCompletion,
-} from './shared-state.js';
+} from './shared-state.js?v=2';
 
 function formatAlanbucks(amount) {
   return `${amount.toLocaleString()} alanbucks`;
@@ -141,10 +141,9 @@ function initStorePage() {
   if (renderCheckoutPage()) {
     return;
   }
-  if (wireInstallPage(DLC_KEYS.battle)) {
-    return;
-  }
-  if (wireInstallPage(DLC_KEYS.harbor)) {
+  const explicitDlcKey = document.querySelector('[data-dlc-key]')?.getAttribute('data-dlc-key');
+  if (explicitDlcKey === DLC_KEYS.battle || explicitDlcKey === DLC_KEYS.harbor) {
+    wireInstallPage(explicitDlcKey);
     return;
   }
   renderHubPage();

@@ -141,8 +141,13 @@
           align-items: start;
         }
 
-        .game-shell.layout-stacked {
+        .game-shell.layout-choices-stacked {
           grid-template-columns: minmax(0, 2.3fr) minmax(320px, 1fr);
+          align-items: start;
+        }
+
+        .game-shell.layout-all-stacked {
+          grid-template-columns: minmax(0, 1fr);
           align-items: start;
         }
       }
@@ -461,6 +466,12 @@
         var shell = document.getElementById('gameShell');
         var layoutToggle = document.getElementById('layoutToggle');
         var layoutKey = 'castle_ledger_layout_mode_v1';
+        var layoutModes = ['split', 'choices-stacked', 'all-stacked'];
+        var layoutLabels = {
+          split: 'Stack choices',
+          'choices-stacked': 'Stack ledger too',
+          'all-stacked': 'Split into 3 columns'
+        };
         if (!intro || !toggle) {
           return;
         }
@@ -473,24 +484,38 @@
           intro.style.display = intro.style.display === 'none' ? 'grid' : 'none';
           syncIntroToggle();
         });
+        function normalizeLayoutMode(mode) {
+          if (mode === 'stacked') {
+            return 'choices-stacked';
+          }
+          return layoutModes.indexOf(mode) >= 0 ? mode : 'split';
+        }
         function syncLayoutToggle(mode) {
           if (!shell || !layoutToggle) {
             return;
           }
-          var split = mode !== 'stacked';
-          shell.classList.toggle('layout-split', split);
-          shell.classList.toggle('layout-stacked', !split);
-          layoutToggle.setAttribute('aria-pressed', String(split));
-          layoutToggle.textContent = split ? 'Stack choices' : 'Split into 3 columns';
+          var normalized = normalizeLayoutMode(mode);
+          shell.classList.toggle('layout-split', normalized === 'split');
+          shell.classList.toggle('layout-choices-stacked', normalized === 'choices-stacked');
+          shell.classList.toggle('layout-all-stacked', normalized === 'all-stacked');
+          layoutToggle.setAttribute('aria-pressed', String(normalized === 'split'));
+          layoutToggle.textContent = layoutLabels[normalized];
         }
         if (shell && layoutToggle) {
           var savedMode = null;
           try {
             savedMode = window.localStorage.getItem(layoutKey);
           } catch (error) {}
-          syncLayoutToggle(savedMode === 'stacked' ? 'stacked' : 'split');
+          syncLayoutToggle(savedMode);
           layoutToggle.addEventListener('click', function () {
-            var nextMode = shell.classList.contains('layout-split') ? 'stacked' : 'split';
+            var currentMode = 'split';
+            if (shell.classList.contains('layout-choices-stacked')) {
+              currentMode = 'choices-stacked';
+            } else if (shell.classList.contains('layout-all-stacked')) {
+              currentMode = 'all-stacked';
+            }
+            var currentIndex = layoutModes.indexOf(currentMode);
+            var nextMode = layoutModes[(currentIndex + 1) % layoutModes.length];
             syncLayoutToggle(nextMode);
             try {
               window.localStorage.setItem(layoutKey, nextMode);

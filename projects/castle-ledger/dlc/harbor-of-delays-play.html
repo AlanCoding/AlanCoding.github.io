@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Play The Battle of Mastings</title>
+    <title>Play Harbor of Delays</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       :root {
@@ -12,7 +12,7 @@
       }
       body {
         margin: 0;
-        background: radial-gradient(circle at top, rgba(135, 110, 77, 0.14), rgba(49, 34, 19, 0.08)), #f3ede2;
+        background: radial-gradient(circle at top, rgba(97, 118, 133, 0.15), rgba(49, 34, 19, 0.08)), #f3ede2;
       }
       main {
         width: min(100%, 1500px);
@@ -87,7 +87,7 @@
         padding: 0.9rem 1rem;
         border-radius: 12px;
         border: 1px solid #cfbca0;
-        background: linear-gradient(135deg, rgba(255, 249, 240, 0.95), rgba(214, 195, 170, 0.6));
+        background: linear-gradient(135deg, rgba(255, 249, 240, 0.95), rgba(194, 205, 214, 0.62));
         cursor: pointer;
       }
       .option-button[disabled] {
@@ -167,19 +167,19 @@
   <body>
     <main>
       <div class="top">
-        <a href="battle-of-mastings.html">Back to DLC detail</a>
+        <a href="harbor-of-delays.html">Back to DLC detail</a>
         <a href="index.html">Back to DLC hub</a>
         <a href="../">Back to Castle Ledger</a>
         <button type="button" class="layout-toggle" id="layoutToggle" aria-pressed="true">Stack choices</button>
       </div>
 
       <section id="notInstalled" class="empty-state" hidden>
-        <h1>The Battle of Mastings is not installed</h1>
-        <p>You cannot ride into Duke Gilliam’s camp until the local installer has finished dramatizing itself.</p>
-        <p><a href="battle-of-mastings.html">Open the install page</a></p>
+        <h1>Harbor of Delays is not installed</h1>
+        <p id="notInstalledMessage">You cannot fail to launch this warship until the premium installer has formally finished pretending to help.</p>
+        <p><a href="harbor-of-delays.html">Open the install page</a></p>
       </section>
 
-      <section id="battleApp" class="shell layout-split" hidden>
+      <section id="harborApp" class="shell layout-split" hidden>
         <article class="card">
           <div class="room-meta" id="roomMeta"></div>
           <h1 id="roomTitle"></h1>
@@ -196,11 +196,11 @@
         </section>
         <aside class="sidebar">
           <section>
-            <h2>Battle Inventory</h2>
+            <h2>Harbor Inventory</h2>
             <ul class="list" id="inventoryList"></ul>
           </section>
           <section>
-            <h2>War Resources</h2>
+            <h2>Launch Board</h2>
             <div class="resource-grid" id="resourceGrid"></div>
           </section>
           <section>
@@ -210,6 +210,6 @@
         </aside>
       </section>
     </main>
-    <script type="module" src="battle.js?v=5"></script>
+    <script type="module" src="harbor.js?v=5"></script>
   </body>
 </html>

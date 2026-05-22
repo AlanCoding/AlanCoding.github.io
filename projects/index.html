@@ -143,6 +143,10 @@ permalink: /projects/
       </table>
       <p id="castleEmpty" class="achievement-empty" hidden>Walk the walls of Beldane Keep to begin recording your chronicles.</p>
       <p class="achievement-card__footnote">Need a nudge? Consult the <a href="{{ '/projects/castle-ledger/spoilers.html' | relative_url }}">Castle Ledger spoilers</a>.</p>
+      <div class="management-card__controls" style="margin-top: 0.75rem;">
+        <button id="castleLedgerClearAll" type="button" class="management-clear management-clear--danger">Clear All Castle Ledger Data</button>
+      </div>
+      <p id="castleLedgerClearMessage" class="management-message" role="status" aria-live="polite"></p>
     </article>
   </section>
 
@@ -250,3 +254,36 @@ permalink: /projects/
 <div id="achievementToastContainer" class="achievement-toast-container" aria-live="assertive" aria-atomic="true"></div>
 
 <script type="module" src="{{ '/projects/achievements.js' | relative_url }}"></script>
+<script>
+  (function () {
+    var button = document.getElementById('castleLedgerClearAll');
+    var message = document.getElementById('castleLedgerClearMessage');
+    if (!button || !message) {
+      return;
+    }
+    function expireCastleCookie(path, domain) {
+      var parts = ['castle_ledger_state_v1=', 'expires=Thu, 01 Jan 1970 00:00:00 GMT', 'max-age=0', 'path=' + path, 'SameSite=Lax'];
+      if (domain) {
+        parts.push('domain=' + domain);
+      }
+      document.cookie = parts.join(';');
+    }
+    button.addEventListener('click', function () {
+      var hostname = window.location.hostname;
+      ['/', '/projects', '/projects/', '/projects/castle-ledger', '/projects/castle-ledger/', '/projects/castle-ledger/dlc', '/projects/castle-ledger/dlc/'].forEach(function (path) {
+        expireCastleCookie(path, '');
+        expireCastleCookie(path, hostname);
+      });
+      try {
+        window.localStorage.removeItem('castle_ledger_layout_mode_v1');
+        window.localStorage.removeItem('castle_ledger_debug_state');
+        window.sessionStorage.removeItem('castle_ledger_layout_mode_v1');
+        window.sessionStorage.removeItem('castle_ledger_debug_state');
+      } catch (error) {}
+      message.textContent = 'All Castle Ledger progress, alanbucks, DLC installs, and campaign state were cleared.';
+      window.setTimeout(function () {
+        window.location.reload();
+      }, 250);
+    });
+  })();
+</script>

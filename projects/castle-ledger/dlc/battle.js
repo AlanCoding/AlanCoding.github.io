@@ -1,4 +1,4 @@
-import { DLC_KEYS, appendBattleLog, isInstalled, loadSharedState, saveSharedState } from './shared-state.js';
+import { DLC_KEYS, appendBattleLog, isInstalled, loadSharedState, saveSharedState } from './shared-state.js?v=2';
 
 const ITEM_CATALOG = {
   horn_nock: { name: 'Horn nock', description: 'A worked nock tip suitable for an inspected war arrow.' },
@@ -824,7 +824,7 @@ const SCENES = {
       'Duke Gilliam of Mormandy’s side takes the day. No one quite notices that the helpful clerk drifting through arrow counts, mounted tack, and fallen standards was anything more dangerous than competent.',
       'The camp congratulates itself. Across the channel, and across every sea worth worrying about, word arrives of trouble overseas. A harbor launch will be needed in haste, and the men who speak most confidently about readiness should not be trusted.',
       'The game is over here.',
-      '<a href="harbor-of-delays.html">Go to the Harbor of Delays DLC page.</a>',
+      '<a href="harbor-of-delays-play.html">Go to Harbor of Delays.</a>',
     ],
     options: [],
   }),
@@ -836,7 +836,7 @@ const SCENES = {
       'You are congratulated with exhausting explicitness for having counted, delayed, and misdirected exactly enough. It is not a grand heroic reward. It is simply correct, which feels better.',
       'Word still arrives of trouble overseas. A ship must be launched in anger, and the harbor’s promise of readiness sounds suspicious already.',
       'The game is over here.',
-      '<a href="harbor-of-delays.html">Go to the Harbor of Delays DLC page.</a>',
+      '<a href="harbor-of-delays-play.html">Go to Harbor of Delays.</a>',
     ],
     options: [],
   }),
@@ -896,24 +896,44 @@ document.addEventListener('DOMContentLoaded', () => {
   const shell = document.getElementById('battleApp');
   const layoutToggle = document.getElementById('layoutToggle');
   const layoutKey = 'castle_ledger_layout_mode_v1';
+  const layoutModes = ['split', 'choices-stacked', 'all-stacked'];
+  const layoutLabels = {
+    split: 'Stack choices',
+    'choices-stacked': 'Stack ledger too',
+    'all-stacked': 'Split into 3 columns',
+  };
+  function normalizeLayoutMode(mode) {
+    if (mode === 'stacked') {
+      return 'choices-stacked';
+    }
+    return layoutModes.includes(mode) ? mode : 'split';
+  }
   function syncLayout(mode) {
     if (!shell || !layoutToggle) {
       return;
     }
-    const split = mode !== 'stacked';
-    shell.classList.toggle('layout-split', split);
-    shell.classList.toggle('layout-stacked', !split);
-    layoutToggle.setAttribute('aria-pressed', String(split));
-    layoutToggle.textContent = split ? 'Stack choices' : 'Split into 3 columns';
+    const normalized = normalizeLayoutMode(mode);
+    shell.classList.toggle('layout-split', normalized === 'split');
+    shell.classList.toggle('layout-choices-stacked', normalized === 'choices-stacked');
+    shell.classList.toggle('layout-all-stacked', normalized === 'all-stacked');
+    layoutToggle.setAttribute('aria-pressed', String(normalized === 'split'));
+    layoutToggle.textContent = layoutLabels[normalized];
   }
   if (shell && layoutToggle) {
     let savedMode = null;
     try {
       savedMode = window.localStorage.getItem(layoutKey);
     } catch (error) {}
-    syncLayout(savedMode === 'stacked' ? 'stacked' : 'split');
+    syncLayout(savedMode);
     layoutToggle.addEventListener('click', () => {
-      const nextMode = shell.classList.contains('layout-split') ? 'stacked' : 'split';
+      let currentMode = 'split';
+      if (shell.classList.contains('layout-choices-stacked')) {
+        currentMode = 'choices-stacked';
+      } else if (shell.classList.contains('layout-all-stacked')) {
+        currentMode = 'all-stacked';
+      }
+      const currentIndex = layoutModes.indexOf(currentMode);
+      const nextMode = layoutModes[(currentIndex + 1) % layoutModes.length];
       syncLayout(nextMode);
       try {
         window.localStorage.setItem(layoutKey, nextMode);

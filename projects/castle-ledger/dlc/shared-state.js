@@ -87,6 +87,42 @@ function normalizeBattleState(rawBattle) {
   return next;
 }
 
+function normalizeHarborState(rawHarbor) {
+  const next = {
+    introSeen: false,
+    location: null,
+    visited: {},
+    inventory: {},
+    flags: {},
+    log: [],
+    counters: {
+      failedLaunches: 0,
+      assurancesHeard: 0,
+      furiousMeetings: 0,
+    },
+    outcome: null,
+  };
+  if (!rawHarbor || typeof rawHarbor !== 'object') {
+    return next;
+  }
+  next.introSeen = Boolean(rawHarbor.introSeen);
+  next.location = typeof rawHarbor.location === 'string' ? rawHarbor.location : null;
+  next.visited = rawHarbor.visited && typeof rawHarbor.visited === 'object' ? rawHarbor.visited : {};
+  next.inventory = rawHarbor.inventory && typeof rawHarbor.inventory === 'object' ? rawHarbor.inventory : {};
+  next.flags = rawHarbor.flags && typeof rawHarbor.flags === 'object' ? rawHarbor.flags : {};
+  next.log = Array.isArray(rawHarbor.log) ? rawHarbor.log.slice(-18).map(entry => String(entry)) : [];
+  if (rawHarbor.counters && typeof rawHarbor.counters === 'object') {
+    Object.keys(next.counters).forEach(key => {
+      const value = Number(rawHarbor.counters[key]);
+      if (Number.isFinite(value)) {
+        next.counters[key] = value;
+      }
+    });
+  }
+  next.outcome = rawHarbor.outcome === 'launched' ? rawHarbor.outcome : null;
+  return next;
+}
+
 export function loadSharedState() {
   let parsed = {};
   const cookieValue = readCookie(COOKIE_NAME);
@@ -111,15 +147,7 @@ export function loadSharedState() {
   next.dlc.installs[DLC_KEYS.battle] = normalizeInstall(next.dlc.installs[DLC_KEYS.battle]);
   next.dlc.installs[DLC_KEYS.harbor] = normalizeInstall(next.dlc.installs[DLC_KEYS.harbor]);
   next.dlc[DLC_KEYS.battle] = normalizeBattleState(next.dlc[DLC_KEYS.battle]);
-  if (!next.dlc[DLC_KEYS.harbor] || typeof next.dlc[DLC_KEYS.harbor] !== 'object') {
-    next.dlc[DLC_KEYS.harbor] = {
-      location: null,
-      visited: {},
-      inventory: {},
-      flags: {},
-      log: [],
-    };
-  }
+  next.dlc[DLC_KEYS.harbor] = normalizeHarborState(next.dlc[DLC_KEYS.harbor]);
   return next;
 }
 
@@ -183,5 +211,12 @@ export function appendBattleLog(state, message) {
   const log = state.dlc[DLC_KEYS.battle].log;
   log.push(message);
   state.dlc[DLC_KEYS.battle].log = log.slice(-18);
+  saveSharedState(state);
+}
+
+export function appendHarborLog(state, message) {
+  const log = state.dlc[DLC_KEYS.harbor].log;
+  log.push(message);
+  state.dlc[DLC_KEYS.harbor].log = log.slice(-18);
   saveSharedState(state);
 }

@@ -608,6 +608,7 @@
   const ROOMS = {
     south_road: state => {
       const battleInstalled = Boolean(state.dlc?.installs?.battle_of_mastings?.installed);
+      const harborInstalled = Boolean(state.dlc?.installs?.harbor_of_delays?.installed);
       const description = [
         'The southern road rises gently toward Beldane Keep. Wagon ruts trace muddy grooves past carts stacked with barley sheaves. A thatcher hums while repairing a roadside shelter, and smoke from the castle kitchens drifts on the wind.',
         'Children play at knights with willow sticks, pausing to stare as you pass. The keep’s front drawbridge looms ahead, chains taut above the moat’s green sheen.'
@@ -627,6 +628,9 @@
       addOption(options, 'Jump straight to The Battle of Mastings', () => {
         window.location.href = 'dlc/battle-of-mastings-play.html';
       }, { disabled: !battleInstalled });
+      addOption(options, 'Jump straight to Harbor of Delays', () => {
+        window.location.href = 'dlc/harbor-of-delays-play.html';
+      }, { disabled: !harborInstalled });
       return {
         title: 'Southern Road to Beldane Keep',
         meta: 'Outer ring — South road approach',
@@ -733,8 +737,8 @@
         description.push('The rope you bartered for is coiled around a metal ring. With the mastiff distracted, you could descend to the sally ladder hidden beneath the bridge.');
       }
       const options = [];
-      addOption(options, 'Return along the mill stream toward the weir', () => setLocation('east_mill_stream', 'You back away from the postern, senses sharp.'));
       addOption(options, 'Continue north along the moat path toward the monastery gardens', () => setLocation('northeast_monastery', 'You pass the tower and head toward the quiet monastery plots.'));
+      addOption(options, 'Return along the mill stream toward the weir', () => setLocation('east_mill_stream', 'You back away from the postern, senses sharp.'));
       if (hasItem('salted_pork')) {
         addOption(options, 'Toss the salted pork to the mastiff to distract him', () => {
           adjustItem('salted_pork', -1);
