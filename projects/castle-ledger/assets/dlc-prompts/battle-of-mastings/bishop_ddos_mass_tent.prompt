@@ -1,0 +1,23 @@
+# Bishop Ddo’s Mass Tent — Illustration Prompt
+
+## Castle Ledger Illustration Prompt Template
+
+Use the following structure for every generated image:
+
+**Base Prompt**  
+Create a richly detailed, roughly square digital painting sized to sit beside narrative text on desktop or mobile screens. Depict a grounded late-medieval world centered on the Battle of Mastings parody campaign with historically accurate 11th-century Norman and Anglo-Saxon clothing, equipment, carts, standards, and architecture. Keep the scene more colorful and visually legible than a muddy naturalistic war painting: use brighter heraldic accents, clearer separation of planes, and a cleaner almost-infographic readability while still remaining painterly and historical. Emphasize tactile materials—weathered wood, damp wool, iron rings, parchment, wax, horse tack, mud, and linen—and naturalistic light with gentle bloom. Compose the scene with measured perspective and painterly realism reminiscent of manuscript illuminations, early Renaissance panel art, and historical illustrated reconstructions, avoiding exaggerated proportions or stylization. Keep the palette earthy overall but noticeably enlivened by crimson, deep blue, warm gold, cream linen, painted shield color, and readable focal contrasts.
+
+**Rendering Guidance**  
+- Framing: focus on the named location or grouping, filling most of the frame while leaving breathable space above and below so the artwork can stack with text.  
+- Aspect & scale: aim for a square canvas that could crop cleanly; no cinematic black bars.  
+- Lighting: natural ambient light with localized highlights from candles, braziers, dawn, or cloudy sky to guide the eye.  
+- Mood: historically grounded and administratively tense, but visually clearer and brighter than the dreariest battlefield palette.  
+- Style emphasis: prioritize readability, distinct zones of action, and a slightly diagrammatic clarity of people, props, and exits, without turning it into a literal infographic or UI.  
+- Avoid: monochrome brown sludge, modern objects, anachronistic plate armor, fantasy castles, visible UI, or text overlays.
+
+## Location-Specific Direction
+- Composition: large campaign mass tent where relics, witness tokens, and treatment strips share space with clerks and armed men.
+- Key elements: altar cloth, relic casket, tied witness tokens, bandage basket, chanting clerics, muddy soldiers passing through for blessing, with enough color separation that relics, cloth, baskets, and figures read clearly at a glance.
+- Character focus: Bishop Ddo’s clerk giving the player a token while everyone else acts as if this is spiritually distinct from administration.
+- Atmosphere: busy, organized, and self-important rather than bleak, with strong cloth color, warm candlelight, and cool daylight balancing each other.
+- Navigation hint: show a flap or passage facing the main camp road for easy return.

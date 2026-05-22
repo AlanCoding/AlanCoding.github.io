@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Play The Battle of Mastings</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        font-family: "EB Garamond", "Times New Roman", serif;
+        color: #2c241d;
+        background: #f3ede2;
+      }
+      body {
+        margin: 0;
+        background: radial-gradient(circle at top, rgba(135, 110, 77, 0.14), rgba(49, 34, 19, 0.08)), #f3ede2;
+      }
+      main {
+        width: min(100%, 1500px);
+        margin: 0 auto;
+        padding: 1.5rem;
+        display: grid;
+        gap: 1.5rem;
+      }
+      a { color: #633728; }
+      .top {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .layout-toggle {
+        border: 1px solid #d0c1ab;
+        background: #fff8ef;
+        color: #633728;
+        border-radius: 999px;
+        padding: 0.4rem 0.85rem;
+        font: 600 0.95rem/1 system-ui, sans-serif;
+        cursor: pointer;
+      }
+      .shell {
+        display: grid;
+        gap: 1.5rem;
+      }
+      @media (min-width: 980px) {
+        .shell.layout-split {
+          grid-template-columns: minmax(0, 1.95fr) minmax(320px, 1.05fr) minmax(300px, 1fr);
+          align-items: start;
+        }
+        .shell.layout-stacked {
+          grid-template-columns: minmax(0, 2.3fr) minmax(320px, 1fr);
+          align-items: start;
+        }
+      }
+      .card, .sidebar {
+        background: rgba(255, 250, 242, 0.92);
+        border: 1px solid #d7c7b0;
+        border-radius: 18px;
+        padding: 1.25rem;
+        box-shadow: 0 18px 30px rgba(43, 27, 15, 0.12);
+      }
+      .room-meta, .statusline {
+        font-family: system-ui, sans-serif;
+        font-size: 0.95rem;
+        color: #6f5843;
+      }
+      h1, h2, h3 {
+        color: #633728;
+      }
+      #roomTitle {
+        margin: 0 0 0.3rem;
+        font-size: clamp(1.7rem, 1.8vw + 1rem, 2.5rem);
+      }
+      #roomDescription p {
+        line-height: 1.7;
+      }
+      .options {
+        display: grid;
+        gap: 0.75rem;
+      }
+      .option-button {
+        font: 600 1rem/1.4 system-ui, sans-serif;
+        text-align: left;
+        padding: 0.9rem 1rem;
+        border-radius: 12px;
+        border: 1px solid #cfbca0;
+        background: linear-gradient(135deg, rgba(255, 249, 240, 0.95), rgba(214, 195, 170, 0.6));
+        cursor: pointer;
+      }
+      .option-button[disabled] {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .sidebar {
+        display: grid;
+        gap: 1rem;
+      }
+      .choices-card {
+        background: rgba(255, 250, 242, 0.92);
+        border: 1px solid #d7c7b0;
+        border-radius: 18px;
+        padding: 1.25rem;
+        box-shadow: 0 18px 30px rgba(43, 27, 15, 0.12);
+        display: grid;
+        gap: 1rem;
+      }
+      .list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 0.55rem;
+      }
+      .list li {
+        border-bottom: 1px dashed #d8c9b3;
+        padding-bottom: 0.4rem;
+      }
+      .inventory-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 0.75rem;
+      }
+      .inventory-copy {
+        min-width: 0;
+      }
+      .inventory-remove {
+        border: 1px solid #c9a985;
+        background: #fff5ea;
+        color: #8b3a20;
+        border-radius: 999px;
+        width: 1.7rem;
+        height: 1.7rem;
+        flex: 0 0 auto;
+        padding: 0;
+        font: 700 0.95rem/1 system-ui, sans-serif;
+        cursor: pointer;
+      }
+      .inventory-remove:hover {
+        background: #ffe2d2;
+      }
+      .list li:last-child {
+        border-bottom: none;
+      }
+      .resource-grid {
+        display: grid;
+        gap: 0.55rem;
+      }
+      .resource-grid div {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        font-family: system-ui, sans-serif;
+        font-size: 0.95rem;
+      }
+      .empty-state {
+        background: rgba(255, 250, 242, 0.92);
+        border: 1px solid #d7c7b0;
+        border-radius: 18px;
+        padding: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="top">
+        <a href="battle-of-mastings.html">Back to DLC detail</a>
+        <a href="index.html">Back to DLC hub</a>
+        <a href="../">Back to Castle Ledger</a>
+        <button type="button" class="layout-toggle" id="layoutToggle" aria-pressed="true">Stack choices</button>
+      </div>
+
+      <section id="notInstalled" class="empty-state" hidden>
+        <h1>The Battle of Mastings is not installed</h1>
+        <p>You cannot ride into Duke Gilliam’s camp until the local installer has finished dramatizing itself.</p>
+        <p><a href="battle-of-mastings.html">Open the install page</a></p>
+      </section>
+
+      <section id="battleApp" class="shell layout-split" hidden>
+        <article class="card">
+          <div class="room-meta" id="roomMeta"></div>
+          <h1 id="roomTitle"></h1>
+          <figure id="roomIllustration" hidden style="margin: 0 0 1rem 0; border-radius: 16px; overflow: hidden; border: 1px solid #d7c7b0; background: #efe4d5;">
+            <img id="roomIllustrationImage" alt="" loading="lazy" decoding="async" style="display: block; width: 100%; height: auto;" />
+            <figcaption id="roomIllustrationCaption" style="padding: 0.75rem 1rem 1rem; font-family: system-ui, sans-serif; font-size: 0.9rem; color: #6f5843;"></figcaption>
+          </figure>
+          <div id="roomDescription"></div>
+        </article>
+        <section class="choices-card" aria-labelledby="choicesHeading">
+          <h2 id="choicesHeading">Choices &amp; notation</h2>
+          <div class="options" id="options"></div>
+          <div class="statusline" id="eventLog"></div>
+        </section>
+        <aside class="sidebar">
+          <section>
+            <h2>Battle Inventory</h2>
+            <ul class="list" id="inventoryList"></ul>
+          </section>
+          <section>
+            <h2>War Resources</h2>
+            <div class="resource-grid" id="resourceGrid"></div>
+          </section>
+          <section>
+            <h2>Current Aim</h2>
+            <ul class="list" id="questList"></ul>
+          </section>
+        </aside>
+      </section>
+    </main>
+    <script type="module" src="battle.js?v=3"></script>
+  </body>
+</html>

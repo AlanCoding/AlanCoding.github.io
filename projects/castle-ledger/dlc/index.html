@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Castle Ledger DLC Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        margin: 0;
+        font-family: "EB Garamond", serif;
+        background: #f3ede2;
+        color: #2c241d;
+      }
+      main {
+        width: min(100%, 1100px);
+        margin: 0 auto;
+        padding: 1.5rem;
+        display: grid;
+        gap: 1.5rem;
+      }
+      a { color: #633728; }
+      .top {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .balance {
+        padding: 0.65rem 0.95rem;
+        border-radius: 999px;
+        background: #fff8ef;
+        border: 1px solid #d0c1ab;
+        font-weight: 600;
+      }
+      .grid {
+        display: grid;
+        gap: 1rem;
+      }
+      .card {
+        background: #fffaf2;
+        border: 1px solid #d7c7b0;
+        border-radius: 18px;
+        overflow: hidden;
+      }
+      .card img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .card-copy {
+        padding: 1rem;
+      }
+      .card-copy h2 {
+        margin: 0 0 0.4rem;
+      }
+      .status {
+        font-family: system-ui, sans-serif;
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="top">
+        <a href="../">Back to Castle Ledger</a>
+        <a href="../../">All games</a>
+        <a href="alanbucks.html">Add alanbucks</a>
+        <div class="balance">Balance: <span id="alanbucksBalance">0 alanbucks</span></div>
+      </div>
+
+      <header>
+        <h1>Castle Ledger Premium DLC Hub</h1>
+        <p>The ledger now supports premium campaign expansions with impeccable local accounting.</p>
+        <p style="font-family: system-ui, sans-serif; font-size: 0.95rem; color: #6f5843;">
+          Battle of Mastings art generation burned roughly <strong>$0.89</strong> in OpenAI credits already, so frankly these alanbucks prices are still a public service.
+        </p>
+      </header>
+
+      <section class="grid">
+        <article class="card">
+          <a href="battle-of-mastings.html"><img src="../assets/illustrations/dlc/battle_of_mastings_large.jpeg" alt="Battle of Mastings banner" /></a>
+          <div class="card-copy">
+            <h2><a href="battle-of-mastings.html">The Battle of Mastings</a></h2>
+            <p>Enemy camp administration, arrow lies, and a battlefield clerk where no clerk should be.</p>
+            <p class="status" id="battleStatus"></p>
+          </div>
+        </article>
+        <article class="card">
+          <a href="harbor-of-delays.html"><img src="../assets/illustrations/dlc/harbor_of_delays_large.jpeg" alt="Harbor of Delays banner" /></a>
+          <div class="card-copy">
+            <h2><a href="harbor-of-delays.html">Harbor of Delays</a></h2>
+            <p>A ship that is always ready, except for the one part no one mentioned yet.</p>
+            <p class="status" id="harborStatus"></p>
+          </div>
+        </article>
+      </section>
+    </main>
+    <script type="module" src="store.js?v=2"></script>
+  </body>
+</html>

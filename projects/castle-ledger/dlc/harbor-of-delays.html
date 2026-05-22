@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Harbor of Delays DLC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { margin: 0; font-family: "EB Garamond", serif; background: #f3ede2; color: #2c241d; }
+      main { width: min(100%, 1100px); margin: 0 auto; padding: 1.5rem; display: grid; gap: 1.5rem; }
+      a { color: #633728; }
+      .top { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+      .balance { padding: 0.65rem 0.95rem; border-radius: 999px; background: #fff8ef; border: 1px solid #d0c1ab; font-weight: 600; }
+      .banner { background: #fffaf2; border: 1px solid #d7c7b0; border-radius: 18px; overflow: hidden; }
+      .banner img { display: block; width: 100%; height: auto; }
+      .copy { padding: 1rem; }
+      .actions { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; }
+      button { font: inherit; padding: 0.7rem 1rem; }
+      .status { font-family: system-ui, sans-serif; font-size: 0.95rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="top">
+        <a href="index.html">Back to DLC hub</a>
+        <a href="../">Back to Castle Ledger</a>
+        <div class="balance">Balance: <span id="alanbucksBalance">0 alanbucks</span></div>
+      </div>
+      <article class="banner">
+        <img src="../assets/illustrations/dlc/harbor_of_delays_large.jpeg" alt="Harbor of Delays banner" />
+        <div class="copy">
+          <h1>Harbor of Delays</h1>
+          <p>The ship is ready. No one is blocking it. You now need to prove both of those claims false, repeatedly.</p>
+          <div class="actions">
+            <button type="button" id="installButton">Install DLC</button>
+            <a id="playLink" href="../" hidden>Installed</a>
+            <a id="addFundsLink" href="alanbucks.html">Add alanbucks</a>
+            <span class="status" id="installStatus"></span>
+          </div>
+        </div>
+      </article>
+    </main>
+    <script type="module" src="store.js?v=2"></script>
+  </body>
+</html>

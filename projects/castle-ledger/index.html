@@ -36,7 +36,7 @@
       }
 
       main {
-        width: min(100%, 1100px);
+        width: min(100%, 1500px);
         background: rgba(255, 250, 240, 0.92);
         border-radius: 20px;
         padding: clamp(1.5rem, 3vw, 2.75rem);
@@ -95,6 +95,21 @@
         background: rgba(203, 181, 157, 0.22);
       }
 
+      .layout-toggle {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.7);
+        color: var(--accent);
+        border-radius: 999px;
+        padding: 0.28rem 0.75rem;
+        font: 600 0.95rem/1 "Inter", system-ui, sans-serif;
+        cursor: pointer;
+      }
+
+      .layout-toggle:hover,
+      .layout-toggle:focus {
+        background: rgba(203, 181, 157, 0.22);
+      }
+
       header h1 {
         font-size: clamp(2rem, 3vw + 1rem, 3.2rem);
         margin: 0;
@@ -121,8 +136,13 @@
       }
 
       @media (min-width: 980px) {
-        .game-shell {
-          grid-template-columns: 2.1fr 1fr;
+        .game-shell.layout-split {
+          grid-template-columns: minmax(0, 1.95fr) minmax(320px, 1.05fr) minmax(300px, 1fr);
+          align-items: start;
+        }
+
+        .game-shell.layout-stacked {
+          grid-template-columns: minmax(0, 2.3fr) minmax(320px, 1fr);
           align-items: start;
         }
       }
@@ -201,6 +221,28 @@
         border: 1px dashed var(--border);
       }
 
+      .choices-card {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: clamp(1.1rem, 2vw, 1.55rem);
+        box-shadow: 0 16px 28px rgba(46, 24, 6, 0.14);
+        display: grid;
+        gap: 1rem;
+      }
+
+      .choices-card h2 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: var(--accent);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .choices-card {
+          background: rgba(24, 20, 16, 0.85);
+        }
+      }
+
       .room-log h3 {
         margin: 0 0 0.4rem 0;
         font-size: 0.95rem;
@@ -234,6 +276,19 @@
       .option-button:focus {
         transform: translateY(-2px);
         box-shadow: 0 10px 22px rgba(46, 24, 6, 0.18);
+      }
+
+      .option-button--dlc {
+        border-color: #b26c10;
+        background: linear-gradient(135deg, rgba(255, 214, 102, 0.9), rgba(214, 72, 26, 0.78));
+        color: #2f160a;
+        font-weight: 700;
+        box-shadow: 0 10px 24px rgba(177, 102, 16, 0.2);
+      }
+
+      .option-button--dlc:hover,
+      .option-button--dlc:focus {
+        box-shadow: 0 14px 28px rgba(177, 102, 16, 0.3);
       }
 
       .option-button[disabled] {
@@ -349,8 +404,12 @@
     <main>
       <div class="top-bar">
         <a class="back-link" href="../">All games</a>
+        <a class="back-link" href="dlc/" style="gap: 0.35rem;">DLC hub</a>
         <button type="button" class="intro-toggle" id="introToggle" aria-expanded="false" aria-controls="gameIntro">
           Show title
+        </button>
+        <button type="button" class="layout-toggle" id="layoutToggle" aria-pressed="true">
+          Stack choices
         </button>
       </div>
       <header class="game-intro" id="gameIntro" style="display: none;">
@@ -362,7 +421,7 @@
         </p>
       </header>
 
-      <section class="game-shell" aria-live="polite">
+      <section class="game-shell layout-split" id="gameShell" aria-live="polite">
         <article class="room-card" aria-labelledby="roomTitle">
           <div class="room-meta" id="roomMeta"></div>
           <h2 id="roomTitle"></h2>
@@ -371,12 +430,15 @@
             <figcaption id="roomIllustrationCaption"></figcaption>
           </figure>
           <div id="roomDescription"></div>
+        </article>
+        <section class="choices-card" aria-labelledby="choicesHeading">
+          <h2 id="choicesHeading">Choices &amp; notation</h2>
           <div class="options" id="options" role="group" aria-label="Available actions"></div>
           <div class="room-log" aria-live="polite">
             <h3>Recent notation</h3>
             <p id="eventLog">Your ledger is open. The parchment still smells of fresh gall ink.</p>
           </div>
-        </article>
+        </section>
         <aside class="inventory-card" aria-labelledby="inventoryHeading">
           <h2 id="inventoryHeading">Ledger &amp; Inventory</h2>
           <ul class="inventory-list" id="inventoryList"></ul>
@@ -396,6 +458,9 @@
       (function () {
         var intro = document.getElementById('gameIntro');
         var toggle = document.getElementById('introToggle');
+        var shell = document.getElementById('gameShell');
+        var layoutToggle = document.getElementById('layoutToggle');
+        var layoutKey = 'castle_ledger_layout_mode_v1';
         if (!intro || !toggle) {
           return;
         }
@@ -408,6 +473,30 @@
           intro.style.display = intro.style.display === 'none' ? 'grid' : 'none';
           syncIntroToggle();
         });
+        function syncLayoutToggle(mode) {
+          if (!shell || !layoutToggle) {
+            return;
+          }
+          var split = mode !== 'stacked';
+          shell.classList.toggle('layout-split', split);
+          shell.classList.toggle('layout-stacked', !split);
+          layoutToggle.setAttribute('aria-pressed', String(split));
+          layoutToggle.textContent = split ? 'Stack choices' : 'Split into 3 columns';
+        }
+        if (shell && layoutToggle) {
+          var savedMode = null;
+          try {
+            savedMode = window.localStorage.getItem(layoutKey);
+          } catch (error) {}
+          syncLayoutToggle(savedMode === 'stacked' ? 'stacked' : 'split');
+          layoutToggle.addEventListener('click', function () {
+            var nextMode = shell.classList.contains('layout-split') ? 'stacked' : 'split';
+            syncLayoutToggle(nextMode);
+            try {
+              window.localStorage.setItem(layoutKey, nextMode);
+            } catch (error) {}
+          });
+        }
         syncIntroToggle();
       })();
     </script>

@@ -46,6 +46,50 @@
       reportComplete: false,
       earlRewarded: false,
     },
+    meta: {
+      alanbucks: 0,
+    },
+    dlc: {
+      installs: {
+        battle_of_mastings: {
+          installed: false,
+          startedAt: null,
+          completedAt: null,
+        },
+        harbor_of_delays: {
+          installed: false,
+          startedAt: null,
+          completedAt: null,
+        },
+      },
+      battle_of_mastings: {
+        introSeen: false,
+        location: null,
+        visited: {},
+        inventory: {},
+        flags: {},
+        log: [],
+        resources: {
+          readyArrows: 2400,
+          reserveArrows: 1800,
+          spentVolleys: 0,
+          serviceableShields: 640,
+          serviceableHauberks: 280,
+          remountHorses: 190,
+          pigs: 14,
+          ducks: 33,
+          cabbageLoads: 18,
+        },
+        outcome: null,
+      },
+      harbor_of_delays: {
+        location: null,
+        visited: {},
+        inventory: {},
+        flags: {},
+        log: [],
+      },
+    },
     log: ['You arrive on the southern road to Beldane Keep with a satchel of writs and a ledger.'],
   };
 
@@ -64,82 +108,192 @@
     progressNote: document.getElementById('progressNote'),
   };
 
+  const ILLUSTRATION_BASE_DIR = 'assets/illustrations/base';
+
+  function buildIllustration(fileName, alt, caption) {
+    return {
+      illustration: `${ILLUSTRATION_BASE_DIR}/${fileName}`,
+      illustrationAlt: alt,
+      illustrationCaption: caption,
+    };
+  }
+
   const ROOM_ILLUSTRATIONS = {
-    south_road: {
-      illustration: 'assets/illustrations/southern_road.jpeg',
-      illustrationAlt: 'Southern road leading toward Beldane Keep with carts, villagers, and the castle ahead.',
-      illustrationCaption: 'Southern road at daybreak on the approach to Beldane Keep.',
-    },
-    front_drawbridge: {
-      illustration: 'assets/illustrations/front_drawbridge.jpg',
-      illustrationAlt: 'The raised front drawbridge of Beldane Keep above the moat and waiting carts.',
-      illustrationCaption: 'The main drawbridge plaza beneath the gatehouse.',
-    },
-    southeast_shanty: {
-      illustration: 'assets/illustrations/shanties_ropewalkers.jpeg',
-      illustrationAlt: 'Ropewalkers’ shanties and workyards pressed close to the moat.',
-      illustrationCaption: 'The ropewalkers’ quarter of patched roofs, tar, and hemp.',
-    },
-    east_postern: {
-      illustration: 'assets/illustrations/eastern_postern.jpeg',
-      illustrationAlt: 'A narrow eastern postern bridge and side gate set into the castle wall.',
-      illustrationCaption: 'The guarded eastern postern above the waterline.',
-    },
-    northeast_monastery: {
-      illustration: 'assets/illustrations/monastery.jpeg',
-      illustrationAlt: 'Priory gardens and monastery buildings near the northeastern edge of the keep.',
-      illustrationCaption: 'Herb plots and cloister walls beside the priory.',
-    },
-    fishers_huts: {
-      illustration: 'assets/illustrations/fishers_marsh_hut.jpeg',
-      illustrationAlt: 'Marsh huts on stilts with nets, traps, and smoke rising from peat fires.',
-      illustrationCaption: 'Fishers’ huts raised above the northern marsh.',
-    },
-    rear_drawbridge: {
-      illustration: 'assets/illustrations/rear_service_drawbridge.jpeg',
-      illustrationAlt: 'The rear service drawbridge with carts, winches, and the northern service gate.',
-      illustrationCaption: 'The rear service bridge where the winch gear must be secured.',
-    },
-    northwest_hunters: {
-      illustration: 'assets/illustrations/hunters_stand.jpeg',
-      illustrationAlt: 'Hunters’ stands and archery butts with game racks along the moat path.',
-      illustrationCaption: 'The northwestern hunting grounds and practice butts.',
-    },
-    surgeons_pavilion: {
-      illustration: 'assets/illustrations/surgeons_pavilion.jpeg',
-      illustrationAlt: 'A field surgeon’s pavilion with instruments, herbs, and wounded men under treatment.',
-      illustrationCaption: 'The leech’s pavilion beside the archery grounds.',
-    },
-    outer_bailey: {
-      illustration: 'assets/illustrations/outer_bailey.jpeg',
-      illustrationAlt: 'The outer bailey alive with pages, grooms, and movement beneath the keep.',
-      illustrationCaption: 'The busy outer bailey inside Beldane Keep.',
-    },
-    blacksmith_forge: {
-      illustration: 'assets/illustrations/blacksmith.jpg',
-      illustrationAlt: 'A blacksmith’s forge with sparks, bellows, and ironwork in progress.',
-      illustrationCaption: 'Hrodgar’s forge in the inner ward.',
-    },
-    training_yard: {
-      illustration: 'assets/illustrations/training_yard.jpeg',
-      illustrationAlt: 'The training yard with squires drilling, pells, and the master-at-arms overseeing practice.',
-      illustrationCaption: 'The castle training yard under Sir Merrick’s watch.',
-    },
-    kitchens: {
-      illustration: 'assets/illustrations/kitchen.jpeg',
-      illustrationAlt: 'A bustling castle kitchen crowded with spits, tables, and steaming cauldrons.',
-      illustrationCaption: 'The kitchens at full labor beneath the hall.',
-    },
-    great_hall: {
-      illustration: 'assets/illustrations/great_hall.jpeg',
-      illustrationAlt: 'The great hall with banners, stained light, and the earl’s dais at the far end.',
-      illustrationCaption: 'The great hall prepared for petitions and judgment.',
-    },
-    chapel: {
-      illustration: 'assets/illustrations/chapel.jpeg',
-      illustrationAlt: 'The castle chapel lit by candles with altar, incense, and kneeling figures.',
-      illustrationCaption: 'The keep’s candlelit chapel.',
-    },
+    south_road: buildIllustration(
+      'south_road.jpeg',
+      'Southern road leading toward Beldane Keep with carts, villagers, and the castle ahead.',
+      'Southern road at daybreak on the approach to Beldane Keep.'
+    ),
+    south_market_lane: buildIllustration(
+      'south_market_lane.jpeg',
+      'A market lane along the southern wall crowded with vendors, awnings, and muddy wagon ruts.',
+      'The market lane pressed against the southern wall of the keep.'
+    ),
+    pilgrim_shrine: buildIllustration(
+      'pilgrim_shrine.jpeg',
+      'A hawthorn shrine with ribbons, candles, and pilgrims pausing beside the road.',
+      'The hawthorn shrine where travelers leave ribbons and prayers.'
+    ),
+    west_sally_port: buildIllustration(
+      'west_sally_port.jpeg',
+      'A guarded west sally port tucked beneath a squat tower beside the moat.',
+      'The west sally port watching the moat-side path.'
+    ),
+    west_floodgate: buildIllustration(
+      'west_floodgate.jpeg',
+      'A floodgate and sluice where the western moat narrows near timberworks and reeds.',
+      'The west floodgate and its creaking sluiceworks.'
+    ),
+    tanners_yard: buildIllustration(
+      'tanners_yard.jpeg',
+      'A tanners’ yard of stretched hides, drying racks, and sour vats by the wall.',
+      'The tannery yard of hides, vats, and rank wind.'
+    ),
+    front_drawbridge: buildIllustration(
+      'front_drawbridge.jpg',
+      'The raised front drawbridge of Beldane Keep above the moat and waiting carts.',
+      'The main drawbridge plaza beneath the gatehouse.'
+    ),
+    butchers_stall: buildIllustration(
+      'butchers_stall.jpeg',
+      'A butcher’s stall beneath a red awning with chopping block, hooks, and slabs of meat.',
+      'The butcher’s stall near the gatehouse traffic.'
+    ),
+    village_green: buildIllustration(
+      'village_green.jpeg',
+      'A trampled village green with resting minstrels, benches, and children between carts.',
+      'The village green beside the market bustle.'
+    ),
+    southeast_shanty: buildIllustration(
+      'southeast_shanty.jpeg',
+      'Ropewalkers’ shanties and workyards pressed close to the moat.',
+      'The ropewalkers’ quarter of patched roofs, tar, and hemp.'
+    ),
+    ropemaker_shack: buildIllustration(
+      'ropemaker_shack.jpeg',
+      'A rope-maker’s shack crowded with coils, hooks, hemp strands, and drying line.',
+      'Matilde’s rope-maker shack beside the ropewalk.'
+    ),
+    east_mill_stream: buildIllustration(
+      'east_mill_stream.jpeg',
+      'A curving mill stream below the eastern wall with reeds, banks, and a humming sluice.',
+      'The mill stream curving beneath the eastern wall.'
+    ),
+    mill_jetty: buildIllustration(
+      'mill_jetty.jpeg',
+      'A narrow mill jetty of wet planks, sacks, and moored skiffs by the waterwheel.',
+      'The mill jetty at the edge of the rushing stream.'
+    ),
+    east_postern: buildIllustration(
+      'east_postern.jpeg',
+      'A narrow eastern postern bridge and side gate set into the castle wall.',
+      'The guarded eastern postern above the waterline.'
+    ),
+    northeast_monastery: buildIllustration(
+      'northeast_monastery.jpeg',
+      'Priory gardens and monastery buildings near the northeastern edge of the keep.',
+      'Herb plots and cloister walls beside the priory.'
+    ),
+    scriptorium: buildIllustration(
+      'scriptorium.jpeg',
+      'A priory scriptorium of desks, vellum, candles, and winter light through narrow windows.',
+      'The priory scriptorium where Brother Aldwin keeps his texts.'
+    ),
+    north_reed_marsh: buildIllustration(
+      'north_reed_marsh.jpeg',
+      'A damp reed marsh path with plank footing, black water, and mist beyond the priory.',
+      'The reed marsh path running north of the priory.'
+    ),
+    fishers_huts: buildIllustration(
+      'fishers_huts.jpeg',
+      'Marsh huts on stilts with nets, traps, and smoke rising from peat fires.',
+      'Fishers’ huts raised above the northern marsh.'
+    ),
+    rear_drawbridge: buildIllustration(
+      'rear_drawbridge.jpeg',
+      'The rear service drawbridge with carts, winches, and the northern service gate.',
+      'The rear service bridge where the winch gear must be secured.'
+    ),
+    northwest_hunters: buildIllustration(
+      'northwest_hunters.jpeg',
+      'Hunters’ stands and archery butts with game racks along the moat path.',
+      'The northwestern hunting grounds and practice butts.'
+    ),
+    surgeons_pavilion: buildIllustration(
+      'surgeons_pavilion.jpeg',
+      'A field surgeon’s pavilion with instruments, herbs, and wounded men under treatment.',
+      'The leech’s pavilion beside the archery grounds.'
+    ),
+    outer_bailey: buildIllustration(
+      'outer_bailey.jpeg',
+      'The outer bailey alive with pages, grooms, and movement beneath the keep.',
+      'The busy outer bailey inside Beldane Keep.'
+    ),
+    stables: buildIllustration(
+      'stables.jpeg',
+      'The castle stables and pigeon roosts with hay, tack, and grooms under the inner wall.',
+      'The stables and roosts tucked against the inner wall.'
+    ),
+    messenger_loft: buildIllustration(
+      'messenger_loft.jpeg',
+      'A messenger loft above the stables with roost boxes, baskets, and rolled dispatches.',
+      'The messenger loft above the stable yard.'
+    ),
+    blacksmith_forge: buildIllustration(
+      'blacksmith_forge.jpg',
+      'A blacksmith’s forge with sparks, bellows, and ironwork in progress.',
+      'Hrodgar’s forge in the inner ward.'
+    ),
+    training_yard_gate: buildIllustration(
+      'training_yard_gate.jpeg',
+      'A gate into the training yard with practice gear, splintered pells, and watching squires.',
+      'The gate leading into the castle training yard.'
+    ),
+    training_yard: buildIllustration(
+      'training_yard.jpeg',
+      'The training yard with squires drilling, pells, and the master-at-arms overseeing practice.',
+      'The castle training yard under Sir Merrick’s watch.'
+    ),
+    guard_station: buildIllustration(
+      'guard_station.jpeg',
+      'A guard station beneath the wall walk with benches, message tallies, and watch gear.',
+      'The guard station where messages and watches are tallied.'
+    ),
+    great_hall_entry: buildIllustration(
+      'great_hall_entry.jpeg',
+      'A stone stair and landing before the carved doors of the great hall.',
+      'The stair and landing beneath the great hall doors.'
+    ),
+    kitchens: buildIllustration(
+      'kitchens.jpeg',
+      'A bustling castle kitchen crowded with spits, tables, and steaming cauldrons.',
+      'The kitchens at full labor beneath the hall.'
+    ),
+    great_hall: buildIllustration(
+      'great_hall.jpeg',
+      'The great hall with banners, stained light, and the earl’s dais at the far end.',
+      'The great hall prepared for petitions and judgment.'
+    ),
+    solar: buildIllustration(
+      'solar.jpeg',
+      'A steward’s solar with ledgers, shutters, tapestry light, and a table set for private business.',
+      'The steward’s solar beyond the great hall.'
+    ),
+    wall_walk: buildIllustration(
+      'wall_walk.jpeg',
+      'A wall walk overlooking the keep, moat, and surrounding fields from the ramparts.',
+      'The wall walk above the bailey and the roads beyond.'
+    ),
+    chapel: buildIllustration(
+      'chapel.jpeg',
+      'The castle chapel lit by candles with altar, incense, and kneeling figures.',
+      'The keep’s candlelit chapel.'
+    ),
+    archives: buildIllustration(
+      'archives.jpeg',
+      'A cramped archive room of shelves, wax tablets, rolled charters, and locked chests.',
+      'The castle archives of ledgers, rolls, and dust.'
+    ),
   };
 
   function cloneState(value) {
@@ -209,6 +363,26 @@
       }
       if (Array.isArray(raw.log)) {
         next.log = raw.log.slice(-12).map(entry => String(entry));
+      }
+      if (raw.meta && typeof raw.meta === 'object') {
+        const alanbucks = Number(raw.meta.alanbucks);
+        next.meta.alanbucks = Number.isFinite(alanbucks) ? alanbucks : 0;
+      }
+      if (raw.dlc && typeof raw.dlc === 'object') {
+        next.dlc = cloneState(raw.dlc);
+        const installs = next.dlc.installs && typeof next.dlc.installs === 'object' ? next.dlc.installs : {};
+        next.dlc.installs = {
+          battle_of_mastings: {
+            installed: Boolean(installs.battle_of_mastings?.installed),
+            startedAt: Number.isFinite(Number(installs.battle_of_mastings?.startedAt)) ? Number(installs.battle_of_mastings.startedAt) : null,
+            completedAt: Number.isFinite(Number(installs.battle_of_mastings?.completedAt)) ? Number(installs.battle_of_mastings.completedAt) : null,
+          },
+          harbor_of_delays: {
+            installed: Boolean(installs.harbor_of_delays?.installed),
+            startedAt: Number.isFinite(Number(installs.harbor_of_delays?.startedAt)) ? Number(installs.harbor_of_delays.startedAt) : null,
+            completedAt: Number.isFinite(Number(installs.harbor_of_delays?.completedAt)) ? Number(installs.harbor_of_delays.completedAt) : null,
+          },
+        };
       }
     }
     saveState(next);
@@ -312,6 +486,9 @@
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'option-button';
+        if (option.className) {
+          button.classList.add(option.className);
+        }
         button.textContent = option.label;
         if (option.disabled) {
           button.disabled = true;
@@ -402,6 +579,7 @@
       },
       disabled: Boolean(config.disabled),
       hidden: Boolean(config.hidden),
+      className: config.className || '',
     });
   }
 
@@ -429,6 +607,7 @@
 
   const ROOMS = {
     south_road: state => {
+      const battleInstalled = Boolean(state.dlc?.installs?.battle_of_mastings?.installed);
       const description = [
         'The southern road rises gently toward Beldane Keep. Wagon ruts trace muddy grooves past carts stacked with barley sheaves. A thatcher hums while repairing a roadside shelter, and smoke from the castle kitchens drifts on the wind.',
         'Children play at knights with willow sticks, pausing to stare as you pass. The keep’s front drawbridge looms ahead, chains taut above the moat’s green sheen.'
@@ -442,6 +621,12 @@
       addOption(options, 'Continue along the lane toward the market bustle by the southern wall', () => setLocation('south_market_lane', 'You follow the wagon ruts toward the market lane.'));
       addOption(options, 'Circle west along the moat toward the dyers’ yards', () => setLocation('west_sally_port', 'You skirt the moat’s edge toward the west sally port.'));
       addOption(options, 'Visit the hawthorn shrine tended by passing pilgrims', () => setLocation('pilgrim_shrine', 'You bow your head and step beneath the hawthorn branches.'));
+      addOption(options, 'Review the ledger extras and DLC installations', () => {
+        window.location.href = 'dlc/';
+      });
+      addOption(options, 'Jump straight to The Battle of Mastings', () => {
+        window.location.href = 'dlc/battle-of-mastings-play.html';
+      }, { disabled: !battleInstalled });
       return {
         title: 'Southern Road to Beldane Keep',
         meta: 'Outer ring — South road approach',
@@ -1305,6 +1490,8 @@
       };
     },
     archives: state => {
+      const battleInstalled = Boolean(state.dlc?.installs?.battle_of_mastings?.installed);
+      const battleIntroSeen = Boolean(state.dlc?.battle_of_mastings?.introSeen);
       const description = [
         'Shelves of scrolls line the castle archives. Wooden boxes labeled with decades of tithe rolls rest beside survey maps inked in precise hand. A clerk sharpens goose quills at a tall desk.'
       ];
@@ -1313,6 +1500,9 @@
         appendLog('You confirm the toll rates you quoted outside match last year’s rolls—no magistrate will catch you unprepared.');
         saveState();
       });
+      addOption(options, battleIntroSeen ? 'Reopen the Mastings campaign ledger (DLC)' : 'Open the sealed summons for Mastings Field (DLC)', () => {
+        window.location.href = battleIntroSeen ? 'dlc/battle-of-mastings-play.html' : 'dlc/battle-of-mastings-play.html?entry=story';
+      }, { disabled: !battleInstalled, className: 'option-button--dlc' });
       addOption(options, 'Return to the great hall entry', () => setLocation('great_hall_entry', 'You close the archive door softly.'));
       return {
         title: 'Castle Archives',
@@ -1328,7 +1518,10 @@
 
   if (SELECTORS.resetButton) {
     SELECTORS.resetButton.addEventListener('click', () => {
-      overwriteState(cloneState(DEFAULT_STATE));
+      const resetState = cloneState(DEFAULT_STATE);
+      resetState.meta = cloneState(state.meta || DEFAULT_STATE.meta);
+      resetState.dlc = cloneState(state.dlc || DEFAULT_STATE.dlc);
+      overwriteState(resetState);
       appendLog('You close the ledger, scrape the wax smooth, and begin anew.');
       render();
     });

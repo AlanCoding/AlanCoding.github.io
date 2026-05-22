@@ -3,6 +3,43 @@ layout: default
 permalink: /projects/
 ---
 
+<style>
+  .projects-dlc-showcase {
+    margin: 2rem 0 2.5rem;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .projects-dlc-showcase__heading {
+    margin: 0;
+  }
+
+  .projects-dlc-showcase__grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .projects-dlc-banner {
+    margin: 0;
+    overflow: hidden;
+    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 16px 28px rgba(0, 0, 0, 0.08);
+  }
+
+  .projects-dlc-banner img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .projects-dlc-banner figcaption {
+    padding: 0.9rem 1rem 1rem;
+    line-height: 1.5;
+  }
+</style>
+
 <div class="achievements-page">
   <nav class="achievements-nav" aria-label="Game navigation">
     <a class="achievements-nav__link" href="{{ '/' | relative_url }}">&larr; Back to home</a>
@@ -98,7 +135,7 @@ permalink: /projects/
           <h2>
             <a class="achievement-card__title-link" href="{{ '/projects/castle-ledger/' | relative_url }}">Castle Ledger Chronicle</a>
           </h2>
-          <p class="achievement-card__lead">Trace your route, quests, and supplies while circling the keep.</p>
+          <p class="achievement-card__lead">Trace your route, quests, and supplies while circling the keep. <strong>new DLC!</strong></p>
         </div>
       </header>
       <table class="achievement-table achievement-table--facts">
@@ -107,6 +144,37 @@ permalink: /projects/
       <p id="castleEmpty" class="achievement-empty" hidden>Walk the walls of Beldane Keep to begin recording your chronicles.</p>
       <p class="achievement-card__footnote">Need a nudge? Consult the <a href="{{ '/projects/castle-ledger/spoilers.html' | relative_url }}">Castle Ledger spoilers</a>.</p>
     </article>
+  </section>
+
+  <section class="projects-dlc-showcase" aria-labelledby="projectsDlcHeading">
+    <div>
+      <h2 id="projectsDlcHeading" class="projects-dlc-showcase__heading">Castle Ledger DLC</h2>
+      <p>Two new expansion areas are on the way.</p>
+    </div>
+    <div class="projects-dlc-showcase__grid">
+      <figure class="projects-dlc-banner">
+        <a href="{{ '/projects/castle-ledger/dlc/battle-of-mastings.html' | relative_url }}">
+          <img
+            src="{{ '/projects/castle-ledger/assets/illustrations/dlc/battle_of_mastings_large.jpeg' | relative_url }}"
+            alt="Promotional banner for the Battle of Mastings DLC showing medieval battle chaos and a taunt about Duke Gilliam's arrow count."
+            loading="lazy"
+            decoding="async"
+          />
+        </a>
+        <figcaption><strong><a href="{{ '/projects/castle-ledger/dlc/battle-of-mastings.html' | relative_url }}">The Battle of Mastings</a></strong>: Duke Gilliam’s arrow count will not survive inspection.</figcaption>
+      </figure>
+      <figure class="projects-dlc-banner">
+        <a href="{{ '/projects/castle-ledger/dlc/harbor-of-delays.html' | relative_url }}">
+          <img
+            src="{{ '/projects/castle-ledger/assets/illustrations/dlc/harbor_of_delays_large.jpeg' | relative_url }}"
+            alt="Promotional banner for the Harbor of Delays DLC showing crowded docks, ships, and maritime bustle."
+            loading="lazy"
+            decoding="async"
+          />
+        </a>
+        <figcaption><strong><a href="{{ '/projects/castle-ledger/dlc/harbor-of-delays.html' | relative_url }}">Harbor of Delays</a></strong>: ropes, tides, manifests, and one impossible ship launch.</figcaption>
+      </figure>
+    </div>
   </section>
 
   <section class="achievements-trophies" aria-labelledby="trophiesHeading">

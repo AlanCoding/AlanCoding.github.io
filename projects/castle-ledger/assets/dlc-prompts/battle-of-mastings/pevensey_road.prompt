@@ -1,0 +1,21 @@
+# Pevensey Road — Illustration Prompt
+
+## Castle Ledger Illustration Prompt Template
+
+Use the following structure for every generated image:
+
+**Base Prompt**  
+Create a richly detailed, roughly square digital painting sized to sit beside narrative text on desktop or mobile screens. Depict a grounded late-medieval world centered on the Battle of Mastings parody campaign with historically accurate 11th-century Norman and Anglo-Saxon clothing, equipment, carts, standards, and architecture. Emphasize tactile materials—weathered wood, damp wool, iron rings, parchment, wax, horse tack, mud, and linen—and naturalistic light with gentle bloom. Compose the scene with measured perspective and painterly realism reminiscent of manuscript illuminations and early panel paintings, avoiding exaggerated proportions or stylization. Keep the palette earthy with selective heraldic accents in crimson, deep blue, faded gold, and weathered dragon-red.
+
+**Rendering Guidance**  
+- Framing: focus on the named location or grouping, filling most of the frame while leaving breathable space above and below so the artwork can stack with text.  
+- Aspect & scale: aim for a square canvas that could crop cleanly; no cinematic black bars.  
+- Lighting: natural ambient light with localized highlights from candles, braziers, dawn, or cloudy sky to guide the eye.  
+- Mood: grimly practical, historically grounded, and full of logistic tension rather than heroic fantasy posing.  
+- Avoid: modern objects, anachronistic plate armor, fantasy castles, visible UI, or text overlays.
+
+## Location-Specific Direction
+- Composition: broad invasion road scene with supply carts, muddy ruts, camp followers, and the distant sprawl of Gilliam’s camp beyond.
+- Key elements: carts of arrows and pork, horse lines branching off one side, a Roman ruin silhouette in another direction, banners and tents deeper ahead.
+- Character focus: the player-clerk arriving awkwardly among hardened campaign workers who already seem too busy to explain anything.
+- Navigation hint: leave multiple visible route cues toward the Roman fort, the wagon park, the mass tent, and the line leading toward Senlac.

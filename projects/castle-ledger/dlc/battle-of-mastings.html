@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>The Battle of Mastings DLC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { margin: 0; font-family: "EB Garamond", serif; background: #f3ede2; color: #2c241d; }
+      main { width: min(100%, 1100px); margin: 0 auto; padding: 1.5rem; display: grid; gap: 1.5rem; }
+      a { color: #633728; }
+      .top { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+      .balance { padding: 0.65rem 0.95rem; border-radius: 999px; background: #fff8ef; border: 1px solid #d0c1ab; font-weight: 600; }
+      .banner { background: #fffaf2; border: 1px solid #d7c7b0; border-radius: 18px; overflow: hidden; }
+      .banner img { display: block; width: 100%; height: auto; }
+      .copy { padding: 1rem; }
+      .actions { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; }
+      button { font: inherit; padding: 0.7rem 1rem; }
+      .status { font-family: system-ui, sans-serif; font-size: 0.95rem; }
+      #playLink[hidden] { display: none; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="top">
+        <a href="index.html">Back to DLC hub</a>
+        <a href="../">Back to Castle Ledger</a>
+        <div class="balance">Balance: <span id="alanbucksBalance">0 alanbucks</span></div>
+      </div>
+      <article class="banner">
+        <img src="../assets/illustrations/dlc/battle_of_mastings_large.jpeg" alt="Battle of Mastings banner" />
+        <div class="copy">
+          <h1>The Battle of Mastings</h1>
+          <p>Enter the camp of Duke Gilliam of Mormandy, count the arrows badly, and decide which side learns to regret your presence.</p>
+          <div class="actions">
+            <button type="button" id="installButton">Install DLC</button>
+            <a id="playLink" href="battle-of-mastings-play.html" hidden>Open The Battle of Mastings</a>
+            <a id="addFundsLink" href="alanbucks.html">Add alanbucks</a>
+            <span class="status" id="installStatus"></span>
+          </div>
+        </div>
+      </article>
+    </main>
+    <script type="module" src="store.js?v=2"></script>
+  </body>
+</html>

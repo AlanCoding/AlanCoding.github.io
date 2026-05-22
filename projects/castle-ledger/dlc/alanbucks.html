@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Add Alanbucks</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { margin: 0; font-family: "EB Garamond", serif; background: #f3ede2; color: #2c241d; }
+      main { width: min(100%, 760px); margin: 0 auto; padding: 1.5rem; display: grid; gap: 1.25rem; }
+      form, .card { background: #fffaf2; border: 1px solid #d7c7b0; border-radius: 18px; padding: 1rem; }
+      label { display: grid; gap: 0.35rem; margin-bottom: 0.9rem; font-family: system-ui, sans-serif; font-size: 0.95rem; }
+      input, select, button { font: inherit; padding: 0.7rem 0.8rem; }
+      .top { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+      .balance { padding: 0.65rem 0.95rem; border-radius: 999px; background: #fff8ef; border: 1px solid #d0c1ab; font-weight: 600; }
+      #checkoutMessage { font-family: system-ui, sans-serif; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="top">
+        <a href="index.html">Back to DLC hub</a>
+        <a href="../">Back to Castle Ledger</a>
+        <div class="balance">Balance: <span id="alanbucksBalance">0 alanbucks</span></div>
+      </div>
+      <header>
+        <h1>Add Alanbucks</h1>
+        <p>The local processor accepts all major cards, minor cards, and silence.</p>
+      </header>
+      <form id="alanbucksCheckout">
+        <label>
+          Alanbucks bundle
+          <select id="alanbucksBundle" name="alanbucks_bundle"></select>
+        </label>
+        <label>
+          Name on card
+          <input type="text" name="cc_name" autocomplete="cc-name" />
+        </label>
+        <label>
+          Card number
+          <input type="text" inputmode="numeric" name="cc_number" autocomplete="cc-number" />
+        </label>
+        <label>
+          Expiration
+          <input type="text" name="cc_exp" autocomplete="cc-exp" />
+        </label>
+        <label>
+          Security code
+          <input type="text" inputmode="numeric" name="cc_csc" autocomplete="cc-csc" />
+        </label>
+        <button type="submit">Credit alanbucks locally</button>
+      </form>
+      <div class="card">
+        <p id="checkoutMessage">No transaction has been unnecessarily dramatized yet.</p>
+      </div>
+    </main>
+    <script type="module" src="store.js?v=2"></script>
+  </body>
+</html>
