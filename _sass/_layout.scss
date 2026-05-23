@@ -519,6 +519,20 @@
     color: $grey-color-dark;
 }
 
+.concept-gallery--stacked {
+    grid-template-columns: 1fr;
+    gap: $spacing-unit;
+}
+
+.concept-gallery__heading {
+    margin: 0;
+    padding-bottom: 0.35rem;
+    border-bottom: 2px solid rgba(148, 163, 184, 0.35);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
 .home-divider {
     margin: ($spacing-unit * 1.5) 0;
     border: 0;

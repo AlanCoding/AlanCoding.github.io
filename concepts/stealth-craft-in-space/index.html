@@ -20,13 +20,31 @@ permalink: /concepts/stealth-craft-in-space/
   <section class="concept-page__section">
     <h2>Notes</h2>
     <p>
-      Two candidate geometries here are the inverted-hourglass pass-through idea and very long tube arrangements that complicate direct observation and passive heating assumptions.
+      A spacecraft in the inner solar system is hard to hide because sunlight illuminates it. If the craft simply absorbs sunlight, it must eventually dump that energy as infrared radiation, making it detectable. If it reflects sunlight, it also creates an occultation to anything behind it. So the engineering problem is not “make an invisible ship,” but more narrowly: <strong>how can a spacecraft avoid absorbing most of the solar power that falls on its cross-section?</strong>
     </p>
-    <div class="concept-gallery">
+    <p>
+      The simplest good design is a <strong>sunward mirror-reflector craft</strong>. It points a highly reflective mirror at the Sun and throws most of the incident sunlight back roughly toward the Sun instead of letting it hit the spacecraft body. This does not preserve the solar beam behind the vehicle, so occultations are detectable, but it greatly reduces the absorbed heat load if the mirror is good.
+    </p>
+    <p>
+      A more extreme variant of the same idea is the <strong>long, narrow reflector craft</strong>, with a length-to-diameter ratio around <strong>60</strong>. In that case, the front still handles the main solar flux, but any leakage or grazing illumination along the hull strikes at very shallow angles. If mirror absorption falls strongly at low grazing angles, the absorption fraction can be orders of magnitude lower, with the ratio of 60 being optimized for maximum volume divided by heat input. This is a non-obvious conclusion. Future mirror designs are unlikely to change the fundamental effect.
+    </p>
+    <p>
+      The most ambitious design is the <strong>pass-through mirror craft</strong>, or inverse-hourglass geometry. Instead of reflecting sunlight back sunward, mirrors route incoming sunlight inward through a central throat and then back outward so that it exits behind the craft inside the original solar angular cone. The spacecraft structure occupies the dark region outside that hourglass-shaped light path, so the hull stays in shadow while the sunlight is passed around the payload. In the ideal parallel-ray version this is a clean two-mirror geometry, but the real Sun has a finite angular radius, so some rays form displaced “skirts” that must be corrected with additional mirror surfaces. That makes it harder than the simple reflector, but it is conceptually the strongest design for stealth because it eliminates most optical evidence that anything was there.
+    </p>
+    <div class="concept-gallery concept-gallery--stacked">
+      <h3 class="concept-gallery__heading">Long-Tube Design: Cryogenic Reflector</h3>
       <figure>
         <img src="{{ '/concepts/assets/stealth-craft-in-space/1_cryo_reflector.png' | relative_url }}" alt="Cryogenic reflector concept for reducing spacecraft detectability" />
         <figcaption>Cryogenic reflector variant.</figcaption>
       </figure>
+
+      <h3 class="concept-gallery__heading">Long-Tube Design: Top Oblique View</h3>
+      <figure>
+        <img src="{{ '/concepts/assets/stealth-craft-in-space/CAM_top_oblique.png' | relative_url }}" alt="Long-tube stealth spacecraft shown from a top oblique angle" />
+        <figcaption>Top oblique render of the long-tube geometry.</figcaption>
+      </figure>
+
+      <h3 class="concept-gallery__heading">Long-Tube Design: Pass-Through Geometry</h3>
       <figure>
         <img src="{{ '/concepts/assets/stealth-craft-in-space/4b_hourglass_beta_1p0_extremal.png' | relative_url }}" alt="Hourglass stealth geometry showing a pass-through optical layout" />
         <figcaption>Hourglass pass-through geometry.</figcaption>
