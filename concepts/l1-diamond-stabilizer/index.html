@@ -3,6 +3,18 @@ layout: default
 permalink: /concepts/l1-diamond-stabilizer/
 ---
 
+<style>
+  .concept-gallery figure.concept-figure--natural {
+    text-align: center;
+  }
+
+  .concept-gallery figure.concept-figure--natural img {
+    width: auto;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+</style>
+
 <div class="concept-page">
   <nav class="achievements-nav" aria-label="Concept navigation">
     <a class="achievements-nav__link" href="{{ '/concepts/' | relative_url }}">&larr; Back to concepts</a>
@@ -20,7 +32,7 @@ permalink: /concepts/l1-diamond-stabilizer/
   <section class="concept-page__section">
     <h2>Motivation</h2>
     <p>
-      The diamond stabilizer is a specific form of a concept I dreamed about for years, without being able to put into a form. AI did somewhat help me with this, but it cannot actually advance it on its own.
+      The diamond stabilizer is a specific form of a concept I dreamed about for years, without being able to put into a form. Talking to AI did help me settle on the geometry, but AI doesn't seem to like to come up with new things on its own. It is always me doing a "what if..." and refining.
     </p>
     <p>
       The broader idea, which I <a href="https://space.stackexchange.com/questions/1926/are-there-propellant-less-ways-to-balance-at-an-unstable-orbital-point">asked about on Physics Stack Exchange long ago</a>, is that you use a pole like a tightrope walker. If you go off balance, you move the pole to restore your position. This solves a real problem of keeping you centered around an unstable orbit.
@@ -48,10 +60,13 @@ permalink: /concepts/l1-diamond-stabilizer/
       The reason for the diamond shape is that you can squish it to elongate in one direction or the other, in a way where the moment of inertia of the total structure does not change. That means it keeps rotating at the same angular velocity before and after the squish, namely the angular velocity of the Earth-Moon system.
     </p>
     <p>
-      This isolates torsional effects and lets you produce a pure shape change in the rotating frame of reference. You are not first paying a penalty to spin the whole thing up or slow it down just to get the geometry you want.
+      This isolates torsional effects and lets you produce a pure shape change in the rotating frame of reference.
     </p>
     <p>
-      Those shape changes then lead to a very, very tiny acceleration because Earth and Moon have different gravitational-field shapes, mostly because they are different sizes. Exploiting those small accelerations can offset drift from the orbital instability and let you generally move yourself around, within some limits.
+      Those shape changes then lead to a very, very tiny acceleration because Earth and Moon have different gravitational-field shapes, mostly because they are different sizes. Exploiting those small accelerations can offset drift from the orbital instability and let you generally move around, within some limits.
+    </p>
+    <p>
+      More specifically, you would use this to balance the saddle-point instability at Earth-Moon L1 with a basic PID controller. This only balances along the Earth-moon line. The other directions are stable.
     </p>
     <p>
       What this means in practice...
@@ -62,12 +77,21 @@ permalink: /concepts/l1-diamond-stabilizer/
     <p>
       The L1 point is also special because it gives fantastic Delta V approaches to all of our most important destinations. The main reason against using it is actually solved by this scheme. The main downside is that it is very large and multi-component. So this is only useful when we are already significantly space-faring, but there's a good argument that it will be useful at that point. It can manage to work its way into many other grand archectures in the cislunar system. Another drawback that I think humans haven't processed yet is that you can only have 1 of these systems at the Earth-Moon L1 point, so we would all have to agree on many governance issues of the system. And we don't have a great track record for these things.
     </p>
+    <div class="concept-gallery">
+      <figure class="concept-figure--natural">
+        <img src="{{ '/concepts/assets/l1-diamond-stabilizer/diamond_moon_background.png' | relative_url }}" alt="Render of the L1 diamond stabilizer with the Moon in the background" />
+        <figcaption>Blender render of the L1 diamond stabilizer with the Moon in the background.</figcaption>
+      </figure>
+    </div>
   </section>
 
   <section class="concept-page__section">
     <h2>What I don't know</h2>
     <p>
       What I do not know is how, or if, you would correct for perturbations in and out of the plane. The diamond could extend in 3 dimensions into a rectangular octahedron. You can draw that shape, but I do not know what the control law for it would look like.
+    </p>
+    <p>
+      Again, the L1 point is unstable in 1 axis, and the 2 other axes are stable. But you still want to be able to dampen in those 2 directions. So dampening motion in the orbital forward-reverse direction is <em>also</em> a problem, very similar to how in-and-out of plane movement is a problem. You're not stabilizing, you're just dampening... but, how do you do that without messing up control in the other direction? That's actually a quite complex question, but I believe it can probably have a very full and satisfying solution.
     </p>
     <p>
       Another thing I do not know is the contingency-case story. The L1 location is super useful because it can reach so many other orbits with small initial-condition changes, but that is a double-edged sword because people will worry about it hitting Earth. I do not know generally if I have this correct, and the problem needs a lot more specific color on it.

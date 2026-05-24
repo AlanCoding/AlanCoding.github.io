@@ -3,6 +3,12 @@ layout: default
 permalink: /concepts/petawatt-radiators/
 ---
 
+<style>
+  .concept-page__section h3 {
+    margin-top: 1.6rem;
+  }
+</style>
+
 <div class="concept-page">
   <nav class="achievements-nav" aria-label="Concept navigation">
     <a class="achievements-nav__link" href="{{ '/concepts/' | relative_url }}">&larr; Back to concepts</a>
@@ -37,76 +43,54 @@ permalink: /concepts/petawatt-radiators/
   <section class="concept-page__section">
     <h2>Basic Design Directions</h2>
     <p>
-      At sufficient scale, the core problem for a space habitat, and at this point I prefer to call it a city, is <strong>concentrated low-temperature heat rejection</strong>. A large habitat may contain enormous industry, atmosphere, and rotating artificial-gravity structures, but all of its waste heat still has to cross some boundary and radiate to space.
+      At sufficient scale, the core problem for a space habitat (and at this point I prefer to call it a city) is <strong>concentrated low-temperature heat rejection</strong>. A large habitat may contain enormous industry, atmosphere, and rotating artificial-gravity structures, but all of its waste heat still has to cross some boundary and radiate to space.
     </p>
     <p>
-      Small spacecraft solve this with coolant loops and fixed radiators. Small habitat concepts, less than roughly a billion people, often avoid the problem by assuming the hull itself has enough surface area, or by quietly limiting the power use to whatever the hull can reject. This project starts where those assumptions fail: the habitat is compact compared with the radiator it needs, and the pressure boundary is too small and too temperature-constrained to be the main radiator.
+      Small spacecraft solve this with coolant loops and fixed radiators. Small habitat concepts, less than roughly a billion people, can avoid the problem by assuming the hull itself has enough surface area, or by limiting the power use to whatever the surface area can reject. This idea starts where the heat production inside of a volume exceeds the ability of its surface area to radiate that heat away. This is the point at which the radiator starts to become the largest physical part.
     </p>
 
-    <h3>What This Is Not</h3>
+    <h3>Need for Concentrating Radiator</h3>
+    <p>
+      In a Dyson Swarm, the entire 1 AU sphere is the radiator. I find this very unsatisfying, because it requires that the computation is distributed throughout that space. If you are trying to build the most powerful computer possible, then you've left an optimization on the table, due to introducing latency limited by speed-of-light, and <a href="https://en.wikipedia.org/wiki/Amdahl%27s_law">Amdahl's Law</a> is pretty fundamental.
+    </p>
+    <p>
+      Humans exhibit this same propensity by concentrating in cities even when this carries financial disincentives like high rent. Whatever our future society is, density will still be a premium. So we should assume there is incentive to create a 3D space where energy-intensive activities are happening. Additional intentional structures to transport that heat out will therefore be justified.
+    </p>
+    <p>
+      Coolant loops don't work on this scale, you need to make use of the low-friction vacuum you're already in, even with the additional complications that poses to get the energy back into pressurized space. Fe-Ni is the natural material baseline because it is abundant in asteroids and can be used with minimal processing. So now we're talking about large roadways of great big blocks of metal going in and out of the city so that the city can burn brighter.
+    </p>
+    <p>
+      Other radiator concepts might not do this, but what they enable just is not as grand. So this is worth some thought.
+    </p>
+
+    <h3>Cold-Tour Design</h3>
+    <p>
+      The first design decision is the cold-tour metal movement pattern. This is how the hot metal leaves the city, spends time out in vacuum radiating, and then comes back cold enough to be useful again.
+    </p>
     <ul class="concept-page__links">
-      <li>a Dyson swarm, because the heat source is not distributed over astronomical distances.</li>
-      <li>just “make the hull colder,” because the hull area becomes insufficient.</li>
-      <li>merely a bigger spacecraft coolant loop, because kilometer-to-planet-scale plumbing becomes the dominant machine.</li>
-      <li><strong>What it is:</strong> a way to attach a compact heat-producing civilization to an external radiator system much larger than the city itself.</li>
+      <li><strong>Ribbon loop:</strong> continuous or semi-continuous ribbons go out from the city, bake in reverse, and come back on a long loop. The picture here shows a spherical design, but I believe a torus design would be the chosen one. The loops themselves are inherently circles.</li>
+      <li><strong>Tethered kite:</strong> large radiator kites leave folded, open up for the cold-tour, and stay mechanically controlled through a tethered return path.</li>
+      <li><strong>Semi-tethered kite:</strong> the kite is let go once it reaches its bake location, and instead of pulling from a single tether, it works against a diffuse superstructure, more like a tether spiderweb.</li>
     </ul>
 
+    <h3>Transfer Yard Details</h3>
     <p>
-      In all of the designs here, power, and thus all scaling, is mass-constrained, so Fe-Ni is the natural baseline because it is abundant and can be used with minimal processing. The radiator is therefore not best imagined as a thin magical panel. It is <strong>blocks of metal</strong> being thermally charged and discharged.
-    </p>
-
-    <h3>Moving Solid Radiator Loop</h3>
-    <p>
-      The first design family is the <strong>moving solid radiator loop</strong>. Instead of pumping coolant through a vast fixed radiator, the system moves solid radiator mass through a repeating cycle. Cold Fe-Ni metal arrives near the city, receives heat through fixed heat exchangers that cross the pressure boundary, leaves hot, spreads through vacuum, radiates to space over a long cold part of the loop, and eventually returns cold again.
+      The next decision design is how the metal blocks transfer heat to the city.
     </p>
     <ul class="concept-page__links">
-      <li><strong>Ribbon loop:</strong> continuous or semi-continuous strips of metal pass through a compact heat-transfer region, then arc outward through a much larger cold radiating path.</li>
-      <li><strong>Accordion pages:</strong> folded slabs or pages open up for radiative exposure, then fold or stack for handling near the city.</li>
-      <li><strong>Layered ribbons:</strong> many ribbons pass over and under one another, increasing the amount of heat-transfer area available near the city while accepting partial self-shielding during the cold part of the tour.</li>
-      <li><strong>Discrete blocks/pages:</strong> instead of one continuous ribbon, the radiator can be made from many independent metal elements that circulate through the same thermal cycle.</li>
+      <li><strong>Outside conduction:</strong> folding pages or related structures touch the outside of the pressurized areas and conduct heat across that boundary.</li>
+      <li><strong>Designed airlock transfer:</strong> move the hot or cold blocks through a specially designed airlock and do the transfer more directly.</li>
+      <li><strong>Radiative-to-radiative transfer:</strong> transfer heat without slowing down for direct contact. This still needs more elaboration, and people will love to hate it.</li>
     </ul>
 
-    <h3>Cold-Ship Or Tethered-Kite Radiator</h3>
+    <h3>Thermal Impedance Matching</h3>
     <p>
-      The second family is the <strong>cold-ship or tethered-kite radiator</strong>. Here the radiator mass is divided into large deployable vehicles or kites. Each kite leaves the city folded and mechanically controlled, deploys into a broad flat radiator during its cold tour, then folds and returns for another heat-loading pass.
-    </p>
-    <p>
-      This solves one of the major weaknesses of a loose swarm: the radiator mass does not simply drift around hoping self-gravity and orbital timing recover it. It remains mechanically connected or recoverable through tethers, winches, momentum exchange, or a larger spiderweb-like logistics network.
+      Finally, there is thermal impedance matching. The transfer to the city has to go faster than the cold-tour, so these are ways to speed up the relative rate of transfer on the city side.
     </p>
     <ul class="concept-page__links">
-      <li><strong>Folded transport mode:</strong> compact shape for launch, capture, and passage through the heat-transfer infrastructure.</li>
-      <li><strong>Deployed radiator mode:</strong> broad, flat, thin geometry for radiating heat efficiently.</li>
-      <li><strong>Tethered return:</strong> mechanical retention replaces fragile reliance on self-gravity alone.</li>
-      <li><strong>Main scaling limit:</strong> low-temperature heat payload per kilogram limits acceptable velocity, so very large cold tours imply long cycle times.</li>
-    </ul>
-
-    <h3>Radiative-To-Radiative Swarm</h3>
-    <p>
-      The third family is the <strong>radiative-to-radiative swarm</strong>. This is the weirdest-looking option, but possibly the most important at the largest scales. Instead of requiring every kilogram of radiator metal to physically return to the city after every cycle, one radiating population can exchange heat with another radiating population through open space.
-    </p>
-    <p>
-      The system becomes more like a sparse shell, torus, or ring swarm surrounding the heat source. This may reduce the velocity problem that hurts cold ships, because the system can pass heat outward through radiation between large populations rather than moving all hot material through one compact pickup point.
-    </p>
-    <ul class="concept-page__links">
-      <li><strong>Sparse ring swarm:</strong> many large radiator paths pass near or through the heat source region, then spread outward into a much larger cold geometry.</li>
-      <li><strong>Torus-like swarm:</strong> radiator material circulates in a thick ring around the city, with momentum exchange and self-gravity helping shape the flow.</li>
-      <li><strong>Spherical shell / cold cloud:</strong> the radiator becomes an enormous, low-density cloud or shell with average optical coverage rather than clean solid panels.</li>
-      <li><strong>Radiative cascade:</strong> heat moves outward by radiation between bodies, reducing the need for every radiator element to mechanically dock with the city each cycle.</li>
-    </ul>
-
-    <h3>Cross-Cutting Constraint</h3>
-    <p>
-      Across all of these options, a physics constraint is <strong>thermal matching</strong> between vacuum radiation and metal conduction. Heat must conduct from the interior of a page or slab to its surface, while the surface radiates to space. If the metal is too thick, the interior does not cool effectively during the cycle. If it is too thin, the system becomes dominated by handling, structure, and huge numbers of fragile elements.
-    </p>
-    <p>
-      The useful designs are therefore not just more metal or more area, but geometries that keep conduction time, radiation time, logistics time, and city-side heat-transfer rate in the same rough range.
-    </p>
-    <ul class="concept-page__links">
-      <li><strong>Thicker metal:</strong> stores more heat per square meter, but becomes conduction-limited.</li>
-      <li><strong>Thinner metal:</strong> radiates well, but creates too much mechanical inventory.</li>
-      <li><strong>More layers:</strong> increases city-side throughput while tolerating some cold-side self-shielding.</li>
-      <li><strong>Larger radius:</strong> gives more cold-tour time and area, but increases logistics delay.</li>
-      <li><strong>Higher temperature:</strong> makes radiation much easier, but moves away from the low-temperature habitat-radiator goal.</li>
+      <li><strong>Folding pages:</strong> create more transfer area near the city without needing the whole cold-tour geometry to have that same density.</li>
+      <li><strong>Layered ribbons:</strong> stack more transfer passes near the city even if the outer cold-tour stays sparse.</li>
+      <li><strong>Extra folding for kites:</strong> for kite designs, another layer of folding might be used so they turtle up during transit to and from the city.</li>
     </ul>
   </section>
 
