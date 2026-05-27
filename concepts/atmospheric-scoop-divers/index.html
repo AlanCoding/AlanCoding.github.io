@@ -18,15 +18,15 @@ permalink: /concepts/atmospheric-scoop-divers/
   </header>
 
   <section class="concept-page__section">
-    <h2>Notes</h2>
+    <h2>Basic Idea</h2>
     <p>
-      Others have written papers on steady hypersonic flight in orbit, using atmosphere to maintain speed. This is a very hard problem and I believe it likely will not work.
+      <a href="https://www.esa.int/Enabling_Support/Space_Engineering_Technology/Shaping_the_Future/Atmosphere-breathing_electric_propulsion_systems_for_very_low_orbit">ABEP</a> is an idea for capturing gas in a low Earth orbit (presumed circular) and ejecting it at higher speed to gain momentum. There is punishingly little engineering margin at the speeds involved and if it does work, it's really hard to make it work as a propellant exporter for other missions.
     </p>
     <p>
       What I am positing instead is that it might work in a non-steady-state way. That means using an elliptical orbit with a regular dive phase into atmosphere, followed by a coast phase back out of it.
     </p>
     <p>
-      That offers several advantages. One is active cooling, which can be refreshed in the coast phase. You cannot lose any coolant, so the vehicle needs to remain closed until close to perigee, at which point it can open its mouth and let the bow shock keep the new air and the coolant in place.
+      That offers several advantages. One is <strong>active cooling</strong>, which can be refreshed in the coast phase. You cannot lose any coolant, so the vehicle needs to remain closed until close to perigee, at which point it can open its mouth and let the bow shock keep the new air and the coolant in place.
     </p>
     <p>
       The upper levels of Earth's atmosphere are mostly molecular oxygen, and that kind of sucks if what you really want is nitrogen. Oxygen is still useful, and in some architectures it could even be the point, but it brings additional handling and storage challenges and does not solve the big atmosphere-fill problem for space habitats.
@@ -43,16 +43,33 @@ permalink: /concepts/atmospheric-scoop-divers/
     <p>
       There is some angular weirdness involved in thrusting, but I do not currently think that is the real blocker.
     </p>
-    <div class="concept-gallery">
+    <div class="concept-gallery concept-gallery--stacked">
       <figure>
-        <img src="{{ '/concepts/assets/atmospheric-scoop-divers/scoop_craft_chatgpt.png' | relative_url }}" alt="Atmospheric scoop craft diving into the upper atmosphere to harvest volatiles" />
-        <figcaption>Scoop craft concept during an atmospheric collection pass.</figcaption>
+        <img src="{{ '/concepts/assets/atmospheric-scoop-divers/scoop_parts.png' | relative_url }}" alt="Diagram labeling the main parts of an atmospheric scoop diver" />
+        <figcaption>Parts diagram for the atmospheric scoop diver.</figcaption>
+      </figure>
+      <figure>
+        <img src="{{ '/concepts/assets/atmospheric-scoop-divers/scoop_tilt.png' | relative_url }}" alt="Rotational stability diagram for an atmospheric scoop diver" />
+        <figcaption>Rotational stability diagram for the atmospheric scoop diver.</figcaption>
       </figure>
       <figure>
         <img src="{{ '/concepts/assets/atmospheric-scoop-divers/orbital-scoop-svgs/11_deep_nitrogen_split_scoop.svg' | relative_url }}" alt="Deep nitrogen split-scoop orbital architecture" />
         <figcaption>Deep nitrogen split-scoop architecture. <a href="{{ '/concepts/assets/atmospheric-scoop-divers/orbital-scoop-svgs/index.html' | relative_url }}">View the full orbital architecture gallery</a>.</figcaption>
       </figure>
     </div>
+  </section>
+
+  <section class="concept-page__section">
+    <h2>What I don't know</h2>
+    <p>
+      I'm legitimately unsure if this specific form has been described in other papers. I have seen a diagram of collection using elliptical orbits, but they seemed to be incorrectly labeled or else missed something in dissemination.
+    </p>
+    <p>
+      Also, the basic analysis isn't at all finished. I need to make a calculator for this where the ultimate output is mass return over time.
+    </p>
+    <p>
+      Finally, the big unknown is materials. Some numbers I can remember looking at (possibly for other variants of this) required about 15x the amount of coolant relative to the amount of gas collected. This means you'll need about 15 passes before doubling that mass, and more for the structural mass payoff. I do think it will be less than this, but even optimistically we would be looking at a dozen passes for payoff. Getting a sense of hypersonic material use with cooling is hard, but Starship might give a good reference very soon!
+    </p>
   </section>
 
   <section class="concept-page__section">
