@@ -278,6 +278,25 @@
     color: $grey-color;
 }
 
+.ai-use {
+    margin: ($spacing-unit / 4) 0;
+}
+
+.ai-use summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: $grey-color-dark;
+}
+
+.ai-use summary:hover,
+.ai-use summary:focus {
+    color: $text-color;
+}
+
+.ai-use > :last-child {
+    margin-bottom: 0;
+}
+
 .home-links {
     list-style: none;
     margin: 0;

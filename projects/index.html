@@ -41,10 +41,6 @@ permalink: /projects/
 </style>
 
 <div class="achievements-page">
-  <nav class="achievements-nav" aria-label="Game navigation">
-    <a class="achievements-nav__link" href="{{ '/' | relative_url }}">&larr; Back to home</a>
-  </nav>
-
   <header class="achievements-hero">
     <div class="achievements-hero__art">
       <img src="{{ '/projects/minesweeper/flag.png' | relative_url }}" alt="Land Mine Mapper flag icon" width="64" height="64" />
@@ -57,6 +53,13 @@ permalink: /projects/
       <p>Track your victories, puzzle streaks, and hoops dominance all in one place.</p>
     </div>
   </header>
+
+  <details class="achievements-management ai-use">
+    <summary>AI use</summary>
+    <p class="achievements-management__intro">
+      Land Mine Mapper and Word Jumble were originally games I wrote by hand on my website around 2015. I did Word Jumble after I got the problem wrong in a developer interview. Once the AI models got good enough, I took the existing code and added achievements and leaderboards, then did true vibecoding of new games.
+    </p>
+  </details>
 
   <section class="achievements-grid" aria-label="Game progress summary">
     <article class="achievement-card" data-game="minesweeper">
@@ -143,17 +146,13 @@ permalink: /projects/
       </table>
       <p id="castleEmpty" class="achievement-empty" hidden>Walk the walls of Beldane Keep to begin recording your chronicles.</p>
       <p class="achievement-card__footnote">Need a nudge? Consult the <a href="{{ '/projects/castle-ledger/spoilers.html' | relative_url }}">Castle Ledger spoilers</a>.</p>
-      <div class="management-card__controls" style="margin-top: 0.75rem;">
-        <button id="castleLedgerClearAll" type="button" class="management-clear management-clear--danger">Clear All Castle Ledger Data</button>
-      </div>
-      <p id="castleLedgerClearMessage" class="management-message" role="status" aria-live="polite"></p>
     </article>
   </section>
 
   <section class="projects-dlc-showcase" aria-labelledby="projectsDlcHeading">
     <div>
       <h2 id="projectsDlcHeading" class="projects-dlc-showcase__heading">Castle Ledger DLC</h2>
-      <p>Two new expansion areas are on the way.</p>
+      <p>Two new expansion areas are now live! They cost me a coffee's worth of tokens, but they'll cost you nothing but alanbucks.</p>
     </div>
     <div class="projects-dlc-showcase__grid">
       <figure class="projects-dlc-banner">
@@ -245,6 +244,13 @@ permalink: /projects/
       <p>Remove stored run history and unlock progress for the basketball sim.</p>
       <button id="manageBasketballReset" type="button" class="management-clear">Clear Basketball Runs</button>
       <p id="manageBasketballMessage" class="management-message" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="management-card" data-manage="castle-ledger">
+      <h3>Castle Ledger Data</h3>
+      <p>Remove Castle Ledger progress, alanbucks, DLC installs, and campaign state.</p>
+      <button id="castleLedgerClearAll" type="button" class="management-clear management-clear--danger">Clear All Castle Ledger Data</button>
+      <p id="castleLedgerClearMessage" class="management-message" role="status" aria-live="polite"></p>
     </div>
   </section>
 </div>
