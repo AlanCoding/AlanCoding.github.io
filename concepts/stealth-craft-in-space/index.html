@@ -18,21 +18,24 @@ permalink: /concepts/stealth-craft-in-space/
   </header>
 
   <section class="concept-page__section">
-    <h2>Notes</h2>
+    <h2>Basic Idea</h2>
     <p>
-      A spacecraft in the inner solar system is hard to hide because sunlight illuminates it. If the craft simply absorbs sunlight, it must eventually dump that energy as infrared radiation, making it detectable. If it reflects sunlight, it also creates an occultation to anything behind it. So the engineering problem is not “make an invisible ship,” but more narrowly: <strong>how can a spacecraft avoid absorbing most of the solar power that falls on its cross-section?</strong>
+      A spacecraft in the inner solar system is hard to hide because sunlight illuminates it. If the craft simply absorbs sunlight, it will eventually dump that energy as infrared radiation, which extremely good telescopes can detect. If it reflects sunlight, it also creates an occultation to anything behind it. Optical cloaking is bad science. Better to start from a thermodynamic standpoint, and realize you mainly want to "cloak" against the sunlight which is a limited angular range, and is possible.
     </p>
     <p>
-      The simplest good design is a <strong>sunward mirror-reflector craft</strong>. It points a highly reflective mirror at the Sun and throws most of the incident sunlight back roughly toward the Sun instead of letting it hit the spacecraft body. This does not preserve the solar beam behind the vehicle, so occultations are detectable, but it greatly reduces the absorbed heat load if the mirror is good.
+      The simplest good design is a <strong>sunward mirror-reflector craft</strong>. It points a highly reflective mirror at the Sun and throws most of the incident sunlight back roughly toward the Sun instead of letting it hit the spacecraft body. This does not preserve the solar beam behind the vehicle, so occultations are detectable, but it greatly reduces the absorbed heat load.
     </p>
     <p>
-      A more extreme variant of the same idea is the <strong>long, narrow reflector craft</strong>, with a length-to-diameter ratio around <strong>60</strong>. In that case, the front still handles the main solar flux, but any leakage or grazing illumination along the hull strikes at very shallow angles. If mirror absorption falls strongly at low grazing angles, the absorption fraction can be orders of magnitude lower, with the ratio of 60 being optimized for maximum volume divided by heat input. This is a non-obvious conclusion. Future mirror designs are unlikely to change the fundamental effect.
+      A more extreme variant of the same idea is the <strong>long, narrow reflector craft</strong>, with a length-to-diameter ratio around <strong>60</strong>. In that case, the front still handles the main solar flux, but any leakage or grazing illumination along the hull strikes at very shallow angles. Mirror absorption falls by orders-of-magnitude at low grazing angles. So the absorption fraction can be much lower, with the ratio of 60 being optimized volume-to-heat-input. This was a non-obvious conclusion of my research. Future mirror designs are unlikely to change the fundamental tradeoff.
     </p>
     <p>
       The most ambitious design is the <strong>pass-through mirror craft</strong>, or inverse-hourglass geometry. Instead of reflecting sunlight back sunward, mirrors route incoming sunlight inward through a central throat and then back outward so that it exits behind the craft inside the original solar angular cone. The spacecraft structure occupies the dark region outside that hourglass-shaped light path, so the hull stays in shadow while the sunlight is passed around the payload. In the ideal parallel-ray version this is a clean two-mirror geometry, but the real Sun has a finite angular radius, so some rays form displaced “skirts” that must be corrected with additional mirror surfaces. That makes it harder than the simple reflector, but it is conceptually the strongest design for stealth because it eliminates most optical evidence that anything was there.
     </p>
+    <p>
+      All of these designs would be coupled with an internal heat sink of cryogenic fluid, so that it is zero emissions. Alternatively, a small offgassing as the cryogenic fluid boils would allow much longer dwell time. All of these also rely on very large stand-off distances and a passive trajectory, so these are more like cold war silos than fighters of a hot war. Ideally we don't have any kind of war, but understanding the physics of power projection in space might help us develop strategies to avoid the need for them.
+    </p>
     <div class="concept-gallery concept-gallery--stacked">
-      <h3 class="concept-gallery__heading">Long-Tube Design: Cryogenic Reflector</h3>
+      <h3 class="concept-gallery__heading">Cryogenic Reflector</h3>
       <figure>
         <img src="{{ '/concepts/assets/stealth-craft-in-space/1_cryo_reflector.png' | relative_url }}" alt="Cryogenic reflector concept for reducing spacecraft detectability" />
         <figcaption>Cryogenic reflector variant.</figcaption>
@@ -44,12 +47,25 @@ permalink: /concepts/stealth-craft-in-space/
         <figcaption>Top oblique render of the long-tube geometry.</figcaption>
       </figure>
 
-      <h3 class="concept-gallery__heading">Long-Tube Design: Pass-Through Geometry</h3>
+      <h3 class="concept-gallery__heading">Inverted Hourglass Design: Pass-Through Geometry</h3>
       <figure>
         <img src="{{ '/concepts/assets/stealth-craft-in-space/4b_hourglass_beta_1p0_extremal.png' | relative_url }}" alt="Hourglass stealth geometry showing a pass-through optical layout" />
         <figcaption>Hourglass pass-through geometry.</figcaption>
       </figure>
     </div>
+  </section>
+
+  <section class="concept-page__section">
+    <h2>What I don't know</h2>
+    <p>
+      I drove myself a bit crazy trying to understand if beam divergence could be corrected for. I got my basic answer: it can be. The simulations in the git repo are relatively developed for this, but they never reached 100% beam recovery in the Monte Carlo simulations, because I believe that the correction mirrors have to be curved to do this. If this sounds fun to you, I'm letting you know that the floor is wide open to publish a complete mirror geometry.
+    </p>
+    <p>
+      In the mirror tube design I have, the back-reflection part is also just intuitively distasteful. You can see it in the above image if you look closely: some beams go past the throat and then back to reflect off the throat. I <em>suspect</em> (but I do not know) that this can be accomplished in a dramatically more elegant way by curving the main mirrors slightly (towards the edges??).
+    </p>
+    <p>
+      An optics PhD, I assume, could figure this out. But I'll tell you that ChatGPT current models sure can't figure it out. Getting an AI with better geometric awareness and skill at optics should totally be possible, even modern advanced models really collapse on this problem when you press them.
+    </p>
   </section>
 
   <section class="concept-page__section">

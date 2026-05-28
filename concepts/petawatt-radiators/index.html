@@ -24,6 +24,30 @@ permalink: /concepts/petawatt-radiators/
   </header>
 
   <section class="concept-page__section">
+    <h2>Basic Idea</h2>
+    <p>
+      I have a particular bone to pick that Dyson Swarms are a concept that misses most of the point. I wrote about this in <a href="https://medium.com/@alanse/the-problem-with-dyson-spheres-38f524315495">The Problem with Dyson Spheres</a>. It goes in the right direction that space-faring civilizations will appear more as a warm blob to our telescopes than anything else. However, the swarm itself is the radiator in that case. It also fails in the goal of having density.
+    </p>
+    <p>
+      Working on other concepts, specifically large microgravity habitats, I find myself arriving at the same problem from the other direction. The volume-to-surface-area ratio requires a separate radiator at some point, at which point the radiator becomes the dominant physical feature. Importantly, however, the design of such a large radiator becomes deeply awkward and uncomfortable. Coolant loops are generally awful, and abandon the benefits of vacuum. However, moving mass through vacuum introduces the problem of crossing pressure boundaries.
+    </p>
+    <p>
+      After much thinking, I've concluded there is no "clever trick" to this problem. The universe itself demands that the radiator will be awkward and physically dominating, so we should accept it and lean into the analysis. We have batch processes, which every engineer hates. Only 1 design avoids this, and it commits the greatest sin imaginable, which is adding another stage of radiative heat transfer. So say "thanks, I hate it", dig in, and you'll love to hate it.
+    </p>
+
+    <h3>Need for Concentrating Radiator</h3>
+    <p>
+      In a Dyson Swarm, the entire 1 AU sphere is the radiator. I find this very unsatisfying, because it requires that the computation is distributed throughout that space. If you are trying to build the most powerful computer possible, then you've left an optimization on the table, due to introducing latency limited by speed-of-light, and <a href="https://en.wikipedia.org/wiki/Amdahl%27s_law">Amdahl's Law</a> is pretty fundamental.
+    </p>
+    <p>
+      Humans exhibit this same propensity by concentrating in cities even when this carries financial disincentives like high rent. Whatever our future society is, density will still be a premium. So we should assume there is incentive to create a 3D space where energy-intensive activities are happening. Additional intentional structures to transport that heat out will therefore be justified.
+    </p>
+    <p>
+      Coolant loops don't work on this scale, you need to make use of the low-friction vacuum you're already in, even with the additional complications that poses to get the energy back into pressurized space. Fe-Ni is the natural material baseline because it is abundant in asteroids and can be used with minimal processing. So now we're talking about large roadways of great big blocks of metal going in and out of the city so that the city can burn brighter.
+    </p>
+  </section>
+
+  <section class="concept-page__section">
     <h2>Visuals</h2>
     <p>
       These are renders of moving solid radiator loops, where the cold-tour of all rings combined produces a spherical shape. These are sparse (as opposed to layered) ribbon loops, because that is easier to visualize. A space city sits in the middle, behind the solar panels. The visualization is agnostic of the design of ribbon heat transfer to the city.
@@ -41,28 +65,7 @@ permalink: /concepts/petawatt-radiators/
   </section>
 
   <section class="concept-page__section">
-    <h2>Basic Design Directions</h2>
-    <p>
-      At sufficient scale, the core problem for a space habitat (and at this point I prefer to call it a city) is <strong>concentrated low-temperature heat rejection</strong>. A large habitat may contain enormous industry, atmosphere, and rotating artificial-gravity structures, but all of its waste heat still has to cross some boundary and radiate to space.
-    </p>
-    <p>
-      Small spacecraft solve this with coolant loops and fixed radiators. Small habitat concepts, less than roughly a billion people, can avoid the problem by assuming the hull itself has enough surface area, or by limiting the power use to whatever the surface area can reject. This idea starts where the heat production inside of a volume exceeds the ability of its surface area to radiate that heat away. This is the point at which the radiator starts to become the largest physical part.
-    </p>
-
-    <h3>Need for Concentrating Radiator</h3>
-    <p>
-      In a Dyson Swarm, the entire 1 AU sphere is the radiator. I find this very unsatisfying, because it requires that the computation is distributed throughout that space. If you are trying to build the most powerful computer possible, then you've left an optimization on the table, due to introducing latency limited by speed-of-light, and <a href="https://en.wikipedia.org/wiki/Amdahl%27s_law">Amdahl's Law</a> is pretty fundamental.
-    </p>
-    <p>
-      Humans exhibit this same propensity by concentrating in cities even when this carries financial disincentives like high rent. Whatever our future society is, density will still be a premium. So we should assume there is incentive to create a 3D space where energy-intensive activities are happening. Additional intentional structures to transport that heat out will therefore be justified.
-    </p>
-    <p>
-      Coolant loops don't work on this scale, you need to make use of the low-friction vacuum you're already in, even with the additional complications that poses to get the energy back into pressurized space. Fe-Ni is the natural material baseline because it is abundant in asteroids and can be used with minimal processing. So now we're talking about large roadways of great big blocks of metal going in and out of the city so that the city can burn brighter.
-    </p>
-    <p>
-      Other radiator concepts might not do this, but what they enable just is not as grand. So this is worth some thought.
-    </p>
-
+    <h2>Design Directions</h2>
     <h3>Cold-Tour Design</h3>
     <p>
       The first design decision is the cold-tour metal movement pattern. This is how the hot metal leaves the city, spends time out in vacuum radiating, and then comes back cold enough to be useful again.
@@ -92,6 +95,22 @@ permalink: /concepts/petawatt-radiators/
       <li><strong>Layered ribbons:</strong> stack more transfer passes near the city even if the outer cold-tour stays sparse.</li>
       <li><strong>Extra folding for kites:</strong> for kite designs, another layer of folding might be used so they turtle up during transit to and from the city.</li>
     </ul>
+  </section>
+
+  <section class="concept-page__section">
+    <h2>What I don't know</h2>
+    <p>
+      One critical variable for the <em>conduction</em> option is how energy-efficient it is to stop and start movement of the metal blocks. We can get fairly high regenerative braking in EVs, but a future space civilization might be able to get nearly 100% efficiency by using the kinetic energy of the incoming blocks to accelerate the outgoing blocks. This would allow conduction designs even in the cases where kinetic energy is greater than thermal energies. I also don't know if this is a good idea.
+    </p>
+    <p>
+      Traffic management is also a major concern, and that is a real head-scratcher. Ribbons, if not going through a full-stop phase, could be going at tremendous speeds, and how you maintain alignment is unclear.
+    </p>
+    <p>
+      I also don't know what assumptions are safe for designs using airlocks.
+    </p>
+    <p>
+      Additionally, I haven't really done a proper analysis and writeup.
+    </p>
   </section>
 
   <section class="concept-page__section">
