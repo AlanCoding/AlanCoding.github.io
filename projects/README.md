@@ -11,5 +11,6 @@ Planning entry point:
 - `word-jumble/` &mdash; a letter unscrambler powered by pre-generated XML dictionaries.
 - `basketball/` &mdash; a WebGL2 rapid-fire free throw simulator with hundreds of colliding balls.
 - `castle-ledger/` &mdash; a narrative ledger adventure tracking your cookies as you explore Beldane Keep.
+- Track Planet now lives in the sibling `gravity-games` repo and is expected to deploy at `/gravity-games/#track-planet`.
 
 Additional prototypes will land here over time as they are dusted off or built.
