@@ -4,23 +4,21 @@ title: About
 permalink: /about/
 ---
 
-<nav class="achievements-nav" aria-label="About navigation">
-  <a class="achievements-nav__link" href="{{ '/' | relative_url }}">&larr; Back to home</a>
-</nav>
-
-<h1>About</h1>
+<h1>Alan Rominger</h1>
 
 This is my static-files only web presence (I have shut down a few hosted services).
-Some of it traces all the way back to doing the Iron Yard in 2015.
+Some of it traces back to doing the Iron Yard in 2015.
 Other stuff here is recent AI-generated fun things.
 I originally studied nuclear engineering, but work in enterprise software now.
 My hobbyist interest is space concepts for the future involving heavy physics.
 
-## Profiles
+## Contact
 
-- [LinkedIn](https://www.linkedin.com/in/alan-rominger-40236518)
-- [GitHub](https://github.com/AlanCoding)
-- [Physics Stack Exchange](http://physics.stackexchange.com/users/1255/alan-rominger)
+If you send me a message on [LinkedIn](https://www.linkedin.com/in/alan-rominger-40236518) I should see it, I just need to think it's from a real human to not ignore it. Personal email is alan (dot) rominger at gmail, which I also get things at.
+
+My GitHub profile is [AlanCoding](https://github.com/AlanCoding).
+
+I have also spent time on [Physics Stack Exchange](http://physics.stackexchange.com/users/1255/alan-rominger).
 
 ## Things I've Worked On
 

@@ -3,13 +3,7 @@ title: AlanCoding (github) homepage
 email: alan.rominger@gmail.com
 
 description: > # this means to ignore newlines until "baseurl:"
-  This is my base github site, and project home.
-  I will have plenty of projects to exhibit here
-  and content to share, once my hosting and posting environment
-  has stabilized a little.
-  Jekyll seems to solve a problem that I've always had building
-  static sites, but wanting just a little bit of automated
-  aggregation.
+  This is my personal Jekyll static files base.
 
 # More things which are YAML-y
 baseurl: "" # the subpath of your site, e.g. /blog

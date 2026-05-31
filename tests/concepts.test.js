@@ -14,9 +14,9 @@ async function readSiteFile(relativePath) {
 
 test('home page lists the concept section and links to each breakout page', async () => {
   const html = await readSiteFile('index.html');
-  assert.match(html, /Original Space Concepts/);
-  assert.match(html, /🌀🌬️ Flow Dividers for Artificial Gravity in Air/);
-  assert.match(html, /Kardashev range: 0\.73–1\.7/);
+  assert.match(html, /Space Concepts/);
+  assert.match(html, /🧅🛞 Flow Dividers for Artificial Gravity in Air/);
+  assert.match(html, /relevance and impact is the highest for the flow dividers/);
   assert.match(html, /\/concepts\/flow-dividers\//);
   assert.match(html, /\/concepts\/self-gravity-walls\//);
   assert.match(html, /\/concepts\/l1-diamond-stabilizer\//);
