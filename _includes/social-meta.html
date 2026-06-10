@@ -1,0 +1,20 @@
+{% assign social_title = page.seo_title | default: page.title | default: site.title %}
+{% assign social_description = page.seo_description | default: page.description | default: page.excerpt | strip_html | strip_newlines | truncate: 160 | default: site.description %}
+{% assign social_url = page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url %}
+{% assign social_image = page.seo_image | default: page.image | default: site.image %}
+{% assign social_type = page.seo_type | default: 'website' %}
+
+<meta name="description" content="{{ social_description }}">
+<meta property="og:title" content="{{ social_title }}">
+<meta property="og:description" content="{{ social_description }}">
+<meta property="og:type" content="{{ social_type }}">
+<meta property="og:url" content="{{ social_url }}">
+{% if social_image %}
+<meta property="og:image" content="{{ social_image | prepend: site.baseurl | prepend: site.url }}">
+{% endif %}
+<meta name="twitter:card" content="{% if social_image %}summary_large_image{% else %}summary{% endif %}">
+<meta name="twitter:title" content="{{ social_title }}">
+<meta name="twitter:description" content="{{ social_description }}">
+{% if social_image %}
+<meta name="twitter:image" content="{{ social_image | prepend: site.baseurl | prepend: site.url }}">
+{% endif %}
