@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { access, readFile, readdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -53,4 +53,36 @@ test('external concept pages include the requested outbound links', async () => 
   assert.match(stealthHtml, /https:\/\/medium\.com\/@alanse\/stealth-by-a-long-tube-d0bad90368b9/);
   assert.match(stealthHtml, /https:\/\/github\.com\/AlanCoding\/hourglass-stealth/);
   assert.match(radiatorHtml, /https:\/\/github\.com\/AlanCoding\/cold_civ/);
+});
+
+test('scoop page separates the cooled diver from the aerocycler using the supplied outline', async () => {
+  const html = await readSiteFile('concepts/atmospheric-scoop-divers/index.html');
+  assert.doesNotMatch(html, /<h2>Basic Idea<\/h2>/);
+  const abep = html.indexOf('>ABEP</a>');
+  const cooled = html.indexOf('<h2>Actively-Cooled Scoop Diver</h2>');
+  const unknowns = html.indexOf('<h3>What I don\'t know</h3>');
+  const transition = html.indexOf('While I am fairly sure');
+  const aerocycler = html.indexOf('<h2>Aerocycler</h2>');
+  assert.ok(abep >= 0 && abep < cooled && cooled < unknowns && unknowns < transition && transition < aerocycler);
+  assert.match(html, /\/concepts\/polar-aerocycler\//);
+  assert.match(html, /electromagnetic wings/);
+  assert.match(html, /github\.com\/AlanCoding\/orbital-shape-sim\/tree\/devel\/docs\/aerocycler_27day/);
+});
+
+test('aerocycler is a standalone static page with all runtime assets and source-backed downloads', async () => {
+  const base = 'concepts/polar-aerocycler';
+  const html = await readSiteFile(`${base}/index.html`);
+  assert.ok(html.startsWith('<!doctype html>'));
+  assert.match(html, /27\.4413/);
+  assert.match(html, /id="space"/);
+  assert.match(html, /\/concepts\/atmospheric-scoop-divers\//);
+  assert.match(html, /https:\/\/github\.com\/AlanCoding\/orbital-shape-sim\/tree\/devel\/docs\/aerocycler_27day/);
+  assert.match(html, /raw\.githubusercontent\.com\/AlanCoding\/orbital-shape-sim\/devel\/docs\/aerocycler_27day\/data\/trajectory\.csv/);
+  const attributes = [...html.matchAll(/(?:href|src)="([^"]+)"/g)].map(match => match[1]);
+  for (const url of attributes) {
+    if (/^(?:https?:|#)/.test(url)) continue;
+    await access(path.join(root, url.startsWith('/') ? url.slice(1) : `${base}/${url}`));
+  }
+  const files = await readdir(path.join(root, base), { recursive: true });
+  assert.equal(files.filter(name => /\.(html|css|js|png|svg)$/.test(name)).length, 14);
 });

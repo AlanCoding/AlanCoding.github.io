@@ -17,15 +17,18 @@ permalink: /concepts/atmospheric-scoop-divers/
     <h1>🚀🐋 Atmospheric Scoop Divers</h1>
     <p class="concept-page__scale">Kardashev range: 0.8–1.8</p>
     <p class="concept-page__lede">
-      Instead of treating Earth only as a launch well, this idea treats the atmosphere as a resource layer. Fast scoop vehicles could dive deep, harvest volatiles, and move them outward for orbital or lunar industry.
+      The broader idea of atmospheric scoops is to collect gas and gain momentum from an orbiting craft interacting with atmosphere. These are my very special variations on fast-pass versions.
     </p>
   </header>
 
   <section class="concept-page__section">
-    <h2>Basic Idea</h2>
     <p>
       <a href="https://www.esa.int/Enabling_Support/Space_Engineering_Technology/Shaping_the_Future/Atmosphere-breathing_electric_propulsion_systems_for_very_low_orbit">ABEP</a> is an idea for capturing gas in a low Earth orbit (presumed circular) and ejecting it at higher speed to gain momentum. There is punishingly little engineering margin at the speeds involved and if it does work, it's really hard to make it work as a propellant exporter for other missions.
     </p>
+  </section>
+
+  <section class="concept-page__section" id="actively-cooled-scoop-diver">
+    <h2>Actively-Cooled Scoop Diver</h2>
     <p>
       What I am positing instead is that it might work in a non-steady-state way. That means using an elliptical orbit with a regular dive phase into atmosphere, followed by a coast phase back out of it.
     </p>
@@ -61,10 +64,7 @@ permalink: /concepts/atmospheric-scoop-divers/
         <figcaption>Deep nitrogen split-scoop architecture. <a href="{{ '/concepts/assets/atmospheric-scoop-divers/orbital-scoop-svgs/index.html' | relative_url }}">View the full orbital architecture gallery</a>.</figcaption>
       </figure>
     </div>
-  </section>
-
-  <section class="concept-page__section">
-    <h2>What I don't know</h2>
+    <h3>What I don't know</h3>
     <p>
       I'm legitimately unsure if this specific form has been described in other papers. I have seen a diagram of collection using elliptical orbits, but they seemed to be incorrectly labeled or else missed something in dissemination.
     </p>
@@ -76,10 +76,39 @@ permalink: /concepts/atmospheric-scoop-divers/
     </p>
   </section>
 
+  <section class="concept-page__section" id="aerocycler">
+    <p>
+      While I am fairly sure the actively-cooled scoop diver is the winning design, I believe I have made some legitimate progress on another alternative which looks better but is worse in practice.
+    </p>
+    <h2>Aerocycler</h2>
+    <p>
+      The Earth–Moon system has free energy. So if you've ever asked if a fully passive spacecraft can extract that energy, I'm here for you. Our challenge is to avoid proposing a megastructure, which is basically my MO. Can you, instead, do it with a microsat? Because that should get us excited. And yes. It seems this is possible.
+    </p>
+    <p>
+      The physical mechanism we will exploit here is <em>lift</em>. In a nearly-polar pass by Earth, we will use the west-east motion of the gas around the equator to nudge the spacecraft to the "side" relative to the direction it is traveling. In layman's terms, the spacecraft grazes the atmosphere, and its wings lift it to the right. This is a direction specifically chosen so that a later Moon pass by will both restore the orbit to its original parameters and add energy to the orbit.
+    </p>
+    <p>
+      I can't articulate this well in text, or even in a picture. You <em>have</em> to grab and drag to understand the picture.
+    </p>
+    <p>
+      <a href="{{ '/concepts/polar-aerocycler/' | relative_url }}">Explore the aerocycler orbit in 3D</a>
+    </p>
+    <p>
+      This orbit looks trollishly simple. I personally spent years back-and-forth on exactly how you might be able to construct an aerocycler orbit, or even if you could! I experimented with every possible orbital resonance and backflips (no really, this is in literature). In the end, GPT Astra and Sol found a 1:1 resonance that solved it. This uses an extremely <em>distant</em> pass, which suits us fine. The problem of viability is shot when you require a lunar <em>close</em> pass closer than its radius, which won't work for obvious reasons.
+    </p>
+    <p>
+      This has a required L/D of 20-something, which comes from basic theory. It relates to dividing the Moon's orbital period by Earth's rotation period (the length of a month is 30-ish days). This is completely out of the question for hypersonics. However, it's not totally disproven to be possible by magnetic ion deflection. The ion population is only something like ~4%. Again, most of the stuff is the atomic oxygen which nobody wants. So you might be able to deflect that 4% of ions by a simple magnetic field at a low deflection angle, and then, well, we can't say this won't work. Not for sure.
+    </p>
+    <p>
+      Assuming the spacecraft design works for that L/D and you have extra margin to work with, you can collect gases, powered by the rotation of the Earth. Nonetheless, I think required collection area is probably really bad. This is likely inferior to the actively-cooled scoop diver for real industrial use. This could also be called a scoop diver, with electromagnetic wings.
+    </p>
+  </section>
+
   <section class="concept-page__section">
     <h2>Links</h2>
     <ul class="concept-page__links">
       <li><a href="{{ '/2025/10/08/l1-diamond-nitrogen-factory.html' | relative_url }}">L1 diamond and nitrogen factory post</a> - I do not think the writing is very good yet; it is more of a TODO.</li>
+      <li><a href="https://github.com/AlanCoding/orbital-shape-sim/tree/devel/docs/aerocycler_27day">Aerocycler source and numerical verification</a></li>
     </ul>
   </section>
 </div>
