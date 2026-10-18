@@ -7,6 +7,12 @@
   <title>A polar return · 27.4413-day aerocycler</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    .breadcrumbs { display: block; padding-top: 20px; color: var(--muted); font-size: 12px; }
+    .breadcrumbs ol { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 0; padding: 0; list-style: none; }
+    .breadcrumbs li { display: flex; align-items: center; gap: 10px; }
+    .breadcrumbs li + li::before { content: "/"; color: var(--muted); }
+    .breadcrumbs a { font-size: inherit; }
+    .breadcrumbs [aria-current="page"] { color: var(--ink); }
     /* Keep both control columns inside narrow phone viewports. */
     @media (max-width: 680px) {
       .controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
@@ -21,6 +27,13 @@
   <script defer src="viewer.js"></script>
 </head>
 <body>
+  <nav class="breadcrumbs wrap" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="/concepts/">Space Concepts</a></li>
+      <li><a href="/concepts/atmospheric-scoop-divers/">Atmospheric Scoop Divers</a></li>
+      <li><span aria-current="page">Polar Aerocycler</span></li>
+    </ol>
+  </nav>
   <header class="masthead wrap">
     <a href="#" class="wordmark"><span class="orbit-icon" aria-hidden="true">◌</span> ORBIT NOTE <span class="muted">/ 01</span></a>
     <nav aria-label="Page"><a href="#explore">Explore</a><a href="#geometry">Geometry</a><a href="#maneuver">The maneuver</a><a href="#verify">Verify</a></nav>
@@ -105,7 +118,7 @@
       <div class="downloads"><a href="https://github.com/AlanCoding/orbital-shape-sim/blob/devel/docs/aerocycler_27day/TECHNICAL.md"><span>Technical verification note</span><small>Markdown · equations & conditions ↗</small></a><a href="https://raw.githubusercontent.com/AlanCoding/orbital-shape-sim/devel/docs/aerocycler_27day/data/initial_conditions.json" download><span>Fixed initial condition</span><small>JSON · full precision ↓</small></a><a href="https://raw.githubusercontent.com/AlanCoding/orbital-shape-sim/devel/docs/aerocycler_27day/data/verification.json" download><span>Verification & bank ledger</span><small>JSON · residuals & units ↓</small></a><a href="https://raw.githubusercontent.com/AlanCoding/orbital-shape-sim/devel/docs/aerocycler_27day/data/trajectory.csv" download><span>Trajectory in three frames</span><small>CSV · positions & velocities ↓</small></a><a href="https://raw.githubusercontent.com/AlanCoding/orbital-shape-sim/devel/docs/aerocycler_27day/data/bank.csv" download><span>Aerodynamic turn samples</span><small>CSV · lift, drag & local L/D ↓</small></a><a href="https://raw.githubusercontent.com/AlanCoding/orbital-shape-sim/devel/docs/aerocycler_27day/reproduce.py" download><span>Standalone reproduction script</span><small>Python · no optimizer ↓</small></a></div>
     </section>
   </main>
-  <footer class="wrap">Polar aerocycler / numerical orbit note · 2026-10-17 <a href="/concepts/atmospheric-scoop-divers/">Back to atmospheric scoop divers</a> <a href="https://github.com/AlanCoding/orbital-shape-sim/tree/devel/docs/aerocycler_27day">Source & verification</a></footer>
+  <footer class="wrap">Polar aerocycler / numerical orbit note · 2026-10-17 <a href="/concepts/atmospheric-scoop-divers/">Back to atmospheric scoop divers</a> <a href="/concepts/">Back to Space Concepts</a> <a href="https://github.com/AlanCoding/orbital-shape-sim/tree/devel/docs/aerocycler_27day">Source & verification</a></footer>
   <noscript><p class="wrap">Enable JavaScript for the 3D viewer. All figures and downloadable data remain available below.</p></noscript>
 </body>
 </html>

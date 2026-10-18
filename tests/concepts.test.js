@@ -94,3 +94,18 @@ test('aerocycler is a standalone static page with all runtime assets and source-
   const files = await readdir(path.join(root, base), { recursive: true });
   assert.equal(files.filter(name => /\.(html|css|js|png|svg)$/.test(name)).length, 14);
 });
+
+test('aerocycler backlinks follow the concept hierarchy', async () => {
+  const html = await readSiteFile('concepts/polar-aerocycler/index.html');
+  const breadcrumb = html.match(/<nav class="breadcrumbs wrap" aria-label="Breadcrumb">([\s\S]*?)<\/nav>/)?.[1];
+  assert.ok(breadcrumb);
+  const ancestors = [...breadcrumb.matchAll(/<a href="([^"]+)">([^<]+)<\/a>/g)].map(match => [match[1], match[2]]);
+  assert.deepEqual(ancestors, [
+    ['/concepts/', 'Space Concepts'],
+    ['/concepts/atmospheric-scoop-divers/', 'Atmospheric Scoop Divers'],
+  ]);
+  assert.match(breadcrumb, /aria-current="page">Polar Aerocycler/);
+  const footer = html.match(/<footer[^>]*>([\s\S]*?)<\/footer>/)?.[1];
+  assert.match(footer, /href="\/concepts\/atmospheric-scoop-divers\/"/);
+  assert.match(footer, /href="\/concepts\/"/);
+});
