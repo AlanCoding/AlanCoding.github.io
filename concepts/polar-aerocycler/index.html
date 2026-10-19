@@ -13,6 +13,7 @@
     .breadcrumbs li + li::before { content: "/"; color: var(--muted); }
     .breadcrumbs a { font-size: inherit; }
     .breadcrumbs [aria-current="page"] { color: var(--ink); }
+    .bank-figure figcaption { padding: 11px 17px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); }
     /* Keep both control columns inside narrow phone viewports. */
     @media (max-width: 680px) {
       .controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
@@ -42,16 +43,16 @@
     <section class="intro wrap">
       <div class="eyebrow"><span class="status-dot"></span> EARTH–MOON SYSTEM · IMPULSIVE REDUCED MODEL</div>
       <h1>A polar pass.<br>A return in <span>27.44 days.</span></h1>
-      <p class="lede">A near-polar trajectory that returns to Earth's atmosphere, using an eastward aerodynamic turn to extract energy from planetary rotation. One specific numerical solution, open for inspection.</p>
+      <p class="lede">A near-polar trajectory that returns to Earth's atmosphere every 27.4413 days. An eastward aerodynamic turn at each atmospheric pass extracts energy from Earth's rotation and closes the orbit in the lunar-co-moving frame.</p>
       <div class="headline-stats">
-        <div><strong>27.4413 <small>days</small></strong><span>One coast, one atmospheric bank</span></div>
+        <div><strong>27.4413 <small>days</small></strong><span>Time between atmospheric maneuvers</span></div>
         <div><strong>25.6854</strong><span>Maximum required local lift / drag</span></div>
         <div><strong>1.228°</strong><span>Largest departure from polar at the pass</span></div>
       </div>
     </section>
 
     <section class="explorer wrap" id="explore" aria-labelledby="explore-title">
-      <div class="section-line"><h2 id="explore-title">Explore the orbit</h2><span>Actual trajectory samples · no illustrative ellipse</span></div>
+      <div class="section-line"><h2 id="explore-title">Explore the orbit</h2><span>Computed trajectory over one 27.4413-day return</span></div>
       <div class="viewer-shell">
         <div class="viewer-toolbar">
           <label for="frame">Coordinates <select id="frame"><option value="rotating">Lunar-co-moving</option><option value="earth">Earth-centered, non-rotating</option><option value="barycentric">Barycentric inertial</option></select></label>
@@ -67,7 +68,7 @@
             </div>
             <div class="control-block"><div class="control-title">AT THE INSTANTANEOUS BANK</div>
               <div class="button-row"><button id="incoming">Incoming</button><button id="outgoing">Outgoing</button></div>
-              <p class="hint">Both states occur at the same position. The bank has no modeled duration.</p>
+              <p class="hint">The bank is the model's instantaneous atmospheric turn. Incoming and outgoing states share the return-periapsis position.</p>
             </div>
             <div class="control-block"><div class="control-title">CAMERA</div>
               <div class="button-row"><button id="orbit-mode" aria-pressed="true">Orbit</button><button id="fly-mode" aria-pressed="false">Fly</button></div>
@@ -77,7 +78,7 @@
             </div>
             <div class="control-block toggles">
               <label><input id="grid" type="checkbox" checked> Lunar / equatorial plane</label>
-              <label><input id="vectors" type="checkbox"> Bank velocity vectors</label>
+              <label><input id="vectors" type="checkbox"> Maneuver velocity vectors</label>
               <p class="hint">Bodies are true radius. Spacecraft and point markers are symbols. No vertical exaggeration.</p>
             </div>
           </aside>
@@ -93,28 +94,33 @@
         </div>
         <div class="frame-explanation" id="frame-explanation">Earth is at the origin; the Moon is fixed on +x. The trajectory closes in this frame after the bank.</div>
       </div>
-      <p class="under-note">The viewer plays one coast and stops at the return. It does not simulate stability, atmospheric flight, or propellant collection. The Earth-pass preset pauses at the return bank; zoom in to distinguish incoming and outgoing directions.</p>
+      <p class="under-note">Playback covers one coast from departure to the next Earth periapsis. The Earth pass preset pauses at the atmospheric maneuver, 100 km above the surface. Use Incoming and Outgoing to inspect the velocity before and after the turn.</p>
     </section>
 
     <section class="wrap explanation" id="geometry">
-      <div><div class="eyebrow">READING THE GEOMETRY</div><h2>Polar describes the plane,<br>not the long axis.</h2></div>
-      <div><p>The orbit is highly eccentric. Looking down the lunar orbital normal compresses its north–south motion and can make a polar orbit look nearly flat. Switch to <strong>Side XZ</strong> or rotate the 3D scene to reveal that dimension.</p><p>At the atmospheric bank, inclination changes from <strong>91.134° to 88.772°</strong>: slightly retrograde to slightly prograde, both nearly polar. Over the coast the instantaneous inclination spans approximately 81.53°–91.16°.</p><p>The nominal resonance is near <strong>1:1</strong>, not exactly one lunar month. The inertial orientation advances by about <strong>1.577° beyond a full revolution</strong> each return. Lunar-frame closure is not a fixed ellipse in inertial space.</p></div>
+      <div><div class="eyebrow">READING THE FIGURES</div><h2>Top-down and<br>side-on views</h2></div>
+      <div>
+        <p>Figures <strong>01 and 02</strong> look along Earth's rotation axis and project the trajectory onto the Earth–Moon orbital plane (XY). This projection omits height above and below that plane, giving the orbit its narrow appearance in Figure 02. Figure <strong>03</strong> shows that height in side-on XZ views. The interactive viewer starts at an oblique angle; use <strong>Top XY</strong> and <strong>Side XZ</strong> to compare these viewing directions.</p>
+        <p>The <strong>Coordinates</strong> menu selects the reference frame independently of the camera view. In the lunar-co-moving frame, Earth and Moon stay fixed. In Earth-centered non-rotating axes, the Moon moves around Earth. Both frames have top-down and side-on views.</p>
+        <p><strong>Osculating inclination</strong> is the angle between the instantaneous orbital plane inferred from the spacecraft's Earth-relative position and velocity and the Earth–Moon orbital plane. In this aligned-spin model, 90° is polar. At the atmospheric maneuver it changes from <strong>91.134° incoming to 88.772° outgoing</strong>. During the coast it spans approximately 81.53°–91.16°.</p>
+        <p>The position and post-maneuver velocity repeat in lunar-co-moving axes every <strong>27.4413 days</strong>. This is a near-<strong>1:1</strong> return: each coast lasts 1.00438 lunar months, and the orientation in non-rotating axes advances by <strong>1.577° beyond a full revolution</strong>.</p>
+      </div>
     </section>
     <section class="wrap figure-grid" aria-label="Trajectory figures">
-      <figure><a href="figures/01_lunar_frame_top.png"><img src="figures/01_lunar_frame_top.png" alt="Top-down lunar-co-moving trajectory with Earth at the origin and the Moon fixed on positive x." loading="lazy"></a><figcaption>01 / Lunar-co-moving, top view <a href="figures/01_lunar_frame_top.svg">SVG</a></figcaption></figure>
-      <figure><a href="figures/02_nonrotating_top.png"><img src="figures/02_nonrotating_top.png" alt="Top-down trajectory in Earth-centered non-rotating axes, showing the Moon's orbit." loading="lazy"></a><figcaption>02 / Non-rotating axes, top view <a href="figures/02_nonrotating_top.svg">SVG</a></figcaption></figure>
-      <figure><a href="figures/03_side_views.png"><img src="figures/03_side_views.png" alt="Equal-scale side views showing motion above and below the lunar plane." loading="lazy"></a><figcaption>03 / The out-of-plane dimension <a href="figures/03_side_views.svg">SVG</a></figcaption></figure>
-      <figure><a href="figures/04_earth_pass.png"><img src="figures/04_earth_pass.png" alt="Nearly northward incoming and outgoing Earth passages and altitude against time near periapsis." loading="lazy"></a><figcaption>04 / The Earth encounter <a href="figures/04_earth_pass.svg">SVG</a></figcaption></figure>
+      <figure><a href="figures/01_lunar_frame_top.png"><img src="figures/01_lunar_frame_top.png" alt="Top-down XY projection in lunar-co-moving axes, with Earth at the origin and the Moon fixed on positive x." loading="lazy"></a><figcaption>01 / XY, lunar-co-moving frame <a href="figures/01_lunar_frame_top.svg">SVG</a></figcaption></figure>
+      <figure><a href="figures/02_nonrotating_top.png"><img src="figures/02_nonrotating_top.png" alt="Top-down XY projection in Earth-centered non-rotating axes, showing the Moon's orbit." loading="lazy"></a><figcaption>02 / XY, Earth-centered non-rotating frame <a href="figures/02_nonrotating_top.svg">SVG</a></figcaption></figure>
+      <figure><a href="figures/03_side_views.png"><img src="figures/03_side_views.png" alt="Equal-scale XZ projections showing height above and below the lunar plane in lunar-co-moving and Earth-centered non-rotating axes." loading="lazy"></a><figcaption>03 / XZ side views in both frames <a href="figures/03_side_views.svg">SVG</a></figcaption></figure>
+      <figure><a href="figures/04_earth_pass.png"><img src="figures/04_earth_pass.png" alt="Local east/north projection of the incoming and outgoing Earth passages, alongside altitude versus time near periapsis." loading="lazy"></a><figcaption>04 / Local encounter geometry and altitude <a href="figures/04_earth_pass.svg">SVG</a></figcaption></figure>
     </section>
 
     <section class="maneuver-section" id="maneuver"><div class="wrap">
-      <div class="eyebrow">THE ENERGY EXCHANGE</div><h2>An eastward turn.<br>Not an engine burn.</h2>
-      <div class="maneuver-columns"><div><p>The spacecraft moves north at about <strong>11.03 km/s</strong>, while the atmosphere moves east at <strong>446 m/s</strong> at the pass. Lift and drag are resolved relative to that tilted airflow—not relative to geographic north and east.</p><p>Drag contributes <strong>−18.734 m/s northward</strong>; lift contributes <strong>+19.028 m/s northward</strong>. The small positive net northward change is their sum, not negative drag. Every segment of the prescribed velocity-space turn has positive drag.</p><p>The bank draws <strong>214.85 kJ/kg</strong> from Earth's rotation and dissipates <strong>207.01 kJ/kg</strong> relative to the atmosphere. Its net orbital-energy gain of <strong>7.84 kJ/kg</strong> balances the preceding coast's loss.</p></div>
-      <div class="impulse-card"><div class="control-title">NET VELOCITY CHANGE · LOCAL COMPONENTS</div><dl><div><dt>Eastward</dt><dd>+481.452 <small>m/s</small></dd></div><div><dt>Northward</dt><dd>+0.294 <small>m/s</small></dd></div><div><dt>Radially outward</dt><dd>0 <small>m/s</small></dd></div></dl><p>These are specific impulses (N·s/kg), not force in newtons. Duration, vehicle mass, and finite-flight loading are not specified.</p></div></div>
-      <figure class="bank-figure"><a href="figures/05_aerodynamic_bank.png"><img src="figures/05_aerodynamic_bank.png" alt="Continuous velocity-space bank and local lift-to-drag ratio along it." loading="lazy"></a></figure>
+      <div class="eyebrow">THE ENERGY EXCHANGE</div><h2>The atmospheric maneuver</h2>
+      <div class="maneuver-columns"><div><p>At the atmospheric pass, the spacecraft moves north at about <strong>11.03 km/s</strong>, while the atmosphere moves east at <strong>446 m/s</strong>. The turn changes the spacecraft's eastward velocity component from <strong>−231 m/s to +250 m/s</strong>. Drag acts opposite the spacecraft's velocity relative to the atmosphere; lift acts perpendicular to that relative velocity.</p><p>Drag contributes <strong>18.734 m/s southward</strong> and lift contributes <strong>19.028 m/s northward</strong>, giving a net change of <strong>0.294 m/s northward</strong>. Drag remains positive throughout the modeled turn. Figure <strong>05</strong> shows the velocity components and the local lift/drag ratio along the turn.</p><p>The maneuver draws <strong>214.85 kJ/kg</strong> from Earth's rotation and dissipates <strong>207.01 kJ/kg</strong> relative to the atmosphere. Its net orbital-energy gain of <strong>7.84 kJ/kg</strong> balances the preceding coast's loss.</p></div>
+      <div class="impulse-card"><div class="control-title">VELOCITY CHANGE PER MANEUVER · m/s</div><dl><div><dt>Eastward</dt><dd>+481.452 <small>m/s</small></dd></div><div><dt>Northward</dt><dd>+0.294 <small>m/s</small></dd></div><div><dt>Radially outward</dt><dd>0 <small>m/s</small></dd></div></dl><p>Components use local east, north, and radial directions. Vehicle mass and maneuver duration are required to convert these velocity changes into average forces. Peak loads require a finite-duration atmospheric model.</p></div></div>
+      <figure class="bank-figure"><a href="figures/05_aerodynamic_bank.png"><img src="figures/05_aerodynamic_bank.png" alt="Eastward and northward velocity components during the atmospheric turn, alongside the local lift/drag ratio." loading="lazy"></a><figcaption>05 / Velocity components and local lift/drag ratio during the atmospheric turn</figcaption></figure>
     </div></section>
 
-    <section class="wrap verify-section" id="verify"><div><div class="eyebrow">OPEN THE NUMBERS</div><h2>One orbit.<br>Enough detail to verify it.</h2><p>The technical note specifies the equations, units, six-state initial condition, event detection, closing maneuver, force decomposition, and numerical residuals. The standalone Python script does not search for or optimize an orbit.</p><p>The model is circular restricted three-body gravity with aligned spin. Collection yield, Sun, oblateness, finite atmospheric flight, and physical vehicle performance are not demonstrated here. A close lunar flyby is not needed for the proposed atmospheric-collection application.</p></div>
+    <section class="wrap verify-section" id="verify"><div><div class="eyebrow">VERIFICATION FILES</div><h2>Initial conditions,<br>trajectory data,<br>and reproduction code</h2><p>The technical note gives the equations, units, six-state initial condition, event definitions, atmospheric maneuver, force decomposition, and numerical residuals. The standalone Python script propagates the fixed initial conditions, applies the maneuver, and reports closure errors and the energy budget.</p><p>The calculation uses circular restricted three-body gravity with the primary spin axis aligned to the lunar orbital normal. Lunar gravity perturbs the coast, and an instantaneous atmospheric turn closes the return. Long-term stability, finite atmospheric flight, collection yield, and physical vehicle performance require additional analysis.</p></div>
       <div class="downloads"><a href="https://github.com/AlanCoding/orbital-shape-sim/blob/devel/docs/aerocycler_27day/TECHNICAL.md"><span>Technical verification note</span><small>Markdown · equations & conditions ↗</small></a><a href="https://raw.githubusercontent.com/AlanCoding/orbital-shape-sim/devel/docs/aerocycler_27day/data/initial_conditions.json" download><span>Fixed initial condition</span><small>JSON · full precision ↓</small></a><a href="https://raw.githubusercontent.com/AlanCoding/orbital-shape-sim/devel/docs/aerocycler_27day/data/verification.json" download><span>Verification & bank ledger</span><small>JSON · residuals & units ↓</small></a><a href="https://raw.githubusercontent.com/AlanCoding/orbital-shape-sim/devel/docs/aerocycler_27day/data/trajectory.csv" download><span>Trajectory in three frames</span><small>CSV · positions & velocities ↓</small></a><a href="https://raw.githubusercontent.com/AlanCoding/orbital-shape-sim/devel/docs/aerocycler_27day/data/bank.csv" download><span>Aerodynamic turn samples</span><small>CSV · lift, drag & local L/D ↓</small></a><a href="https://raw.githubusercontent.com/AlanCoding/orbital-shape-sim/devel/docs/aerocycler_27day/reproduce.py" download><span>Standalone reproduction script</span><small>Python · no optimizer ↓</small></a></div>
     </section>
   </main>
